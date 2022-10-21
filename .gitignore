@@ -1,0 +1,5 @@
+.cache/
+node_modules/
+.cache/_logs
+run/
+output.log
