@@ -1,6 +1,11 @@
 {
-  "watch": ["."],
+  "watch": ["./src"],
   "ext": "ts,json",
-  "ignore": ["src/**/*.spec.ts", ".cache/**", "./node_modules/**", "package-lock.json"],
-  "exec": "npm start"
+  "ignore": [
+    "src/**/*.spec.ts",
+    ".cache/**",
+    "./node_modules/**",
+    "package-lock.json"
+  ],
+  "exec": "npm run build:dev && npm run exec"
 }
