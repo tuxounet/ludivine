@@ -30,7 +30,7 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build:release
-      - run: npm run pack
+      - run: npm pack
       - name: publish artifacts
         uses: actions/upload-artifact@v3
         with:
