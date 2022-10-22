@@ -1,14 +1,13 @@
 {
   "name": "@tuxounet/ludivine",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
-  "main": "out/index.js",
+  "main": "cli/index.js",
   "bin": {
-    "ludivine": "out/index.js"
+    "ludivine": "cli/index.js"
   },
   "scripts": {
-    "exec": "ludivine",
-    "start": "node out/index.js",
+    "start": "node cli/index.js",
     "build:release": "esbuild src/index.ts --bundle --platform=node --minify --sourcemap=external --outfile=out/index.js",
     "build:dev": "esbuild src/index.ts --bundle --platform=node --sourcemap=external --outfile=out/index.js",
     "predev": "npm install --prefer-offline",
