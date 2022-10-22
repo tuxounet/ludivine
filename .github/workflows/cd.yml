@@ -17,9 +17,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
+      - run: npm run typecheck
       - run: npm run lint
       - run: npm run test
-      - run: npm run build:release
       - name: publish source
         uses: actions/upload-artifact@v3
         with:

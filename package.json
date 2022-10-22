@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node cli/index.js",
     "predev": "npm install --prefer-offline",
+    "typecheck": "tsc --noEmut",
     "dev": "nodemon",
     "dev:start": "ts-node src/index.ts",
     "lint": "eslint ./ --fix",
