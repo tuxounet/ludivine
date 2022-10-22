@@ -1,7 +1,10 @@
 name: Publish package to GitHub Packages
 on:
-  release:
-    types: [created]
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,7 +20,43 @@ jobs:
           registry-url: "https://npm.pkg.github.com"
           # Defaults to the user or organization that owns the workflow file
           scope: "@tuxounet"
+      - uses: actions/checkout@v3
+      - name: setup nodejs ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
       - run: npm ci
-      - run: npm publish
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build:release
+      - run: npm run pack
+      - name: publish artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: out
+          path: |
+            coverage/**
+            *.tgz            
+            LICENSE
+          retention-days: 30
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./*.tgz
+          asset_name: ludivine.npm.tgz
+          asset_content_type: application/gzip
