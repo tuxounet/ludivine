@@ -21,15 +21,15 @@ export abstract class ObservableElement
 
   observers: Map<string, KernelElement>;
 
-  register(observer: KernelElement) {
+  register(observer: KernelElement): void {
     this.observers.set(observer.fullName, observer);
   }
 
-  unregister(observerName: string) {
+  unregister(observerName: string): void {
     this.observers.delete(observerName);
   }
 
-  protected async notifyAll(message: IMessageEvent) {
+  protected async notifyAll(message: IMessageEvent): Promise<void> {
     const proms = [];
     for (const observer of this.observers.values()) {
       if (observer.onMessage != null) {

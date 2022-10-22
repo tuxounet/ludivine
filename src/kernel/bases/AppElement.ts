@@ -26,7 +26,7 @@ export abstract class AppElement extends KernelElement implements IAppElement {
     return rc;
   }
 
-  protected async waitForShutdown() {
+  protected async waitForShutdown(): Promise<void> {
     let loopinterval: NodeJS.Timer;
     await new Promise<void>((resolve) => {
       loopinterval = setInterval(() => {
@@ -38,7 +38,7 @@ export abstract class AppElement extends KernelElement implements IAppElement {
     });
   }
 
-  protected async onStart() {
+  protected async onStart(): Promise<void> {
     this.log.debug("onStart");
     if (this.substriptions != null) {
       await Promise.all(
@@ -50,7 +50,7 @@ export abstract class AppElement extends KernelElement implements IAppElement {
     this.log.debug("onStarted");
   }
 
-  protected async onStop() {
+  protected async onStop(): Promise<void> {
     this.log.debug("onStop");
     if (this.substriptions != null) {
       await Promise.all(
@@ -68,5 +68,5 @@ export abstract class AppElement extends KernelElement implements IAppElement {
     return 0;
   }
 
-  async onMessage(message: IMessageEvent) {}
+  async onMessage(message: IMessageEvent): Promise<void> {}
 }

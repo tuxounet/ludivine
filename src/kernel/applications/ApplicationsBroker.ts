@@ -9,9 +9,9 @@ export class ApplicationsBroker extends KernelElement {
     super("applications-broker", kernel);
   }
 
-  async initialize() {}
+  async initialize(): Promise<void> {}
 
-  async shutdown() {
+  async shutdown(): Promise<void> {
     await new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve();
@@ -23,7 +23,7 @@ export class ApplicationsBroker extends KernelElement {
     return await app.execute();
   }
 
-  async executeRootProcess() {
+  async executeRootProcess(): Promise<number> {
     const shellApp = new ShellApp(this.kernel, this);
     const rc = await this.executeAndWait(shellApp);
     return rc;

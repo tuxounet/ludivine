@@ -13,52 +13,42 @@ export class ChannelsBroker extends KernelElement {
     this.outputs = new OutputsBroker(kernel, this);
   }
 
-  async initialize() {
+  async initialize(): Promise<void> {
+    await Promise.all(this.inputs.channels.map((item) => item.initialize?.()));
+    await Promise.all(this.outputs.channels.map((item) => item.initialize?.()));
+  }
+
+  async destroy(): Promise<void> {
     await Promise.all(
-      this.inputs.channels.map(
-        (item) => item.initialize != null && item.initialize()
-      )
-    );
-    await Promise.all(
-      this.outputs.channels.map(
-        (item) => item.initialize != null && item.initialize()
-      )
+      this.inputs.channels.reverse().map((item) => item.destroy?.())
     );
   }
 
-  async destroy() {
-    await Promise.all(
-      this.inputs.channels
-        .reverse()
-        .map((item) => item.destroy != null && item.destroy())
-    );
-  }
-
-  async openAllInputs() {
+  async openAllInputs(): Promise<void> {
     await Promise.all(
       this.inputs.channels.map(async (item) => await item.open())
     );
   }
 
-  async openAllOutputs() {
+  async openAllOutputs(): Promise<void> {
     await Promise.all(
       this.outputs.channels.map(async (item) => await item.open())
     );
   }
 
-  async closeAllInputs() {
+  async closeAllInputs(): Promise<void> {
     await Promise.all(
       this.inputs.channels.map(async (item) => await item.close())
     );
   }
 
-  async closeAllOutputs() {
+  async closeAllOutputs(): Promise<void> {
     await Promise.all(
       this.outputs.channels.map(async (item) => await item.close())
     );
   }
 
-  outputOnAll = async (message: string) => {
+  outputOnAll = async (message: string): Promise<void> => {
     await Promise.all(
       this.outputs.channels.map(async (item) => await item.output(message))
     );

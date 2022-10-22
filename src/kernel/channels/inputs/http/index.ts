@@ -13,15 +13,16 @@ export class HttpInputChannel extends KernelElement implements IInputChannel {
   async initialize(): Promise<void> {
     await this.kernel.endpoints.registerRoute("GET", "/connect", (req, res) => {
       const config = {
-        clientId: req.query.id ? req.query.id : new Date().getTime(),
+        clientId:
+          req.query.id !== undefined ? req.query.id : new Date().getTime(),
       };
       res.setHeader("content-type", "application/json");
       res.send(JSON.stringify(config));
     });
 
     await this.kernel.endpoints.registerRoute("POST", "/input", (req, res) => {
-      const value = req.body && req.body.command;
-      if (!value) {
+      const value = req.body?.command;
+      if (value === undefined) {
         this.log.error("bad input", req.body);
         res.sendStatus(400);
         res.end();

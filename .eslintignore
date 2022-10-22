@@ -3,3 +3,4 @@
 **/coverage
 **/.vscode
 **/*.test.ts
+**/assets/**

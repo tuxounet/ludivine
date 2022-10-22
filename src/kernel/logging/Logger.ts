@@ -44,9 +44,7 @@ export class Logger {
       .map((item) => {
         if (typeof item === "string") return item;
         if (item instanceof Error)
-          return `${item.name}: ${item.message} ${String(
-            item.stack ? item.stack : ""
-          )}`;
+          return `${item.name}: ${item.message} ${item.stack ?? ""}`;
         return JSON.stringify(item);
       })
       .join(" ");

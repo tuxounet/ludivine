@@ -91,11 +91,8 @@ export class WebOutputChannel extends KernelElement implements IOutputChannel {
       message,
     };
 
-    this.clients.forEach(
-      (client) =>
-        client &&
-        client.res &&
-        client.res.write(`data: ${JSON.stringify([ev])}\n\n`)
+    this.clients.forEach((client) =>
+      client?.res?.write(`data: ${JSON.stringify([ev])}\n\n`)
     );
   }
 }

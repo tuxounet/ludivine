@@ -1,4 +1,3 @@
-import readline from "readline";
 import { KernelElement } from "../../../bases/KernelElement";
 import { Kernel } from "../../../kernel";
 

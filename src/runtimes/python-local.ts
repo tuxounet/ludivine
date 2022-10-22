@@ -1,7 +1,7 @@
 import { ComputeRuntimeElement } from "../kernel/bases/ComputeRuntimeElement";
 import { KernelElement } from "../kernel/bases/KernelElement";
 import { Kernel } from "../kernel/kernel";
-import childProc from "child_process";
+
 import {
   IComputeDependency,
   IComputeExecuteResult,
@@ -11,7 +11,7 @@ import {
 import { BasicError } from "../kernel/errors/BasicError";
 import fs from "fs";
 import path from "path";
-import { KERNEL_TMP_PREFIX } from "../kernel/constants";
+
 export class ComputeRuntimePython extends ComputeRuntimeElement {
   constructor(readonly kernel: Kernel, parent: KernelElement) {
     super("python-local", parent);
@@ -29,12 +29,12 @@ export class ComputeRuntimePython extends ComputeRuntimeElement {
     const failed: IComputeDependency[] = [];
     for (const dep of deps) {
       try {
-        await this.installPackage(runFolder, dep.name);
+        await this.installPackage(dep.name);
       } catch {
         failed.push(dep);
       }
     }
-    if (failed && failed.length > 0) {
+    if (failed.length > 0) {
       throw BasicError.notFound(
         this.name,
         "dependencies failed",
@@ -43,17 +43,8 @@ export class ComputeRuntimePython extends ComputeRuntimeElement {
     }
   }
 
-  private async installPackage(runDirectory: string, name: string) {
-    try {
-      const output = childProc.execSync(`pip install  ${name} --user`, {
-        cwd: runDirectory,
-        shell: "bash",
-      });
-      return 0;
-    } catch (error) {
-      this.log.error("install failed", name, "in", runDirectory, error);
-      return 1;
-    }
+  private async installPackage(name: string): Promise<number> {
+    return await this.executeSystemCommand(`pip install  ${name} --user`);
   }
 
   async executeSource(

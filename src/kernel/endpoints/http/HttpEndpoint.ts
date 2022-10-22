@@ -11,7 +11,7 @@ export class HttpEndpoint extends KernelElement implements IEndpoint {
   port = 8080;
   constructor(readonly kernel: Kernel, parent: KernelElement) {
     super("http-endpoint", parent);
-    if (process.env.PORT) this.port = parseInt(process.env.PORT);
+    if (process.env.PORT != null) this.port = parseInt(process.env.PORT);
   }
 
   protected app?: express.Application;

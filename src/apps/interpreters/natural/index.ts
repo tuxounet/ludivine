@@ -15,7 +15,7 @@ export class NaturalInterpreterApp extends AppElement {
     return 0;
   }
 
-  async onMessage(message: IMessageEvent) {
+  async onMessage(message: IMessageEvent): Promise<void> {
     this.log.debug(
       "message arrival",
       message.recipient,
@@ -30,11 +30,11 @@ export class NaturalInterpreterApp extends AppElement {
             " depuis " +
             message.body.channel
         );
-        return await this.processNaturalCommand(message.body.command);
+        await this.processNaturalCommand(message.body.command);
     }
   }
 
-  protected async processNaturalCommand(command: string) {
+  protected async processNaturalCommand(command: string): Promise<void> {
     const helloPythonProject = await this.kernel.compute.executeProject(
       "python-local",
       {

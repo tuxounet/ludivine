@@ -14,7 +14,7 @@ export class CLIInputChannel extends KernelElement implements IInputChannel {
   protected currentRl?: readline.Interface;
   async open(): Promise<void> {
     this.opened = true;
-    const loop = async () => {
+    const loop = async (): Promise<void> => {
       if (this.opened) {
         await new Promise<IChannelInputResult>((resolve, reject) => {
           this.currentRl = readline.createInterface({
@@ -26,7 +26,7 @@ export class CLIInputChannel extends KernelElement implements IInputChannel {
           try {
             let value: string;
             this.currentRl.on("close", () => {
-              if (!value) {
+              if (value === undefined) {
                 value = "";
               }
               this.kernel.messaging
@@ -54,10 +54,10 @@ export class CLIInputChannel extends KernelElement implements IInputChannel {
             reject(e);
           }
         });
-        loop();
+        await loop();
       }
     };
-    loop();
+    loop().catch((err) => this.log.error("initial loop failed", err));
   }
 
   async close(): Promise<void> {

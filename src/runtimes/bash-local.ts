@@ -1,7 +1,7 @@
 import { ComputeRuntimeElement } from "../kernel/bases/ComputeRuntimeElement";
 import { KernelElement } from "../kernel/bases/KernelElement";
 import { Kernel } from "../kernel/kernel";
-import childProc from "child_process";
+
 import {
   IComputeDependency,
   IComputeExecuteResult,
@@ -11,7 +11,6 @@ import {
 import { BasicError } from "../kernel/errors/BasicError";
 import fs from "fs";
 import path from "path";
-import { KERNEL_TMP_PREFIX } from "../kernel/constants";
 export class ComputeRuntimeBash extends ComputeRuntimeElement {
   constructor(readonly kernel: Kernel, parent: KernelElement) {
     super("bash-local", parent);
@@ -34,7 +33,7 @@ export class ComputeRuntimeBash extends ComputeRuntimeElement {
         failed.push(dep);
       }
     }
-    if (failed && failed.length > 0) {
+    if (failed.length > 0) {
       throw BasicError.notFound(
         this.name,
         "dependencies failed",
@@ -43,8 +42,8 @@ export class ComputeRuntimeBash extends ComputeRuntimeElement {
     }
   }
 
-  private async installPackage(name: string) {
-    return true;
+  private async installPackage(name: string): Promise<number> {
+    return 0;
   }
 
   async executeSource(

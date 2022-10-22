@@ -35,7 +35,7 @@ export abstract class ComputeRuntimeElement
         failed.push(dep);
       }
     }
-    if (failed && failed.length > 0) {
+    if (failed.length > 0) {
       throw BasicError.notFound(
         this.name,
         "dependencies failed",
@@ -63,14 +63,14 @@ export abstract class ComputeRuntimeElement
     project: IComputeProjectCode
   ): Promise<IComputeExecuteResult>;
 
-  protected async createNewRunDir() {
+  protected async createNewRunDir(): Promise<void> {
     if (!fs.existsSync(KERNEL_TMP_PREFIX)) {
       fs.mkdirSync(KERNEL_TMP_PREFIX);
     }
     this.runDirectory = fs.mkdtempSync(KERNEL_TMP_PREFIX);
   }
 
-  protected async cleanupRunDir() {
+  protected async cleanupRunDir(): Promise<void> {
     const files = await fs.promises.readdir(this.runDirectory);
     await Promise.all(
       files.map(
@@ -81,7 +81,7 @@ export abstract class ComputeRuntimeElement
     await fs.promises.rmdir(this.runDirectory);
   }
 
-  protected async extractRunLog() {
+  protected async extractRunLog(): Promise<string> {
     const logFile = path.resolve(this.runDirectory, "output.log");
     const logs = await fs.promises.readFile(logFile, { encoding: "utf-8" });
     return logs;
@@ -99,7 +99,7 @@ export abstract class ComputeRuntimeElement
         );
         resolve(0);
       } catch (error) {
-        fs.writeFileSync("output.log", "Fatal: " + error, {
+        fs.writeFileSync("output.log", "Fatal: " + String(error), {
           encoding: "utf-8",
         });
         resolve(1);
