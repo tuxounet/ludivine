@@ -35,10 +35,7 @@ export interface IComputeRuntime {
   provision: () => Promise<boolean>;
   unprovision: () => Promise<boolean>;
   ensureCommandDependencies: () => Promise<void>;
-  ensureDependencies: (
-    runFolder: string,
-    deps: IComputeDependency[]
-  ) => Promise<void>;
+  ensureDependencies: (deps: IComputeDependency[]) => Promise<void>;
   executeSource: (source: IComputeSourceCode) => Promise<IComputeExecuteResult>;
   executeProject: (
     project: IComputeProjectCode
