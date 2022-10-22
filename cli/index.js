@@ -15,7 +15,7 @@ const ludivineMainEntryPoint = path.resolve(
 );
 
 console.info(`Ludivine ${ludivinePackageJson.version}`);
-const startCmd = "npm exec --yes ts-node " + ludivineMainEntryPoint;
+const startCmd = 'npm exec --yes ts-node "' + ludivineMainEntryPoint + '"';
 const startCwd = process.cwd();
 console.debug("lauching", startCmd, "inside", startCwd);
 const ps = childProc.exec(startCmd, {
