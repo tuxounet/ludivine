@@ -23,3 +23,13 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build:release
+      - name: publish artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: out
+          path: |
+            coverage/**
+            out/**
+            package.json
+            package-lock.json
+            LICENSE
