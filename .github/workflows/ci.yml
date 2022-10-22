@@ -26,10 +26,11 @@ jobs:
       - name: publish artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: out
+          name: delivery
           path: |
             coverage/**
-            out/**
+            src/**
+            cli/**
             package.json
             package-lock.json
             LICENSE

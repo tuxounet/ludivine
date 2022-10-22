@@ -1,23 +1,15 @@
-name: Publish package to GitHub Packages
+name: ludivine publishing
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-
     steps:
-      - uses: actions/checkout@v3
-      # Setup .npmrc file to publish to GitHub Packages
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "16.x"
-          registry-url: "https://npm.pkg.github.com"
-          # Defaults to the user or organization that owns the workflow file
-          scope: "@tuxounet"
       - uses: actions/checkout@v3
       - name: setup nodejs ${{ matrix.node-version }}
         uses: actions/setup-node@v3
@@ -28,18 +20,23 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build:release
+      - name: publish source
+        uses: actions/upload-artifact@v3
+        with:
+          name: delivery
+          path: |
+            coverage/**
+            src/**
+            cli/**
+            package.json
+            package-lock.json
+            LICENSE
+          retention-days: 3
       - run: npm pack
       - name: publish artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: out
+          name: package
           path: |
-            coverage/**
-            *.tgz            
-            LICENSE
-          retention-days: 30
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: "*.tgz"
+            **/*.tgz
+          retention-days: 3
