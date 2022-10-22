@@ -5,6 +5,7 @@ import { EndpointsBroker } from "./endpoints/EndpointsBroker";
 import { ComputeBroker } from "./compute/ComputeBroker";
 import { ApplicationsBroker } from "./applications/ApplicationsBroker";
 import { LogBroker } from "./logging/LogBroker";
+import { StorageBroker } from "./storage/StorageBroker";
 
 export class Kernel extends KernelElement {
   production: boolean;
@@ -15,6 +16,7 @@ export class Kernel extends KernelElement {
   endpoints: EndpointsBroker;
   compute: ComputeBroker;
   logging: LogBroker;
+  storage: StorageBroker;
   constructor() {
     super("kernel");
     this.production = process.env.NODE_ENV === "production";
@@ -23,7 +25,7 @@ export class Kernel extends KernelElement {
     this.compute = new ComputeBroker(this);
     this.channels = new ChannelsBroker(this);
     this.applications = new ApplicationsBroker(this);
-
+    this.storage = new StorageBroker(this);
     this.endpoints = new EndpointsBroker(this);
     this.started = false;
   }

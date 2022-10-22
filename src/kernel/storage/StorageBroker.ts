@@ -1,7 +1,16 @@
 import path from "path";
 import fs from "fs";
+import { KernelElement } from "../bases/KernelElement";
+import { LayerBroker } from "./layers/LayerBroker";
+import { Kernel } from "../kernel";
 
-export class StorageBroker {
+export class StorageBroker extends KernelElement {
+  layers: LayerBroker;
+  constructor(readonly kernel: Kernel) {
+    super("storage", kernel);
+    this.layers = new LayerBroker(kernel, this);
+  }
+
   combinePath(...pathParts: string[]): string {
     return path.join(...pathParts);
   }
