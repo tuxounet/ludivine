@@ -22,10 +22,7 @@ export class ComputeRuntimePython extends ComputeRuntimeElement {
     ];
   }
 
-  async ensureDependencies(
-    runFolder: string,
-    deps: IComputeDependency[]
-  ): Promise<void> {
+  async ensureDependencies(deps: IComputeDependency[]): Promise<void> {
     const failed: IComputeDependency[] = [];
     for (const dep of deps) {
       try {
@@ -44,7 +41,7 @@ export class ComputeRuntimePython extends ComputeRuntimeElement {
   }
 
   private async installPackage(name: string): Promise<number> {
-    return await this.executeSystemCommand(`pip install  ${name} --user`);
+    return await this.executeSystemCommand(`python3 -m pip install ${name}`);
   }
 
   async executeSource(
@@ -53,7 +50,7 @@ export class ComputeRuntimePython extends ComputeRuntimeElement {
     await this.createNewRunDir();
     const fileName = source.name + "." + source.extension;
     const targetFilePath = path.resolve(this.runDirectory, fileName);
-    await this.ensureDependencies(this.runDirectory, source.dependencies);
+    await this.ensureDependencies(source.dependencies);
     await fs.promises.writeFile(targetFilePath, source.body, {
       encoding: "utf-8",
     });
@@ -91,7 +88,7 @@ export class ComputeRuntimePython extends ComputeRuntimeElement {
         .filter((item) => project.extensions.includes(item.ext))
         .map(async (item) => await fs.promises.copyFile(item.source, item.dest))
     );
-    await this.ensureDependencies(this.runDirectory, project.dependencies);
+    await this.ensureDependencies(project.dependencies);
 
     const rc = await this.executeSystemCommand(
       `python3 ./${project.entryPoint} ${

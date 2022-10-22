@@ -51,10 +51,7 @@ export abstract class ComputeRuntimeElement
   async unprovision(): Promise<boolean> {
     return false;
   }
-  abstract ensureDependencies(
-    runFolder: string,
-    deps: IComputeDependency[]
-  ): Promise<void>;
+  abstract ensureDependencies(deps: IComputeDependency[]): Promise<void>;
 
   abstract executeSource(
     source: IComputeSourceCode

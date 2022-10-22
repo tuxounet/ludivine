@@ -1,6 +1,6 @@
 {
   "name": "@tuxounet/ludivine",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "",
   "main": "src/index.ts",
   "bin": {
@@ -8,10 +8,10 @@
   },
   "scripts": {
     "start": "node cli/index.js",
-    "build:release": "esbuild src/index.ts --bundle --platform=node --minify --sourcemap=external --outfile=out/index.js",
-    "build:dev": "esbuild src/index.ts --bundle --platform=node --sourcemap=external --outfile=out/index.js",
     "predev": "npm install --prefer-offline",
+    "typecheck": "tsc",
     "dev": "nodemon",
+    "dev:start": "ts-node src/index.ts",
     "lint": "eslint ./ --fix",
     "clean": "rm -rf dist build out coverage",
     "test": "jest --coverage",
