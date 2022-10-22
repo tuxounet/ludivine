@@ -1,6 +1,6 @@
 import { KernelElement } from "../bases/KernelElement";
 import { Kernel } from "../kernel";
-import type { Handler } from "express";
+import { Handler } from "express";
 import { IEndpoint } from "./types/IEndpoint";
 import { HttpEndpoint } from "./http/HttpEndpoint";
 import { EndpointRouteMethod, IEndpointRoute } from "./types/IEndpointRoute";

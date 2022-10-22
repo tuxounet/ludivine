@@ -15,19 +15,21 @@ const ludivineMainEntryPoint = path.resolve(
 );
 
 console.info(`Ludivine ${ludivinePackageJson.version}`);
-
-const ps = childProc.exec("npm exec --yes ts-node " + ludivineMainEntryPoint, {
+const startCmd = 'npm exec --yes ts-node "' + ludivineMainEntryPoint + '"';
+const startCwd = process.cwd();
+console.debug("lauching", startCmd, "inside", startCwd);
+const ps = childProc.exec(startCmd, {
   encoding: "utf-8",
-  cwd: process.cwd(),
+  cwd: startCwd,
 });
 process.stdin.pipe(ps.stdin);
 ps.stdout.pipe(process.stdout);
+ps.on("error", (err) => {
+  console.error("ended with error", err);
+  process.exit(1);
+});
 
 ps.on("exit", (code) => {
   console.info("ended with code", code);
   process.exit(code);
-});
-ps.on("error", (err) => {
-  console.error("ended with error", err);
-  process.exit(1);
 });
