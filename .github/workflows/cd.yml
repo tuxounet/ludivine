@@ -8,6 +8,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+
     steps:
       - uses: actions/checkout@v3
       # Setup .npmrc file to publish to GitHub Packages
@@ -17,7 +18,28 @@ jobs:
           registry-url: "https://npm.pkg.github.com"
           # Defaults to the user or organization that owns the workflow file
           scope: "@tuxounet"
+      - uses: actions/checkout@v3
+      - name: setup nodejs ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
       - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build:release
+      - run: npm pack
+      - name: publish artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: out
+          path: |
+            coverage/**
+            *.tgz            
+            LICENSE
+          retention-days: 30
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: "*.tgz"
