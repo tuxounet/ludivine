@@ -7,7 +7,7 @@ Ludivine, a(n individual) virtual digital assistant
 ## via npx
 
 ```console
-npx --yes --package=github:tuxounet/ludivine#main ludivine --package=github:tuxounet/ludivine#main ludivine
+npx --yes --package=github:tuxounet/ludivine#main ludivine
 # or
 npm exec --yes --package=github:tuxounet/ludivine#main ludivine
 ```
