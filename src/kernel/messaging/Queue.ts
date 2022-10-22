@@ -11,6 +11,7 @@ export class Queue<T = Record<string, unknown>> extends ObservableElement {
   async enqueue(item: T) {
     this.q.push(item);
   }
+
   async dequeue() {
     return this.q.shift();
   }

@@ -32,7 +32,7 @@ export abstract class ObservableElement
   protected async notifyAll(message: IMessageEvent) {
     const proms = [];
     for (const observer of this.observers.values()) {
-      if (observer.onMessage) {
+      if (observer.onMessage != null) {
         proms.push(observer.onMessage(message));
       }
     }

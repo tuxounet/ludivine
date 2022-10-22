@@ -17,7 +17,7 @@ export class Kernel extends KernelElement {
   logging: LogBroker;
   constructor() {
     super("kernel");
-    this.production = process.env.NODE_ENV === "production" ? true : false;
+    this.production = process.env.NODE_ENV === "production";
     this.logging = new LogBroker(this);
     this.messaging = new MessagingBroker(this);
     this.compute = new ComputeBroker(this);

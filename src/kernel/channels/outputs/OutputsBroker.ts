@@ -12,5 +12,6 @@ export class OutputsBroker extends KernelElement {
       new WebOutputChannel(kernel, this),
     ];
   }
+
   channels: IOutputChannel[];
 }

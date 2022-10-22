@@ -10,10 +10,7 @@ export class StorageBroker {
     return path.extname(input);
   }
 
-  createTmpDirectory()
-  {
- const tmpPath =    path.join(process.cwd(), "run") + path.sep;
- 
-
+  createTmpDirectory() {
+    const tmpPath = path.join(process.cwd(), "run") + path.sep;
   }
 }

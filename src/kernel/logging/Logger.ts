@@ -51,7 +51,7 @@ export class Logger {
   }
 
   private toTimeString(timestamp?: Date) {
-    if (!timestamp) timestamp = new Date();
+    if (timestamp == null) timestamp = new Date();
 
     const formatData = (input: number) => {
       if (input > 9) {

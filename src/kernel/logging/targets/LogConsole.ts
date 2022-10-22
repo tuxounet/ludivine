@@ -7,6 +7,7 @@ export class LogTargetConsole extends KernelElement implements ILogTarget {
   constructor(readonly kernel: Kernel, parent: KernelElement) {
     super("log-target-console", parent);
   }
+
   appendLog(level: LogLevels, ...parts: string[]): void {
     throw new Error("Method not implemented.");
   }

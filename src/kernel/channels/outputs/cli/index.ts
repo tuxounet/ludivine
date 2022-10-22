@@ -10,10 +10,12 @@ export class CLIOutputChannel extends KernelElement implements IOutputChannel {
     this.listening = false;
     this.opened = false;
   }
+
   opened: boolean;
   async open(): Promise<void> {
     this.opened = true;
   }
+
   async close(): Promise<void> {
     this.opened = false;
   }

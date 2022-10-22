@@ -15,10 +15,13 @@ export class EndpointsBroker extends KernelElement {
   routes: IEndpointRoute[];
 
   async openEndpoints() {
-    await Promise.all(this.endpoints.map((item) => item.open(this.routes)));
+    await Promise.all(
+      this.endpoints.map(async (item) => await item.open(this.routes))
+    );
   }
+
   async closeEndpoints() {
-    await Promise.all(this.endpoints.map((item) => item.close()));
+    await Promise.all(this.endpoints.map(async (item) => await item.close()));
   }
 
   async registerRoute(

@@ -9,16 +9,17 @@ export class MessagingBroker extends KernelElement {
     this.topicsStore = new TopicsStore(this);
     this.queuesStore = new QueuesStore(this);
   }
+
   topicsStore: TopicsStore;
   queuesStore: QueuesStore;
 
   async subscribeTopic(topic: string, subscriber: KernelElement) {
     this.log.debug("subscribe", topic, "by", subscriber.fullName);
-    if (this.topicsStore.topics.has(topic) == false) {
+    if (!this.topicsStore.topics.has(topic)) {
       await this.topicsStore.registerTopic(topic);
     }
     const currentTopic = this.topicsStore.topics.get(topic);
-    if (!currentTopic) {
+    if (currentTopic == null) {
       throw BasicError.notFound(this.fullName, "topic", topic);
     }
 
@@ -30,7 +31,7 @@ export class MessagingBroker extends KernelElement {
     this.log.debug("unsubscribe", topic, "by", subscriber);
 
     const currentTopic = this.topicsStore.topics.get(topic);
-    if (currentTopic) {
+    if (currentTopic != null) {
       currentTopic.unregister(subscriber);
     }
 
@@ -39,11 +40,11 @@ export class MessagingBroker extends KernelElement {
 
   async subscribeQueue(queue: string, subscriber: KernelElement) {
     this.log.debug("subscribe", queue, "by", subscriber.fullName);
-    if (this.queuesStore.queues.has(queue) == false) {
+    if (!this.queuesStore.queues.has(queue)) {
       await this.queuesStore.registerQueue(queue);
     }
     const current = this.queuesStore.queues.get(queue);
-    if (!current) {
+    if (current == null) {
       throw BasicError.notFound(this.fullName, "queue", queue);
     }
 
@@ -55,7 +56,7 @@ export class MessagingBroker extends KernelElement {
     this.log.debug("unsubscribe", queue, "by", subscriber);
 
     const current = this.topicsStore.topics.get(queue);
-    if (current) {
+    if (current != null) {
       current.unregister(subscriber);
     }
 
@@ -64,11 +65,11 @@ export class MessagingBroker extends KernelElement {
 
   async publish(topic: string, message: Record<string, string>) {
     this.log.debug("publish", topic, "with", message);
-    if (this.topicsStore.topics.has(topic) == false) {
+    if (!this.topicsStore.topics.has(topic)) {
       await this.topicsStore.registerTopic(topic);
     }
     const currentTopic = this.topicsStore.topics.get(topic);
-    if (!currentTopic) {
+    if (currentTopic == null) {
       throw BasicError.notFound(this.fullName, "topic", topic);
     }
     await currentTopic.publish(message);
@@ -77,11 +78,11 @@ export class MessagingBroker extends KernelElement {
 
   async enqueue(queue: string, message: Record<string, string>) {
     this.log.debug("enqueue", queue, "with", message);
-    if (this.queuesStore.queues.has(queue) == false) {
+    if (!this.queuesStore.queues.has(queue)) {
       await this.queuesStore.registerQueue(queue);
     }
     const current = this.queuesStore.queues.get(queue);
-    if (!current) {
+    if (current == null) {
       throw BasicError.notFound(this.fullName, "topic", queue);
     }
     await current.enqueue(message);

@@ -4,7 +4,10 @@ export class BasicError extends Error {
   }
 
   static notFound(who: string, what: string, which: string): BasicError {
-    return new BasicError(404, `entrée ${what} ${which} introuvable quand demandé par ${who}`);
+    return new BasicError(
+      404,
+      `entrée ${what} ${which} introuvable quand demandé par ${who}`
+    );
   }
 
   constructor(readonly code: number, message: string) {

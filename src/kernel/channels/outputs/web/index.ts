@@ -10,6 +10,7 @@ export class WebOutputChannel extends KernelElement implements IOutputChannel {
 
     this.assetsFolder = path.join(__dirname, "assets");
   }
+
   opened: boolean;
 
   async open(): Promise<void> {
@@ -87,7 +88,7 @@ export class WebOutputChannel extends KernelElement implements IOutputChannel {
     this.log.info("output", message);
     const ev = {
       date: new Date().toISOString(),
-      message: message,
+      message,
     };
 
     this.clients.forEach(

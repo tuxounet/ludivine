@@ -32,13 +32,15 @@ export interface IComputeExecuteResult {
 export interface IComputeRuntime {
   name: string;
   commandsDependencies: IComputeCommandDependency[];
-  provision(): Promise<boolean>;
-  unprovision(): Promise<boolean>;
-  ensureCommandDependencies(): Promise<void>;
-  ensureDependencies(
+  provision: () => Promise<boolean>;
+  unprovision: () => Promise<boolean>;
+  ensureCommandDependencies: () => Promise<void>;
+  ensureDependencies: (
     runFolder: string,
     deps: IComputeDependency[]
-  ): Promise<void>;
-  executeSource(source: IComputeSourceCode): Promise<IComputeExecuteResult>;
-  executeProject(project: IComputeProjectCode): Promise<IComputeExecuteResult>;
+  ) => Promise<void>;
+  executeSource: (source: IComputeSourceCode) => Promise<IComputeExecuteResult>;
+  executeProject: (
+    project: IComputeProjectCode
+  ) => Promise<IComputeExecuteResult>;
 }

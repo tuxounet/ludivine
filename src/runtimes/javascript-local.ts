@@ -21,11 +21,12 @@ export class ComputeRuntimeJavascript extends ComputeRuntimeElement {
       },
     ];
   }
+
   async ensureDependencies(
     runFolder: string,
     deps: IComputeDependency[]
   ): Promise<void> {
-    let failed: IComputeDependency[] = [];
+    const failed: IComputeDependency[] = [];
     for (const dep of deps) {
       try {
         await this.installPackage(runFolder, dep.name);
@@ -69,7 +70,7 @@ export class ComputeRuntimeJavascript extends ComputeRuntimeElement {
       encoding: "utf-8",
     });
     const rc = await this.executeSystemCommand(
-      `node ./${fileName} ${source.args ? source.args.join(" ") : " "}`
+      `node ./${fileName} ${source.args != null ? source.args.join(" ") : " "}`
     );
 
     const logs = await this.extractRunLog();
@@ -98,13 +99,13 @@ export class ComputeRuntimeJavascript extends ComputeRuntimeElement {
           };
         })
         .filter((item) => project.extensions.includes(item.ext))
-        .map((item) => fs.promises.copyFile(item.source, item.dest))
+        .map(async (item) => await fs.promises.copyFile(item.source, item.dest))
     );
     await this.ensureDependencies(this.runDirectory, project.dependencies);
 
     const rc = await this.executeSystemCommand(
       `node ./${project.entryPoint} ${
-        project.args ? project.args.join(" ") : " "
+        project.args != null ? project.args.join(" ") : " "
       }`
     );
 

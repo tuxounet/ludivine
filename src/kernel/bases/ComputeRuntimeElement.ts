@@ -23,10 +23,11 @@ export abstract class ComputeRuntimeElement
     this.commandsDependencies = [];
     this.runDirectory = KERNEL_TMP_PREFIX;
   }
+
   commandsDependencies: IComputeCommandDependency[];
   protected runDirectory: string;
   async ensureCommandDependencies(): Promise<void> {
-    let failed: IComputeDependency[] = [];
+    const failed: IComputeDependency[] = [];
     for (const dep of this.commandsDependencies) {
       try {
         await commandExists(dep.name);
@@ -46,6 +47,7 @@ export abstract class ComputeRuntimeElement
   async provision(): Promise<boolean> {
     return true;
   }
+
   async unprovision(): Promise<boolean> {
     return false;
   }
@@ -71,8 +73,9 @@ export abstract class ComputeRuntimeElement
   protected async cleanupRunDir() {
     const files = await fs.promises.readdir(this.runDirectory);
     await Promise.all(
-      files.map((item) =>
-        fs.promises.unlink(path.resolve(this.runDirectory, item))
+      files.map(
+        async (item) =>
+          await fs.promises.unlink(path.resolve(this.runDirectory, item))
       )
     );
     await fs.promises.rmdir(this.runDirectory);
@@ -87,10 +90,13 @@ export abstract class ComputeRuntimeElement
   protected async executeSystemCommand(cmd: string): Promise<number> {
     return await new Promise<number>((resolve) => {
       try {
-        childProc.execSync(`${cmd}>> "${this.runDirectory + path.sep}output.log"`, {
-          cwd: this.runDirectory,
-          shell: "bash",
-        });
+        childProc.execSync(
+          `${cmd}>> "${this.runDirectory + path.sep}output.log"`,
+          {
+            cwd: this.runDirectory,
+            shell: "bash",
+          }
+        );
         resolve(0);
       } catch (error) {
         fs.writeFileSync("output.log", "Fatal: " + error, {

@@ -1,13 +1,12 @@
-
 async function start() {
-  //Config time
+  // Config time
   const clientId = sessionStorage.getItem("clientId");
   const configUrl = clientId !== null ? "/connect?id=" + clientId : "/connect";
   const result = await fetch(configUrl);
   const body = await result.json();
   sessionStorage.setItem("clientId", body.clientId);
 
-  //channel output binding
+  // channel output binding
   const evs = new EventSource("/events");
   evs.onopen = () => {
     document
@@ -55,7 +54,6 @@ async function sendInput(element) {
       },
     });
     element.value = "";
-   
   } catch (e) {
     console.error(e);
   }

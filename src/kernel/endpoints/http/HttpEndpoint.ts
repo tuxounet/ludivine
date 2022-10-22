@@ -13,6 +13,7 @@ export class HttpEndpoint extends KernelElement implements IEndpoint {
     super("http-endpoint", parent);
     if (process.env.PORT) this.port = parseInt(process.env.PORT);
   }
+
   protected app?: express.Application;
   protected server?: Server;
   async open(routes: IEndpointRoute[]): Promise<void> {
@@ -36,8 +37,8 @@ export class HttpEndpoint extends KernelElement implements IEndpoint {
                 app.post(item.path, item.handler);
                 return;
               case "ALL":
-                app.use(item.path, item.handler)
-                return
+                app.use(item.path, item.handler);
+                return;
               default:
                 throw BasicError.badQuery(
                   this.fullName,
@@ -59,11 +60,12 @@ export class HttpEndpoint extends KernelElement implements IEndpoint {
       }
     });
   }
+
   async close(): Promise<void> {
     await new Promise<void>((resolve, reject) => {
-      if (this.server) {
+      if (this.server != null) {
         this.server.close((err) => {
-          if (err) {
+          if (err != null) {
             this.log.error(err);
           }
           resolve();

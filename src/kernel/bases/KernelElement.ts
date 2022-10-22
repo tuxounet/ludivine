@@ -14,9 +14,10 @@ export abstract class KernelElement extends Observer implements IKernelElement {
     super();
     this.log = new Logger(this);
   }
+
   protected log: Logger;
   get fullName(): string {
-    if (this.parent) {
+    if (this.parent != null) {
       return this.parent.fullName + "." + this.name;
     }
     return this.name;

@@ -25,7 +25,6 @@ export class ShellApp extends AppElement {
       this.naturalInterpreterApp.execute(),
     ]);
 
-
     await this.kernel.output("au revoir");
     return 0;
   }
@@ -46,12 +45,12 @@ export class ShellApp extends AppElement {
         const command = message.body.command.trim();
         if (command.startsWith(this.imperativeInterpreter.imperativePrefix)) {
           await this.kernel.messaging.publish("/channels/input/imperative", {
-            command: command,
+            command,
             channel: message.body.channel,
           });
         } else {
           await this.kernel.messaging.publish("/channels/input/natural", {
-            command: command,
+            command,
             channel: message.body.channel,
           });
         }

@@ -9,7 +9,7 @@ export class NaturalInterpreterApp extends AppElement {
   }
 
   protected async main(): Promise<number> {
-    //load catalogs
+    // load catalogs
 
     await this.waitForShutdown();
     return 0;

@@ -8,11 +8,12 @@ export class CLIInputChannel extends KernelElement implements IInputChannel {
     super("cli-input", parent);
     this.opened = false;
   }
+
   promptPrefix = "> ";
   opened: boolean;
   protected currentRl?: readline.Interface;
   async open(): Promise<void> {
-    this.opened = true
+    this.opened = true;
     const loop = async () => {
       if (this.opened) {
         await new Promise<IChannelInputResult>((resolve, reject) => {
@@ -47,7 +48,7 @@ export class CLIInputChannel extends KernelElement implements IInputChannel {
 
             this.currentRl.question(this.promptPrefix, (response) => {
               value = response;
-              if (this.currentRl) this.currentRl.close();
+              if (this.currentRl != null) this.currentRl.close();
             });
           } catch (e) {
             reject(e);
@@ -58,8 +59,9 @@ export class CLIInputChannel extends KernelElement implements IInputChannel {
     };
     loop();
   }
+
   async close(): Promise<void> {
-    if (this.currentRl) {
+    if (this.currentRl != null) {
       this.currentRl.close();
       this.currentRl = undefined;
     }

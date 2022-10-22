@@ -4,7 +4,7 @@ import { KernelElement } from "./KernelElement";
 
 export interface IAppElement {
   onMessage: (message: IMessageEvent) => Promise<void>;
-  execute(): Promise<number>;
+  execute: () => Promise<number>;
 }
 
 export abstract class AppElement extends KernelElement implements IAppElement {
@@ -37,12 +37,13 @@ export abstract class AppElement extends KernelElement implements IAppElement {
       }, 50);
     });
   }
+
   protected async onStart() {
     this.log.debug("onStart");
-    if (this.substriptions) {
+    if (this.substriptions != null) {
       await Promise.all(
-        this.substriptions.map((item) => {
-          return this.kernel.messaging.subscribeTopic(item, this);
+        this.substriptions.map(async (item) => {
+          return await this.kernel.messaging.subscribeTopic(item, this);
         })
       );
     }
@@ -51,10 +52,11 @@ export abstract class AppElement extends KernelElement implements IAppElement {
 
   protected async onStop() {
     this.log.debug("onStop");
-    if (this.substriptions) {
+    if (this.substriptions != null) {
       await Promise.all(
-        this.substriptions.map((item) =>
-          this.kernel.messaging.unsubscribeTopic(item, this.fullName)
+        this.substriptions.map(
+          async (item) =>
+            await this.kernel.messaging.unsubscribeTopic(item, this.fullName)
         )
       );
     }

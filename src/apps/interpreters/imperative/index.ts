@@ -9,6 +9,7 @@ export class ImperativeInterpreterApp extends AppElement {
       "/channels/input/imperative",
     ]);
   }
+
   readonly imperativePrefix = "!";
 
   async onMessage(message: IMessageEvent) {

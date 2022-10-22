@@ -25,18 +25,20 @@ export class ComputeBroker extends KernelElement {
   runtimes: IComputeRuntime[];
 
   async initialize() {
-    await Promise.all(this.runtimes.map((item) => item.provision()));
+    await Promise.all(
+      this.runtimes.map(async (item) => await item.provision())
+    );
   }
 
   async shutdown() {
     await Promise.all(
-      this.runtimes.reverse().map((item) => item.unprovision())
+      this.runtimes.reverse().map(async (item) => await item.unprovision())
     );
   }
 
   async executeSource(runtime: string, source: IComputeSourceCode) {
     const localRuntime = this.runtimes.find((item) => item.name === runtime);
-    if (!localRuntime) {
+    if (localRuntime == null) {
       throw BasicError.notFound(this.fullName, "compute runtime", runtime);
     }
     return await localRuntime.executeSource(source);
@@ -44,7 +46,7 @@ export class ComputeBroker extends KernelElement {
 
   async executeProject(runtime: string, project: IComputeProjectCode) {
     const localRuntime = this.runtimes.find((item) => item.name === runtime);
-    if (!localRuntime) {
+    if (localRuntime == null) {
       throw BasicError.notFound(this.fullName, "compute runtime", runtime);
     }
     return await localRuntime.executeProject(project);

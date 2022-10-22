@@ -12,5 +12,6 @@ export class InputsBroker extends KernelElement {
       new HttpInputChannel(kernel, this),
     ];
   }
+
   channels: IInputChannel[];
 }
