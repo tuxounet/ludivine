@@ -1,3 +1,3 @@
 # @tuxounet/ludivine
 
-Ludivine, a virtual digital assistant
+Ludivine, a(n individual) virtual digital assistant
