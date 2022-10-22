@@ -12,7 +12,7 @@ export class ImperativeInterpreterApp extends AppElement {
 
   readonly imperativePrefix = "!";
 
-  async onMessage(message: IMessageEvent) {
+  async onMessage(message: IMessageEvent): Promise<void> {
     this.log.debug(
       "message arrival",
       message.recipient,
@@ -32,7 +32,7 @@ export class ImperativeInterpreterApp extends AppElement {
     }
   }
 
-  private async processCommand(raw: string) {
+  private async processCommand(raw: string): Promise<void> {
     const cleanCommand = raw.replace(this.imperativePrefix, "").trim();
 
     const tokens = cleanCommand
@@ -48,7 +48,7 @@ export class ImperativeInterpreterApp extends AppElement {
         return await this.kernel.askShutdown();
     }
 
-    function walkToken(object: KernelElement, token: string) {
+    function walkToken(object: KernelElement, token: string): any {
       for (const key in object) {
         const lowerKey = key.toLowerCase();
         if (lowerKey === token) {
@@ -62,7 +62,7 @@ export class ImperativeInterpreterApp extends AppElement {
     let broker: KernelElement = this.kernel;
     for (let i = 0; i < tokens.length; i++) {
       const result = walkToken(broker, tokens[i]);
-      if (!result) {
+      if (result !== undefined) {
         break;
       }
       if (typeof result === "object") {
@@ -77,7 +77,9 @@ export class ImperativeInterpreterApp extends AppElement {
         }
 
         const output = await result.apply(broker, args);
-        await this.kernel.output("command ok:" + cleanCommand + " : " + output);
+        await this.kernel.output(
+          "command ok:" + String(cleanCommand) + " : " + String(output)
+        );
         return;
       }
     }

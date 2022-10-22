@@ -13,7 +13,10 @@ export class MessagingBroker extends KernelElement {
   topicsStore: TopicsStore;
   queuesStore: QueuesStore;
 
-  async subscribeTopic(topic: string, subscriber: KernelElement) {
+  async subscribeTopic(
+    topic: string,
+    subscriber: KernelElement
+  ): Promise<void> {
     this.log.debug("subscribe", topic, "by", subscriber.fullName);
     if (!this.topicsStore.topics.has(topic)) {
       await this.topicsStore.registerTopic(topic);
@@ -27,7 +30,7 @@ export class MessagingBroker extends KernelElement {
     this.log.debug("subscribed", topic, "by", subscriber.fullName);
   }
 
-  async unsubscribeTopic(topic: string, subscriber: string) {
+  async unsubscribeTopic(topic: string, subscriber: string): Promise<void> {
     this.log.debug("unsubscribe", topic, "by", subscriber);
 
     const currentTopic = this.topicsStore.topics.get(topic);
@@ -38,7 +41,10 @@ export class MessagingBroker extends KernelElement {
     this.log.debug("unsubscribed", topic, "by", subscriber);
   }
 
-  async subscribeQueue(queue: string, subscriber: KernelElement) {
+  async subscribeQueue(
+    queue: string,
+    subscriber: KernelElement
+  ): Promise<void> {
     this.log.debug("subscribe", queue, "by", subscriber.fullName);
     if (!this.queuesStore.queues.has(queue)) {
       await this.queuesStore.registerQueue(queue);
@@ -52,7 +58,7 @@ export class MessagingBroker extends KernelElement {
     this.log.debug("subscribed", queue, "by", subscriber.fullName);
   }
 
-  async unsubscribeQueue(queue: string, subscriber: string) {
+  async unsubscribeQueue(queue: string, subscriber: string): Promise<void> {
     this.log.debug("unsubscribe", queue, "by", subscriber);
 
     const current = this.topicsStore.topics.get(queue);
@@ -63,7 +69,7 @@ export class MessagingBroker extends KernelElement {
     this.log.debug("unsubscribed", queue, "by", subscriber);
   }
 
-  async publish(topic: string, message: Record<string, string>) {
+  async publish(topic: string, message: Record<string, string>): Promise<void> {
     this.log.debug("publish", topic, "with", message);
     if (!this.topicsStore.topics.has(topic)) {
       await this.topicsStore.registerTopic(topic);
@@ -76,7 +82,7 @@ export class MessagingBroker extends KernelElement {
     this.log.debug("published", topic, "with", message);
   }
 
-  async enqueue(queue: string, message: Record<string, string>) {
+  async enqueue(queue: string, message: Record<string, string>): Promise<void> {
     this.log.debug("enqueue", queue, "with", message);
     if (!this.queuesStore.queues.has(queue)) {
       await this.queuesStore.registerQueue(queue);

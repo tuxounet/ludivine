@@ -28,14 +28,14 @@ export class Kernel extends KernelElement {
     this.started = false;
   }
 
-  async run() {
+  async run(): Promise<number> {
     await this.start();
     const rc = await this.listen();
     await this.stop();
     return rc;
   }
 
-  askShutdown = async () => {
+  askShutdown = async (): Promise<void> => {
     this.log.debug("ask for shutdown");
     await new Promise<void>((resolve) => {
       this.started = false;
@@ -46,7 +46,7 @@ export class Kernel extends KernelElement {
     this.log.debug("asked for shutdown");
   };
 
-  private async start() {
+  private async start(): Promise<void> {
     await this.compute.initialize();
     await this.channels.initialize();
     await this.applications.initialize();
@@ -54,14 +54,14 @@ export class Kernel extends KernelElement {
     this.started = true;
   }
 
-  private async listen() {
+  private async listen(): Promise<number> {
     await this.endpoints.openEndpoints();
     await this.channels.openAllInputs();
     await this.channels.openAllOutputs();
     return await this.applications.executeRootProcess();
   }
 
-  private async stop() {
+  private async stop(): Promise<void> {
     this.started = false;
     await this.applications.shutdown();
     await this.channels.closeAllInputs();
@@ -70,7 +70,7 @@ export class Kernel extends KernelElement {
     await this.compute.shutdown();
   }
 
-  async output(message: string) {
+  async output(message: string): Promise<void> {
     await this.channels.outputOnAll(message);
   }
 }

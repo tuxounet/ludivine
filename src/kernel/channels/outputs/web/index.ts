@@ -30,7 +30,7 @@ export class WebOutputChannel extends KernelElement implements IOutputChannel {
     },
   ];
 
-  async initialize() {
+  async initialize(): Promise<void> {
     await this.kernel.endpoints.registerRoute("GET", "/", (req, res) => {
       res.sendFile(path.join(this.assetsFolder, "index.html"));
     });

@@ -1,5 +1,6 @@
 import { KernelElement } from "../bases/KernelElement";
 import { ObservableElement } from "../bases/ObservableElement";
+import { BasicError } from "../errors/BasicError";
 
 export class Queue<T = Record<string, unknown>> extends ObservableElement {
   q: T[];
@@ -8,11 +9,14 @@ export class Queue<T = Record<string, unknown>> extends ObservableElement {
     this.q = [];
   }
 
-  async enqueue(item: T) {
+  async enqueue(item: T): Promise<void> {
     this.q.push(item);
   }
 
-  async dequeue() {
-    return this.q.shift();
+  async dequeue(): Promise<T> {
+    const msg = this.q.shift();
+    if (msg === undefined)
+      throw BasicError.badQuery(this.fullName, "queue", "dequeue");
+    return msg;
   }
 }

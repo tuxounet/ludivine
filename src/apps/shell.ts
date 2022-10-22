@@ -29,20 +29,25 @@ export class ShellApp extends AppElement {
     return 0;
   }
 
-  async onMessage(message: IMessageEvent) {
+  async onMessage(message: IMessageEvent): Promise<void> {
     this.log.debug(
       "message arrival",
       message.recipient,
       message.sender,
       message.body
     );
+    if (
+      message.body === undefined ||
+      message.body.command === undefined ||
+      message.body.command === "" ||
+      message.body.command.trim() === ""
+    ) {
+      this.log.warn("commade vide");
+      return;
+    }
+    const command = message.body.command;
     switch (message.recipient) {
       case "/channels/input":
-        if (!message.body.command || message.body.command.trim() === "") {
-          this.log.warn("commade vide");
-          return;
-        }
-        const command = message.body.command.trim();
         if (command.startsWith(this.imperativeInterpreter.imperativePrefix)) {
           await this.kernel.messaging.publish("/channels/input/imperative", {
             command,

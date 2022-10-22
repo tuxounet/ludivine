@@ -7,7 +7,7 @@ export class Topic extends ObservableElement {
     super(name, parent);
   }
 
-  async publish(message: Record<string, string>) {
+  async publish(message: Record<string, string>): Promise<void> {
     this.log.debug("publishing", message);
     const ev: IMessageEvent = {
       sender: this.fullName,

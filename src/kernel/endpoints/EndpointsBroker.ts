@@ -14,13 +14,13 @@ export class EndpointsBroker extends KernelElement {
   endpoints: IEndpoint[];
   routes: IEndpointRoute[];
 
-  async openEndpoints() {
+  async openEndpoints(): Promise<void> {
     await Promise.all(
       this.endpoints.map(async (item) => await item.open(this.routes))
     );
   }
 
-  async closeEndpoints() {
+  async closeEndpoints(): Promise<void> {
     await Promise.all(this.endpoints.map(async (item) => await item.close()));
   }
 
@@ -28,7 +28,7 @@ export class EndpointsBroker extends KernelElement {
     method: EndpointRouteMethod,
     path: string,
     handler: Handler
-  ) {
+  ): Promise<void> {
     this.routes.push({
       path,
       method,
@@ -36,7 +36,10 @@ export class EndpointsBroker extends KernelElement {
     });
   }
 
-  async unregisterRoute(method: EndpointRouteMethod, path: string) {
+  async unregisterRoute(
+    method: EndpointRouteMethod,
+    path: string
+  ): Promise<void> {
     this.routes = this.routes.filter(
       (item) => item.method !== method && item.path !== path
     );

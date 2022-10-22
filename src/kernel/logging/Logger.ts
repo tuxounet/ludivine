@@ -3,37 +3,37 @@ import { KernelElement } from "../bases/KernelElement";
 export class Logger {
   constructor(readonly sender: KernelElement) {}
 
-  debug(...messageParts: unknown[]) {
+  debug(...messageParts: unknown[]): void {
     console.debug(
       this.buildOutput("DBG", this.sender.fullName, ...messageParts)
     );
   }
 
-  input(...messageParts: unknown[]) {
+  input(...messageParts: unknown[]): void {
     console.info(
       this.buildOutput("INP", this.sender.fullName, ...messageParts)
     );
   }
 
-  info(...messageParts: unknown[]) {
+  info(...messageParts: unknown[]): void {
     console.info(
       this.buildOutput("INF", this.sender.fullName, ...messageParts)
     );
   }
 
-  warn(...messageParts: unknown[]) {
+  warn(...messageParts: unknown[]): void {
     console.warn(
       this.buildOutput("WRN", this.sender.fullName, ...messageParts)
     );
   }
 
-  error(...messageParts: unknown[]) {
+  error(...messageParts: unknown[]): void {
     console.error(
       this.buildOutput("ERR", this.sender.fullName, ...messageParts)
     );
   }
 
-  private buildOutput(level: string, ...messageParts: unknown[]) {
+  private buildOutput(level: string, ...messageParts: unknown[]): string {
     const parts = [
       this.toTimeString(),
       level,
@@ -44,18 +44,20 @@ export class Logger {
       .map((item) => {
         if (typeof item === "string") return item;
         if (item instanceof Error)
-          return `${item.name}: ${item.message} ${item.stack}`;
+          return `${item.name}: ${item.message} ${String(
+            item.stack ? item.stack : ""
+          )}`;
         return JSON.stringify(item);
       })
       .join(" ");
   }
 
-  private toTimeString(timestamp?: Date) {
+  private toTimeString(timestamp?: Date): string {
     if (timestamp == null) timestamp = new Date();
 
-    const formatData = (input: number) => {
+    const formatData = (input: number): string => {
       if (input > 9) {
-        return input;
+        return String(input);
       } else return `0${input}`;
     };
 
