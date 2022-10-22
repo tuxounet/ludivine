@@ -2,7 +2,7 @@
 
 Ludivine, a(n individual) virtual digital assistant
 
-# USAGE
+# Launch
 
 ## via npx
 
