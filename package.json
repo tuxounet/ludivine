@@ -60,6 +60,7 @@
   },
   "files": [
     "src",
-    "cli"
+    "cli",
+    "tsconfig.json"
   ]
 }
