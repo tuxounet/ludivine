@@ -7,7 +7,6 @@ import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
 import {
   IStorageFileSystemDriver,
   IStorageFileSystemDriverEntry,
-  IStorageFileSystemDriverStat,
 } from "../../../../shared/storage/IStorageFileSystemDriver";
 
 export interface LocalFileSystemDriverProperties
@@ -85,6 +84,22 @@ export class LocalFileSystemDriver
     };
   }
 
+  async readObjectFile<T = Record<string, unknown>>(
+    fullPath: string
+  ): Promise<IStorageFileSystemDriverEntry<T>> {
+    const realPath = await this.getRealPath(fullPath);
+    if (!fs.existsSync(realPath)) {
+      throw BasicError.notFound(this.fullName, "readFile", realPath);
+    }
+    const content = fs.readFileSync(realPath, { encoding: "utf-8" });
+
+    return {
+      path: fullPath,
+      provider: this.id,
+      body: JSON.parse(content),
+    };
+  }
+
   async existsDirectory(folder: string): Promise<boolean> {
     const realPath = await this.getRealPath(folder);
 
@@ -146,20 +161,6 @@ export class LocalFileSystemDriver
     return relative + path.sep;
   }
 
-  async stat(fullPath: string): Promise<IStorageFileSystemDriverStat> {
-    const realPath = await this.getRealPath(fullPath);
-
-    if (!fs.existsSync(realPath)) {
-      throw BasicError.notFound(this.fullName, "stat", fullPath);
-    }
-    const stat = fs.statSync(realPath);
-    return {
-      path: fullPath,
-      provider: this.id,
-      body: stat,
-    };
-  }
-
   async appendFile(fullPath: string, body: Buffer): Promise<boolean> {
     const realPath = await this.getRealPath(fullPath);
     const folder = path.dirname(realPath);
@@ -181,6 +182,16 @@ export class LocalFileSystemDriver
     const realPath = await this.getRealPath(fullPath);
 
     fs.writeFileSync(realPath, body, { encoding: "utf-8" });
+    return true;
+  }
+
+  async writeObjectFile<T = Record<string, unknown>>(
+    fullPath: string,
+    body: T
+  ): Promise<boolean> {
+    const realPath = await this.getRealPath(fullPath);
+
+    fs.writeFileSync(realPath, JSON.stringify(body), { encoding: "utf-8" });
     return true;
   }
 

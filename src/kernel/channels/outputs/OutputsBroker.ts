@@ -4,6 +4,7 @@ import { CLIOutputChannel } from "./cli";
 import { WebOutputChannel } from "./web";
 import { IKernel } from "../../../shared/kernel/IKernel";
 import { IKernelElement } from "../../../shared/kernel/IKernelElement";
+import { WebPushOutputChannel } from "./push";
 
 export class OutputsBroker extends KernelElement {
   constructor(readonly kernel: IKernel, parent: IKernelElement) {
@@ -11,6 +12,7 @@ export class OutputsBroker extends KernelElement {
     this.channels = [
       new CLIOutputChannel(kernel, this),
       new WebOutputChannel(kernel, this),
+      new WebPushOutputChannel(kernel, this),
     ];
   }
 

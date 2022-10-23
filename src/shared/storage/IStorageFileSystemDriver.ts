@@ -1,4 +1,3 @@
-import type { Stats } from "fs";
 import { IKernelElement } from "../kernel/IKernelElement";
 
 export interface IStorageFileSystemDriverEntry<T = Record<string, unknown>> {
@@ -6,9 +5,6 @@ export interface IStorageFileSystemDriverEntry<T = Record<string, unknown>> {
   provider: string;
   body?: T;
 }
-
-export interface IStorageFileSystemDriverStat
-  extends IStorageFileSystemDriverEntry<Stats> {}
 
 export interface IStorageFileSystemDriver extends IKernelElement {
   readonly id: string;
@@ -20,14 +16,20 @@ export interface IStorageFileSystemDriver extends IKernelElement {
   createDirectory: (path: string) => Promise<boolean>;
   createTempDirectory: () => Promise<string>;
   existsDirectory: (path: string) => Promise<boolean>;
-  stat: (path: string) => Promise<IStorageFileSystemDriverStat>;
   getRealPath: (path: string) => Promise<string>;
   getRelativePath: (path: string) => Promise<string>;
   readTextFile: (
     path: string
   ) => Promise<IStorageFileSystemDriverEntry<string>>;
+  readObjectFile: <T = Record<string, unknown>>(
+    path: string
+  ) => Promise<IStorageFileSystemDriverEntry<T>>;
   readFile: (path: string) => Promise<IStorageFileSystemDriverEntry<Buffer>>;
   writeTextFile: (path: string, body: string) => Promise<boolean>;
+  writeObjectFile: <T = Record<string, unknown>>(
+    path: string,
+    body: T
+  ) => Promise<boolean>;
   writeFile: (path: string, body: Buffer) => Promise<boolean>;
   appendFile: (path: string, body: Buffer) => Promise<boolean>;
   deleteFile: (path: string) => Promise<boolean>;

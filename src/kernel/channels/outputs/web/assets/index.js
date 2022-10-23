@@ -5,7 +5,7 @@ async function start() {
   const result = await fetch(configUrl);
   const body = await result.json();
   sessionStorage.setItem("clientId", body.clientId);
-
+  await startServiceWorker();
   // channel output binding
   const evs = new EventSource("/events");
   evs.onopen = () => {
@@ -78,7 +78,124 @@ async function sendInput(element) {
   element.removeAttribute("disabled");
   element.focus();
 }
-
+async function startServiceWorker() {
+  const pushServerPublicKey = vapi_pub;
+  /**
+   * checks if Push notification and service workers are supported by your browser
+   */
+  function isPushNotificationSupported() {
+    return "serviceWorker" in navigator && "PushManager" in window;
+  }
+  function isServiceWorkerSupported() {
+    return navigator && navigator.serviceWorker !== undefined;
+  }
+  /**
+   * asks user consent to receive push notifications and returns the response of the user, one of granted, default, denied
+   */
+  function initializePushNotifications() {
+    // request user grant to show notification
+    return Notification.requestPermission(function (result) {
+      return result;
+    });
+  }
+  /**
+   * shows a notification
+   */
+  function sendWelcome() {
+    const text = "Enregistrement du terminal effectué";
+    const title = "Souscription";
+    const options = {
+      body: text,       
+      vibrate: [200, 100, 200],
+      tag: "welcome",
+      actions: [{ action: "/", title: "Ouvrir" }],
+    };
+    navigator.serviceWorker.ready.then(function (serviceWorker) {
+      serviceWorker.showNotification(title, options);
+    });
+  }
+  let refreshing;
+  /**
+   *
+   */
+  const registerServiceWorker= ()=> {
+    // The event listener that is fired when the service worker updates
+    // Here we reload the page
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (refreshing) return;
+      window.location.reload();
+      refreshing = true;
+    });
+    navigator.serviceWorker.register("/sw.js").then(function (swRegistration) {
+      //you can do something with the service wrker registration (swRegistration)
+      console.info("sw registered");
+      swRegistration.addEventListener("updatefound", () => {
+        // An updated service worker has appeared in reg.installing!
+        newWorker = swRegistration.installing;
+        newWorker.addEventListener("statechange", () => {
+          // Has service worker state changed?
+          switch (newWorker.state) {
+            case "installed":
+              // There is a new service worker available, show the notification
+              if (navigator.serviceWorker.controller) {
+                console.info("new version available, updating");
+                newWorker.postMessage({ action: "skipWaiting" });
+              }
+              break;
+          }
+        });
+      });
+    });
+  }
+  /**
+   *
+   * using the registered service worker creates a push notification subscription and returns it
+   *
+   */
+  function createNotificationSubscription() {
+    //wait for service worker installation to be ready, and then
+    return navigator.serviceWorker.ready.then(function (serviceWorker) {
+      // subscribe and return the subscription
+      return serviceWorker.pushManager
+        .subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: pushServerPublicKey,
+        })
+        .then(function (subscription) {
+          console.log("User is subscribed.", subscription);
+          return subscription;
+        })
+        .then((sub) => {
+          return fetch("/subscribe", {
+            headers: {
+              "content-type": "application/json;charset=UTF-8",
+              "sec-fetch-mode": "cors",
+            },
+            body: JSON.stringify(sub),
+            method: "POST",
+            mode: "cors",
+          });
+        })
+        .then((data) => {
+          if (data.status === 201) {
+            console.info("user registered", data.status);
+            sendWelcome();
+          }
+        })
+        .catch((e) => console.error(e));
+    });
+  }
+  const serviceWorkerSupported = isServiceWorkerSupported();
+  const pushNotificationSuported = isPushNotificationSupported();
+  if (serviceWorkerSupported && pushNotificationSuported) {
+    registerServiceWorker();
+    initializePushNotifications().then(function (consent) {
+      if (consent === "granted") {
+        createNotificationSubscription();
+      }
+    });
+  }
+}
 start()
   .then(() => {
     console.info("started");

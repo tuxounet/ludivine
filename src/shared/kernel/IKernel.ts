@@ -4,6 +4,7 @@ import { IMessagingBroker } from "../messaging/IMessagingBroker";
 import { IStorageBroker } from "../storage/IStorageBroker";
 
 export interface IKernel {
+  readonly version: string;
   started: boolean;
   logging: ILogBroker;
   storage: IStorageBroker;

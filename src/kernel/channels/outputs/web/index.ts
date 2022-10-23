@@ -4,6 +4,7 @@ import { IOutputChannel } from "../../../../shared/channels/IOutputChannel";
 import express from "express";
 import { IOutputMessage } from "../../../../shared/channels/IOutputMessage";
 import { IKernel } from "../../../../shared/kernel/IKernel";
+import { vapidKeys } from "../push/keys";
 export class WebOutputChannel extends KernelElement implements IOutputChannel {
   constructor(readonly kernel: IKernel, parent: KernelElement) {
     super("web-output", kernel, parent);
@@ -49,6 +50,22 @@ export class WebOutputChannel extends KernelElement implements IOutputChannel {
         res.sendFile(path.join(this.assetsFolder, "index.js"));
       }
     );
+    await this.kernel.endpoints.registerRoute("GET", "/sw.js", (req, res) => {
+      res.sendFile(path.join(this.assetsFolder, "sw.js"));
+    });
+
+    await this.kernel.endpoints.registerRoute(
+      "GET",
+      "/version.js",
+      (req, res) => {
+        res
+          .contentType(".js")
+          .send(`const cache_version = "${this.kernel.version}"`);
+      }
+    );
+    await this.kernel.endpoints.registerRoute("GET", "/push.js", (req, res) => {
+      res.contentType(".js").send(`const vapi_pub = "${vapidKeys.publicKey}";`);
+    });
 
     await this.kernel.endpoints.registerRoute("GET", "/events", (req, res) => {
       const headers = {

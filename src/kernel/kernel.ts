@@ -17,7 +17,7 @@ export class Kernel implements IKernel {
   compute: ComputeBroker;
   logging: LogBroker;
   storage: StoragesBroker;
-  constructor() {
+  constructor(readonly version: string) {
     this.fullName = "kernel";
     this.production = process.env.NODE_ENV === "production";
     this.logging = new LogBroker(this);
