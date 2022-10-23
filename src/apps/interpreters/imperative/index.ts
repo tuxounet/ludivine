@@ -1,7 +1,7 @@
-import { AppElement } from "../../../kernel/bases/AppElement";
-import { KernelElement } from "../../../kernel/bases/KernelElement";
+import { AppElement } from "../../../shared/bases/AppElement";
+import { KernelElement } from "../../../shared/bases/KernelElement";
 import { Kernel } from "../../../kernel/kernel";
-import { IMessageEvent } from "../../../kernel/messaging/IMessageEvent";
+import { IMessageEvent } from "../../../shared/messaging/IMessageEvent";
 
 export class ImperativeInterpreterApp extends AppElement {
   constructor(readonly kernel: Kernel, parent: KernelElement) {
@@ -48,7 +48,7 @@ export class ImperativeInterpreterApp extends AppElement {
         return await this.kernel.askShutdown();
     }
 
-    function walkToken(object: KernelElement, token: string): any {
+    function walkToken(object: KernelElement | Kernel, token: string): any {
       for (const key in object) {
         const lowerKey = key.toLowerCase();
         if (lowerKey === token) {
@@ -59,7 +59,7 @@ export class ImperativeInterpreterApp extends AppElement {
       }
     }
 
-    let broker: KernelElement = this.kernel;
+    let broker: KernelElement | Kernel = this.kernel;
     for (let i = 0; i < tokens.length; i++) {
       const result = walkToken(broker, tokens[i]);
       if (result === undefined) {

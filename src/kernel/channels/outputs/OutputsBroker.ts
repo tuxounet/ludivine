@@ -1,15 +1,18 @@
-import { KernelElement } from "../../bases/KernelElement";
-import { Kernel } from "../../kernel";
-import { IOutputChannel } from "../types/IOutputChannel";
+import { KernelElement } from "../../../shared/bases/KernelElement";
+import { IOutputChannel } from "../../../shared/channels/IOutputChannel";
 import { CLIOutputChannel } from "./cli";
 import { WebOutputChannel } from "./web";
+import { IKernel } from "../../../shared/kernel/IKernel";
+import { IKernelElement } from "../../../shared/kernel/IKernelElement";
+import { WebPushOutputChannel } from "./push";
 
 export class OutputsBroker extends KernelElement {
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
-    super("outputs-broker", parent);
+  constructor(readonly kernel: IKernel, parent: IKernelElement) {
+    super("outputs-broker", kernel, parent);
     this.channels = [
       new CLIOutputChannel(kernel, this),
       new WebOutputChannel(kernel, this),
+      new WebPushOutputChannel(kernel, this),
     ];
   }
 

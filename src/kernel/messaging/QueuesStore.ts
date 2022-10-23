@@ -1,9 +1,11 @@
-import { KernelElement } from "../bases/KernelElement";
+import { KernelElement } from "../../shared/bases/KernelElement";
+import { IKernel } from "../../shared/kernel/IKernel";
+import { IKernelElement } from "../../shared/kernel/IKernelElement";
 import { Queue } from "./Queue";
 
 export class QueuesStore extends KernelElement {
-  constructor(readonly parent: KernelElement) {
-    super("queues-store", parent);
+  constructor(readonly kernel: IKernel, readonly parent: IKernelElement) {
+    super("queues-store", kernel, parent);
     this.queues = new Map();
   }
 
@@ -11,7 +13,7 @@ export class QueuesStore extends KernelElement {
 
   async registerQueue(name: string): Promise<void> {
     this.log.debug("registering", name);
-    const queue = new Queue(name, this);
+    const queue = new Queue(name, this.kernel, this);
     this.queues.set(name, queue);
     this.log.debug("registed", name);
   }

@@ -1,11 +1,11 @@
-import { ComputeRuntimeElement } from "../kernel/bases/ComputeRuntimeElement";
-import { KernelElement } from "../kernel/bases/KernelElement";
-import { Kernel } from "../kernel/kernel";
-import { IComputeDependency } from "../kernel/compute/types/IComputeRuntime";
-import { BasicError } from "../kernel/errors/BasicError";
+import { ComputeRuntimeElement } from "../shared/bases/ComputeRuntimeElement";
+import { IComputeDependency } from "../shared/compute/IComputeRuntime";
+import { BasicError } from "../shared/errors/BasicError";
+import { IKernel } from "../shared/kernel/IKernel";
+import { IKernelElement } from "../shared/kernel/IKernelElement";
 
 export class ComputeRuntimeTypescript extends ComputeRuntimeElement {
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
+  constructor(readonly kernel: IKernel, parent: IKernelElement) {
     super("typescript-local", "ts-node", kernel, parent);
     this.commandsDependencies = [
       {

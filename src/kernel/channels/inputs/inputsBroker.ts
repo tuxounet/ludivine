@@ -1,12 +1,12 @@
-import { KernelElement } from "../../bases/KernelElement";
+import { KernelElement } from "../../../shared/bases/KernelElement";
 import { Kernel } from "../../kernel";
-import { IInputChannel } from "../types/IInputChannel";
+import { IInputChannel } from "../../../shared/channels/IInputChannel";
 import { CLIInputChannel } from "./cli";
 import { HttpInputChannel } from "./http";
 
 export class InputsBroker extends KernelElement {
   constructor(readonly kernel: Kernel, parent: KernelElement) {
-    super("inputs-broker", parent);
+    super("inputs-broker", kernel, parent);
     this.channels = [
       new CLIInputChannel(kernel, this),
       new HttpInputChannel(kernel, this),

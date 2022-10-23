@@ -1,13 +1,13 @@
 import fs from "fs";
 import path from "path";
-import { KernelElement } from "../../../bases/KernelElement";
-import { BasicError } from "../../../errors/BasicError";
-
+import { KernelElement } from "../../../../shared/bases/KernelElement";
+import { BasicError } from "../../../../shared/errors/BasicError";
+import { IKernel } from "../../../../shared/kernel/IKernel";
+import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
 import {
   IStorageFileSystemDriver,
   IStorageFileSystemDriverEntry,
-  IStorageFileSystemDriverStat,
-} from "../types/IStorageFileSystemDriver";
+} from "../../../../shared/storage/IStorageFileSystemDriver";
 
 export interface LocalFileSystemDriverProperties
   extends Record<string, unknown> {
@@ -22,9 +22,10 @@ export class LocalFileSystemDriver
 
   constructor(
     readonly properties: Record<string, unknown>,
-    parent: KernelElement
+    readonly kernel: IKernel,
+    readonly parent: IKernelElement
   ) {
-    super("local-fs", parent);
+    super("local-fs", kernel, parent);
     this.id = "local";
   }
 
@@ -80,6 +81,22 @@ export class LocalFileSystemDriver
       path: fullPath,
       provider: this.id,
       body: content,
+    };
+  }
+
+  async readObjectFile<T = Record<string, unknown>>(
+    fullPath: string
+  ): Promise<IStorageFileSystemDriverEntry<T>> {
+    const realPath = await this.getRealPath(fullPath);
+    if (!fs.existsSync(realPath)) {
+      throw BasicError.notFound(this.fullName, "readFile", realPath);
+    }
+    const content = fs.readFileSync(realPath, { encoding: "utf-8" });
+
+    return {
+      path: fullPath,
+      provider: this.id,
+      body: JSON.parse(content),
     };
   }
 
@@ -144,18 +161,14 @@ export class LocalFileSystemDriver
     return relative + path.sep;
   }
 
-  async stat(fullPath: string): Promise<IStorageFileSystemDriverStat> {
+  async appendFile(fullPath: string, body: Buffer): Promise<boolean> {
     const realPath = await this.getRealPath(fullPath);
-
-    if (!fs.existsSync(realPath)) {
-      throw BasicError.notFound(this.fullName, "stat", fullPath);
+    const folder = path.dirname(realPath);
+    if (!fs.existsSync(folder)) {
+      fs.mkdirSync(folder);
     }
-    const stat = fs.statSync(realPath);
-    return {
-      path: fullPath,
-      provider: this.id,
-      body: stat,
-    };
+    fs.appendFileSync(realPath, body);
+    return true;
   }
 
   async writeFile(fullPath: string, body: Buffer): Promise<boolean> {
@@ -169,6 +182,16 @@ export class LocalFileSystemDriver
     const realPath = await this.getRealPath(fullPath);
 
     fs.writeFileSync(realPath, body, { encoding: "utf-8" });
+    return true;
+  }
+
+  async writeObjectFile<T = Record<string, unknown>>(
+    fullPath: string,
+    body: T
+  ): Promise<boolean> {
+    const realPath = await this.getRealPath(fullPath);
+
+    fs.writeFileSync(realPath, JSON.stringify(body), { encoding: "utf-8" });
     return true;
   }
 

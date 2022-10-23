@@ -2,18 +2,19 @@ import { ComputeRuntimeBash } from "../../runtimes/bash-local";
 import { ComputeRuntimeJavascript } from "../../runtimes/javascript-local";
 import { ComputeRuntimePython } from "../../runtimes/python-local";
 import { ComputeRuntimeTypescript } from "../../runtimes/typescript-local";
-import { KernelElement } from "../bases/KernelElement";
-import { BasicError } from "../errors/BasicError";
-import { Kernel } from "../kernel";
+import { KernelElement } from "../../shared/bases/KernelElement";
+import { BasicError } from "../../shared/errors/BasicError";
+
 import {
   IComputeExecuteResult,
   IComputeProjectCode,
   IComputeRuntime,
   IComputeSourceCode,
-} from "./types/IComputeRuntime";
+} from "../../shared/compute/IComputeRuntime";
+import { IKernel } from "../../shared/kernel/IKernel";
 
 export class ComputeBroker extends KernelElement {
-  constructor(readonly kernel: Kernel) {
+  constructor(readonly kernel: IKernel) {
     super("compute-broker", kernel);
     this.runtimes = [
       new ComputeRuntimeBash(kernel, this),

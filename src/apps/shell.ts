@@ -1,7 +1,7 @@
-import { AppElement } from "../kernel/bases/AppElement";
-import { KernelElement } from "../kernel/bases/KernelElement";
+import { AppElement } from "../shared/bases/AppElement";
+import { KernelElement } from "../shared/bases/KernelElement";
 import { Kernel } from "../kernel/kernel";
-import { IMessageEvent } from "../kernel/messaging/IMessageEvent";
+import { IMessageEvent } from "../shared/messaging/IMessageEvent";
 import { ImperativeInterpreterApp } from "./interpreters/imperative";
 import { NaturalInterpreterApp } from "./interpreters/natural";
 

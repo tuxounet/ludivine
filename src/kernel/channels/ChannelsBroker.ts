@@ -1,8 +1,8 @@
-import { KernelElement } from "../bases/KernelElement";
+import { KernelElement } from "../../shared/bases/KernelElement";
 import { Kernel } from "../kernel";
 import { InputsBroker } from "./inputs/inputsBroker";
 import { OutputsBroker } from "./outputs/OutputsBroker";
-import { IOutputMessage } from "./types/IOutputMessage";
+import { IOutputMessage } from "../../shared/channels/IOutputMessage";
 
 export class ChannelsBroker extends KernelElement {
   inputs: InputsBroker;

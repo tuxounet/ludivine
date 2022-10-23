@@ -1,13 +1,14 @@
-import { KernelElement } from "../../bases/KernelElement";
-import { BasicError } from "../../errors/BasicError";
+import { KernelElement } from "../../../shared/bases/KernelElement";
+import { BasicError } from "../../../shared/errors/BasicError";
 import { StoragesBroker } from "../StoragesBroker";
 import { LocalPathDriver } from "./drivers/LocalPathDriver";
-import { IStoragePathsCtor } from "./types/IStoragePathsCtor";
-import { IStoragePathsDriver } from "./types/IStoragePathsDriver";
+import { IStoragePathsCtor } from "../../../shared/storage/IStoragePathsCtor";
+import { IKernel } from "../../../shared/kernel/IKernel";
+import { IStoragePathsDriver } from "../../../shared/storage/IStoragePathsDriver";
 
 export class StoragePathsFactory extends KernelElement {
-  constructor(parent: StoragesBroker) {
-    super("storage-paths", parent);
+  constructor(readonly kernel: IKernel, parent: StoragesBroker) {
+    super("storage-paths", kernel, parent);
     this.providers = new Map();
     this.drivers = new Set();
   }
@@ -17,7 +18,10 @@ export class StoragePathsFactory extends KernelElement {
 
   async initialize(): Promise<void> {
     this.providers.clear();
-    this.providers.set("local", (props) => new LocalPathDriver(props, this));
+    this.providers.set(
+      "local",
+      (props) => new LocalPathDriver(props, this.kernel, this)
+    );
     this.drivers.clear();
   }
 

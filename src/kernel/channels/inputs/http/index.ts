@@ -1,10 +1,10 @@
-import { KernelElement } from "../../../bases/KernelElement";
+import { KernelElement } from "../../../../shared/bases/KernelElement";
 import { Kernel } from "../../../kernel";
-import { IInputChannel } from "../../types/IInputChannel";
+import { IInputChannel } from "../../../../shared/channels/IInputChannel";
 
 export class HttpInputChannel extends KernelElement implements IInputChannel {
   constructor(readonly kernel: Kernel, parent: KernelElement) {
-    super("http-input", parent);
+    super("http-input", kernel, parent);
     this.opened = false;
   }
 
