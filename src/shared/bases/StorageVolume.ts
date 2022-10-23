@@ -1,8 +1,9 @@
-import { IStorageFileSystemDriver } from "../../kernel/storage/filesystems/types/IStorageFileSystemDriver";
-import { IStoragePathsDriver } from "../../kernel/storage/paths/types/IStoragePathsDriver";
-import { IStorageVolume } from "../../kernel/storage/types/IStorageVolume";
+import { IStorageVolume } from "../storage/IStorageVolume";
 import { IKernel } from "../kernel/IKernel";
 import { KernelElement } from "./KernelElement";
+import { IStorageFileSystemDriver } from "../storage/IStorageFileSystemDriver";
+import { IStoragePathsDriver } from "../storage/IStoragePathsDriver";
+import { IKernelElement } from "../kernel/IKernelElement";
 
 export abstract class StorageVolume
   extends KernelElement
@@ -16,7 +17,7 @@ export abstract class StorageVolume
     readonly paths: IStoragePathsDriver,
     readonly fileSystem: IStorageFileSystemDriver,
     readonly kernel: IKernel,
-    parent: KernelElement
+    readonly parent: IKernelElement
   ) {
     super(name, kernel, parent);
   }

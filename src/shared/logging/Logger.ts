@@ -1,48 +1,49 @@
 import { KernelElement } from "../bases/KernelElement";
+import { LogLevels } from "./_index";
 
 export class Logger {
   constructor(
     readonly sender: KernelElement,
-    readonly callback: (line: string) => void
+    readonly callback: (level: LogLevels, line: string) => void
   ) {}
 
   debug(...messageParts: unknown[]): void {
     this.callback(
-      this.buildOutput("DBG", this.sender.fullName, ...messageParts)
+      "DEBUG",
+      this.buildOutput(this.sender.fullName, ...messageParts)
     );
   }
 
   input(...messageParts: unknown[]): void {
     this.callback(
-      this.buildOutput("INP", this.sender.fullName, ...messageParts)
+      "INPUT",
+      this.buildOutput(this.sender.fullName, ...messageParts)
     );
   }
 
   info(...messageParts: unknown[]): void {
     this.callback(
-      this.buildOutput("INF", this.sender.fullName, ...messageParts)
+      "INFO",
+      this.buildOutput(this.sender.fullName, ...messageParts)
     );
   }
 
   warn(...messageParts: unknown[]): void {
     this.callback(
-      this.buildOutput("WRN", this.sender.fullName, ...messageParts)
+      "WARN",
+      this.buildOutput(this.sender.fullName, ...messageParts)
     );
   }
 
   error(...messageParts: unknown[]): void {
     this.callback(
-      this.buildOutput("ERR", this.sender.fullName, ...messageParts)
+      "ERROR",
+      this.buildOutput(this.sender.fullName, ...messageParts)
     );
   }
 
-  private buildOutput(level: string, ...messageParts: unknown[]): string {
-    const parts = [
-      this.toTimeString(),
-      level,
-      this.sender.fullName,
-      ...messageParts,
-    ];
+  private buildOutput(...messageParts: unknown[]): string {
+    const parts = [this.toTimeString(), this.sender.fullName, ...messageParts];
     return parts
       .map((item) => {
         if (typeof item === "string") return item;

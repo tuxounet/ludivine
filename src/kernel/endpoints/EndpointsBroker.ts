@@ -7,7 +7,8 @@ import {
   EndpointRouteMethod,
   IEndpointRoute,
 } from "../../shared/endpoints/IEndpointRoute";
-export class EndpointsBroker extends KernelElement {
+import { IEndpointsBroker } from "../../shared/endpoints/IEndpointsBroker";
+export class EndpointsBroker extends KernelElement implements IEndpointsBroker {
   constructor(readonly kernel: Kernel) {
     super("endpoints-broker", kernel);
     this.endpoints = [new HttpEndpoint(kernel, this)];

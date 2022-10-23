@@ -1,11 +1,16 @@
 import { KernelElement } from "../../shared/bases/KernelElement";
 import { ObservableElement } from "../../shared/bases/ObservableElement";
 import { BasicError } from "../../shared/errors/BasicError";
+import { IKernel } from "../../shared/kernel/IKernel";
 
 export class Queue<T = Record<string, unknown>> extends ObservableElement {
   q: T[];
-  constructor(name: string, parent: KernelElement) {
-    super(name, parent);
+  constructor(
+    name: string,
+    readonly kernel: IKernel,
+    readonly parent: KernelElement
+  ) {
+    super(name, kernel, parent);
     this.q = [];
   }
 

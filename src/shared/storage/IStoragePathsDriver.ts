@@ -1,4 +1,4 @@
-import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
+import { IKernelElement } from "../kernel/IKernelElement";
 
 export interface IStoragePathsDriver extends IKernelElement {
   id: string;

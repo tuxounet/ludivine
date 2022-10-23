@@ -1,18 +1,19 @@
 import { KernelElement } from "../shared/bases/KernelElement";
 import { StorageVolume } from "../shared/bases/StorageVolume";
-import { Kernel } from "../kernel/kernel";
+import { IKernel } from "../shared/kernel/IKernel";
 
 export class WorkspaceVolume extends StorageVolume {
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
+  constructor(readonly kernel: IKernel, parent: KernelElement) {
     super(
       "workspace-volume",
       "workspace",
       false,
       true,
-      kernel.storage.pathsFactory.getOneDriver("local", {}),
-      kernel.storage.fileSystemsFactory.getOneDriver("local", {
+      kernel.storage.createPathsDriver("local"),
+      kernel.storage.createFileSystemDriver("local", {
         folder: "home",
       }),
+      kernel,
       parent
     );
   }

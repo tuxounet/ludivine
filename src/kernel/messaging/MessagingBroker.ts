@@ -1,14 +1,14 @@
 import { KernelElement } from "../../shared/bases/KernelElement";
 import { BasicError } from "../../shared/errors/BasicError";
-import { Kernel } from "../kernel";
+import { IKernel } from "../../shared/kernel/IKernel";
 import { QueuesStore } from "./QueuesStore";
 import { TopicsStore } from "./TopicsStore";
 
 export class MessagingBroker extends KernelElement {
-  constructor(kernel: Kernel) {
+  constructor(kernel: IKernel) {
     super("topic-broker", kernel);
-    this.topicsStore = new TopicsStore(this);
-    this.queuesStore = new QueuesStore(this);
+    this.topicsStore = new TopicsStore(this.kernel, this);
+    this.queuesStore = new QueuesStore(this.kernel, this);
   }
 
   topicsStore: TopicsStore;

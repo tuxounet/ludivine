@@ -1,10 +1,15 @@
 import { KernelElement } from "../../shared/bases/KernelElement";
 import { ObservableElement } from "../../shared/bases/ObservableElement";
-import { IMessageEvent } from "./IMessageEvent";
+import { IKernel } from "../../shared/kernel/IKernel";
+import { IMessageEvent } from "../../shared/messaging/IMessageEvent";
 
 export class Topic extends ObservableElement {
-  constructor(readonly name: string, parent: KernelElement) {
-    super(name, parent);
+  constructor(
+    readonly name: string,
+    readonly kernel: IKernel,
+    readonly parent: KernelElement
+  ) {
+    super(name, kernel, parent);
   }
 
   async publish(message: Record<string, string>): Promise<void> {

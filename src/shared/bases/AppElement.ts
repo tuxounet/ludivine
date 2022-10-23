@@ -1,5 +1,5 @@
 import { Kernel } from "../../kernel/kernel";
-import { IMessageEvent } from "../../kernel/messaging/IMessageEvent";
+import { IMessageEvent } from "../messaging/IMessageEvent";
 import { KernelElement } from "./KernelElement";
 
 export interface IAppElement {
@@ -14,7 +14,7 @@ export abstract class AppElement extends KernelElement implements IAppElement {
     readonly kernel: Kernel,
     readonly subscriptions?: string[]
   ) {
-    super(name, kernel, subscriptions);
+    super(name, kernel, parent, subscriptions);
   }
 
   async execute(): Promise<number> {

@@ -1,12 +1,12 @@
 import path from "path";
 import { KernelElement } from "../../../../shared/bases/KernelElement";
 import { IOutputChannel } from "../../../../shared/channels/IOutputChannel";
-import { Kernel } from "../../../kernel";
 import express from "express";
 import { IOutputMessage } from "../../../../shared/channels/IOutputMessage";
+import { IKernel } from "../../../../shared/kernel/IKernel";
 export class WebOutputChannel extends KernelElement implements IOutputChannel {
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
-    super("web-output", parent);
+  constructor(readonly kernel: IKernel, parent: KernelElement) {
+    super("web-output", kernel, parent);
     this.opened = false;
 
     this.assetsFolder = path.join(__dirname, "assets");

@@ -9,6 +9,6 @@ export class LogTargetFile extends KernelElement implements ILogTarget {
   }
 
   appendLog(level: LogLevels, ...parts: string[]): void {
-    throw new Error("Method not implemented.");
+    console.info("file", level, ...parts);
   }
 }

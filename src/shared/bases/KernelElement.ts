@@ -7,11 +7,13 @@ export abstract class KernelElement extends Observer implements IKernelElement {
   constructor(
     readonly name: string,
     readonly kernel: IKernel,
-    readonly parent?: KernelElement,
+    readonly parent?: IKernelElement,
     readonly substriptions?: string[]
   ) {
     super();
-    this.log = new Logger(this, this.kernel.logging.output);
+    this.log = new Logger(this, (level, line) => {
+      this.kernel.logging.output(level, line);
+    });
   }
 
   async initialize(): Promise<void> {

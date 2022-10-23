@@ -2,21 +2,40 @@ import { RunspaceVolume } from "../../volumes/RunspaceVolume";
 import { WorkspaceVolume } from "../../volumes/WorkspaceVolume";
 import { KernelElement } from "../../shared/bases/KernelElement";
 import { BasicError } from "../../shared/errors/BasicError";
-import { Kernel } from "../kernel";
 import { StorageFileSystemsFactory } from "./filesystems/StorageFileSystemsFactory";
 import { StoragePathsFactory } from "./paths/StoragePathsFactory";
-import { IStorageVolume } from "./types/IStorageVolume";
+import { IStorageVolume } from "../../shared/storage/IStorageVolume";
 import { IKernel } from "../../shared/kernel/IKernel";
+import { IStorageBroker } from "../../shared/storage/IStorageBroker";
+import { IStoragePathsDriver } from "../../shared/storage/IStoragePathsDriver";
+import { IStorageFileSystemDriver } from "../../shared/storage/IStorageFileSystemDriver";
 
-export class StoragesBroker extends KernelElement {
+export class StoragesBroker extends KernelElement implements IStorageBroker {
   fileSystemsFactory: StorageFileSystemsFactory;
   pathsFactory: StoragePathsFactory;
   volumes: Map<string, IStorageVolume>;
   constructor(readonly kernel: IKernel) {
     super("storage", kernel);
-    this.fileSystemsFactory = new StorageFileSystemsFactory(this);
-    this.pathsFactory = new StoragePathsFactory(this);
+    this.fileSystemsFactory = new StorageFileSystemsFactory(this.kernel, this);
+    this.pathsFactory = new StoragePathsFactory(this.kernel, this);
     this.volumes = new Map();
+  }
+
+  createPathsDriver(
+    name: string,
+    params?: Record<string, unknown>
+  ): IStoragePathsDriver {
+    return this.pathsFactory.getOneDriver(name, params != null ? params : {});
+  }
+
+  createFileSystemDriver(
+    name: string,
+    params?: Record<string, unknown>
+  ): IStorageFileSystemDriver {
+    return this.fileSystemsFactory.getOneDriver(
+      name,
+      params != null ? params : {}
+    );
   }
 
   async initialize(): Promise<void> {

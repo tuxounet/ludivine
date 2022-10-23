@@ -5,4 +5,14 @@ import * as compute from "./compute/_index";
 import * as endpoints from "./endpoints/_index";
 import * as errors from "./errors/_index";
 import * as logging from "./logging/_index";
-export { bases, kernel, channels, compute, endpoints, errors, logging };
+import * as storage from "./storage/_index";
+export {
+  bases,
+  kernel,
+  channels,
+  compute,
+  endpoints,
+  errors,
+  logging,
+  storage,
+};

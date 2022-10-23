@@ -3,12 +3,11 @@ import path from "path";
 import { KernelElement } from "../../../../shared/bases/KernelElement";
 import { BasicError } from "../../../../shared/errors/BasicError";
 import { IKernel } from "../../../../shared/kernel/IKernel";
-
 import {
   IStorageFileSystemDriver,
   IStorageFileSystemDriverEntry,
   IStorageFileSystemDriverStat,
-} from "../types/IStorageFileSystemDriver";
+} from "../../../../shared/storage/IStorageFileSystemDriver";
 
 export interface LocalFileSystemDriverProperties
   extends Record<string, unknown> {
