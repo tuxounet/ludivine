@@ -62,7 +62,7 @@ export class ImperativeInterpreterApp extends AppElement {
     let broker: KernelElement = this.kernel;
     for (let i = 0; i < tokens.length; i++) {
       const result = walkToken(broker, tokens[i]);
-      if (result !== undefined) {
+      if (result === undefined) {
         break;
       }
       if (typeof result === "object") {
