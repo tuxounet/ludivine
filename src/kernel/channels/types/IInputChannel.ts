@@ -7,8 +7,6 @@ export interface IChannelInputResult {
 
 export interface IInputChannel extends IKernelElement {
   opened: boolean;
-  initialize?: () => Promise<void>;
-  destroy?: () => Promise<void>;
   open: () => Promise<void>;
   close: () => Promise<void>;
 }

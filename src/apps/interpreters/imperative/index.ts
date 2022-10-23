@@ -21,7 +21,7 @@ export class ImperativeInterpreterApp extends AppElement {
     );
     switch (message.recipient) {
       case "/channels/input/imperative":
-        await this.kernel.output(
+        await this.kernel.channels.broadcast(
           "commande imperative recu " +
             message.body.command +
             " depuis " +
@@ -62,7 +62,7 @@ export class ImperativeInterpreterApp extends AppElement {
     let broker: KernelElement = this.kernel;
     for (let i = 0; i < tokens.length; i++) {
       const result = walkToken(broker, tokens[i]);
-      if (result !== undefined) {
+      if (result === undefined) {
         break;
       }
       if (typeof result === "object") {
@@ -77,7 +77,7 @@ export class ImperativeInterpreterApp extends AppElement {
         }
 
         const output = await result.apply(broker, args);
-        await this.kernel.output(
+        await this.kernel.channels.broadcast(
           "command ok:" + String(cleanCommand) + " : " + String(output)
         );
         return;
@@ -90,7 +90,7 @@ export class ImperativeInterpreterApp extends AppElement {
         anyBroker[item] instanceof KernelElement
       );
     });
-    await this.kernel.output(
+    await this.kernel.channels.broadcast(
       "bad command : possible tokens " + possibleMethods.join(",")
     );
   }

@@ -3,6 +3,7 @@ import { KernelElement } from "../../../bases/KernelElement";
 import { IOutputChannel } from "../../types/IOutputChannel";
 import { Kernel } from "../../../kernel";
 import express from "express";
+import { IOutputMessage } from "../../types/IOutputMessage";
 export class WebOutputChannel extends KernelElement implements IOutputChannel {
   constructor(readonly kernel: Kernel, parent: KernelElement) {
     super("web-output", parent);
@@ -84,7 +85,7 @@ export class WebOutputChannel extends KernelElement implements IOutputChannel {
     );
   }
 
-  async output(message: string): Promise<void> {
+  async output(message: IOutputMessage): Promise<void> {
     this.log.info("output", message);
     const ev = {
       date: new Date().toISOString(),

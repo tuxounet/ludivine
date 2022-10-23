@@ -10,22 +10,26 @@ import { KernelElement } from "./KernelElement";
 import commandExists from "command-exists";
 import { BasicError } from "../errors/BasicError";
 import childProc from "child_process";
-import fs from "fs";
-import path from "path";
-import { KERNEL_TMP_PREFIX } from "../constants";
+import { Kernel } from "../kernel";
+import { LocalFileSystemDriver } from "../storage/filesystems/drivers/LocalFileSystemDriver";
 
 export abstract class ComputeRuntimeElement
   extends KernelElement
   implements IComputeRuntime
 {
-  constructor(name: string, parent: KernelElement, subscriptions?: string[]) {
+  constructor(
+    name: string,
+    readonly commandPrefix: string,
+    readonly kernel: Kernel,
+    parent: KernelElement,
+    subscriptions?: string[]
+  ) {
     super(name, parent, subscriptions);
     this.commandsDependencies = [];
-    this.runDirectory = KERNEL_TMP_PREFIX;
   }
 
   commandsDependencies: IComputeCommandDependency[];
-  protected runDirectory: string;
+  protected runDirectory?: string;
   async ensureCommandDependencies(): Promise<void> {
     const failed: IComputeDependency[] = [];
     for (const dep of this.commandsDependencies) {
@@ -51,56 +55,162 @@ export abstract class ComputeRuntimeElement
   async unprovision(): Promise<boolean> {
     return false;
   }
+
+  async executeSource(
+    source: IComputeSourceCode
+  ): Promise<IComputeExecuteResult> {
+    await this.createNewRunDir();
+    await this.ensureDependencies(source.dependencies);
+    const fileName = source.name + "." + source.extension;
+    await this.writeSourceFile(fileName, source.body);
+
+    const rc = await this.executeSystemCommand(
+      `${this.commandPrefix} ./${fileName} ${
+        source.args != null ? source.args.join(" ") : " "
+      }`
+    );
+
+    const logs = await this.extractRunLog();
+
+    await this.cleanupRunDir();
+
+    return {
+      rc,
+      output: logs,
+    };
+  }
+
+  async executeProject(
+    project: IComputeProjectCode
+  ): Promise<IComputeExecuteResult> {
+    await this.createNewRunDir();
+    if (this.runDirectory === undefined)
+      throw BasicError.notFound(
+        this.fullName,
+        "executeProject",
+        "runDirectory"
+      );
+    const projectVolume = new LocalFileSystemDriver(
+      { folder: project.path },
+      this
+    );
+    const runVolume = await this.kernel.storage.getVolume("runspace");
+
+    const entries = await projectVolume.list(".");
+
+    await Promise.all(
+      entries.map(async (item) => {
+        const body = await projectVolume.readFile(item.path);
+        if (body.body == null) return;
+        if (this.runDirectory == null) return;
+        await runVolume.fileSystem.writeFile(
+          runVolume.paths.combinePaths(this.runDirectory, item.path),
+          body.body
+        );
+      })
+    );
+    await this.ensureDependencies(project.dependencies);
+
+    const rc = await this.executeSystemCommand(
+      `${this.commandPrefix} ./${project.entryPoint} ${
+        project.args != null ? project.args.join(" ") : " "
+      }`
+    );
+
+    const logs = await this.extractRunLog();
+
+    await this.cleanupRunDir();
+
+    return {
+      rc,
+      output: logs,
+    };
+  }
+
   abstract ensureDependencies(deps: IComputeDependency[]): Promise<void>;
 
-  abstract executeSource(
-    source: IComputeSourceCode
-  ): Promise<IComputeExecuteResult>;
-  abstract executeProject(
-    project: IComputeProjectCode
-  ): Promise<IComputeExecuteResult>;
-
   protected async createNewRunDir(): Promise<void> {
-    if (!fs.existsSync(KERNEL_TMP_PREFIX)) {
-      fs.mkdirSync(KERNEL_TMP_PREFIX);
-    }
-    this.runDirectory = fs.mkdtempSync(KERNEL_TMP_PREFIX);
+    const volume = await this.kernel.storage.getVolume("runspace");
+    this.runDirectory = await volume.fileSystem.createTempDirectory();
   }
 
   protected async cleanupRunDir(): Promise<void> {
-    const files = await fs.promises.readdir(this.runDirectory);
+    if (this.runDirectory === undefined) return;
+    const volume = await this.kernel.storage.getVolume("runspace");
+
+    const files = await volume.fileSystem.list(this.runDirectory);
     await Promise.all(
-      files.map(
-        async (item) =>
-          await fs.promises.unlink(path.resolve(this.runDirectory, item))
-      )
+      files.map(async (item) => await volume.fileSystem.deleteFile(item.path))
     );
-    await fs.promises.rmdir(this.runDirectory);
+
+    await volume.fileSystem.deleteDirectory(this.runDirectory);
   }
 
   protected async extractRunLog(): Promise<string> {
-    const logFile = path.resolve(this.runDirectory, "output.log");
-    const logs = await fs.promises.readFile(logFile, { encoding: "utf-8" });
-    return logs;
+    if (this.runDirectory === undefined) return "no logs";
+    const volume = await this.kernel.storage.getVolume("runspace");
+    const logFile = volume.paths.combinePaths(this.runDirectory, "output.log");
+    const logs = await volume.fileSystem.readTextFile(logFile);
+    if (logs.body === undefined) {
+      return "no logs";
+    }
+    return logs.body;
+  }
+
+  protected async writeSourceFile(
+    fileName: string,
+    body: string
+  ): Promise<boolean> {
+    if (this.runDirectory === undefined)
+      throw BasicError.notFound(
+        this.fullName,
+        "writeSourceFile",
+        "runDirectory"
+      );
+    const volume = await this.kernel.storage.getVolume("runspace");
+    const targetFilePath = volume.paths.combinePaths(
+      this.runDirectory,
+      fileName
+    );
+
+    return await volume.fileSystem.writeTextFile(targetFilePath, body);
   }
 
   protected async executeSystemCommand(cmd: string): Promise<number> {
-    return await new Promise<number>((resolve) => {
-      try {
-        childProc.execSync(
-          `${cmd}>> "${this.runDirectory + path.sep}output.log"`,
-          {
-            cwd: this.runDirectory,
-            shell: "bash",
-          }
-        );
-        resolve(0);
-      } catch (error) {
-        fs.writeFileSync("output.log", "Fatal: " + String(error), {
-          encoding: "utf-8",
-        });
-        resolve(1);
-      }
-    });
+    if (this.runDirectory === undefined) {
+      throw BasicError.notFound(
+        this.fullName,
+        "executeSystemCommand",
+        "runDirectory"
+      );
+    }
+    const volume = await this.kernel.storage.getVolume("runspace");
+    let realRunDirectory = await volume.fileSystem.getRealPath(
+      this.runDirectory
+    );
+    realRunDirectory += volume.paths.sep;
+    const command = `${cmd} >> "${realRunDirectory}output.log"`;
+    this.log.debug("executing", command, "inside", realRunDirectory);
+    try {
+      childProc.execSync(command, {
+        cwd: realRunDirectory,
+        shell: "bash",
+      });
+      this.log.debug("executed", command, "inside", realRunDirectory);
+      return 0;
+    } catch (error) {
+      this.log.error("failed", command, "inside", realRunDirectory);
+
+      const targetFilePath = volume.paths.combinePaths(
+        this.runDirectory,
+        "output.log"
+      );
+      await volume.fileSystem.writeTextFile(
+        targetFilePath,
+        "FATAL :" + String(error)
+      );
+
+      return 1;
+    }
   }
 }

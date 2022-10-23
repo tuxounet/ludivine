@@ -24,7 +24,7 @@ export class NaturalInterpreterApp extends AppElement {
     );
     switch (message.recipient) {
       case "/channels/input/natural":
-        await this.kernel.output(
+        await this.kernel.channels.broadcast(
           "commande natural recu " +
             message.body.command +
             " depuis " +
@@ -47,7 +47,7 @@ export class NaturalInterpreterApp extends AppElement {
       }
     );
 
-    await this.kernel.output(
+    await this.kernel.channels.broadcast(
       "interpretation de la commande: " + helloPythonProject.output
     );
   }

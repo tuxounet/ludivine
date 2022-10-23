@@ -34,10 +34,27 @@ async function start() {
 }
 
 function appendOutput(entry) {
+  const msg = entry.message;
+
+  let tag = "div";
+  let body = "";
+  switch (msg.type) {
+    case "message":
+      body = "* " + msg.body;
+      break;
+    case "object":
+      body = JSON.stringify(msg.body);
+      tag = "pre";
+      break;
+    default:
+      body = JSON.stringify(entry);
+      tag = "pre";
+      break;
+  }
   const output = document.getElementById("output");
-  const appendix = document.createElement("div");
+  const appendix = document.createElement(tag);
   appendix.setAttribute("class", "panel-block");
-  appendix.innerText = entry.message;
+  appendix.innerText = body;
   output.appendChild(appendix);
   window.scrollTo(0, document.body.scrollHeight);
 }
