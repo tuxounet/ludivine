@@ -3,6 +3,8 @@ import { Observer } from "../messaging/Observer";
 
 export interface IKernelElement {
   readonly fullName: string;
+  initialize: () => Promise<void>;
+  shutdown: () => Promise<void>;
 }
 
 export abstract class KernelElement extends Observer implements IKernelElement {
@@ -13,6 +15,14 @@ export abstract class KernelElement extends Observer implements IKernelElement {
   ) {
     super();
     this.log = new Logger(this);
+  }
+
+  async initialize(): Promise<void> {
+    this.log.debug("initialzed");
+  }
+
+  async shutdown(): Promise<void> {
+    this.log.debug("stopped");
   }
 
   protected log: Logger;
