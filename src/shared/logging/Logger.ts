@@ -1,50 +1,59 @@
 import { KernelElement } from "../bases/KernelElement";
-import { LogLevels } from "./_index";
+import { ILogLine } from "./types/ILogLine";
 
 export class Logger {
   constructor(
     readonly sender: KernelElement,
-    readonly callback: (level: LogLevels, line: string) => void
+    readonly callback: (line: ILogLine) => void
   ) {}
 
   debug(...messageParts: unknown[]): void {
-    this.callback(
-      "DEBUG",
-      this.buildOutput(this.sender.fullName, ...messageParts)
-    );
+    this.callback({
+      level: "DEBUG",
+      date: this.toTimeString(),
+      sender: this.sender.fullName,
+      line: this.buildOutput(...messageParts),
+    });
   }
 
   input(...messageParts: unknown[]): void {
-    this.callback(
-      "INPUT",
-      this.buildOutput(this.sender.fullName, ...messageParts)
-    );
+    this.callback({
+      level: "INPUT",
+      date: this.toTimeString(),
+      sender: this.sender.fullName,
+      line: this.buildOutput(...messageParts),
+    });
   }
 
   info(...messageParts: unknown[]): void {
-    this.callback(
-      "INFO",
-      this.buildOutput(this.sender.fullName, ...messageParts)
-    );
+    this.callback({
+      level: "INFO",
+      date: this.toTimeString(),
+      sender: this.sender.fullName,
+      line: this.buildOutput(...messageParts),
+    });
   }
 
   warn(...messageParts: unknown[]): void {
-    this.callback(
-      "WARN",
-      this.buildOutput(this.sender.fullName, ...messageParts)
-    );
+    this.callback({
+      level: "WARN",
+      date: this.toTimeString(),
+      sender: this.sender.fullName,
+      line: this.buildOutput(...messageParts),
+    });
   }
 
   error(...messageParts: unknown[]): void {
-    this.callback(
-      "ERROR",
-      this.buildOutput(this.sender.fullName, ...messageParts)
-    );
+    this.callback({
+      level: "ERROR",
+      date: this.toTimeString(),
+      sender: this.sender.fullName,
+      line: this.buildOutput(...messageParts),
+    });
   }
 
   private buildOutput(...messageParts: unknown[]): string {
-    const parts = [this.toTimeString(), this.sender.fullName, ...messageParts];
-    return parts
+    return messageParts
       .map((item) => {
         if (typeof item === "string") return item;
         if (item instanceof Error)

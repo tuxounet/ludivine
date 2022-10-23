@@ -9,6 +9,7 @@ import { IKernel } from "../../shared/kernel/IKernel";
 import { IStorageBroker } from "../../shared/storage/IStorageBroker";
 import { IStoragePathsDriver } from "../../shared/storage/IStoragePathsDriver";
 import { IStorageFileSystemDriver } from "../../shared/storage/IStorageFileSystemDriver";
+import { LogsVolume } from "../../volumes/LogsVolume";
 
 export class StoragesBroker extends KernelElement implements IStorageBroker {
   fileSystemsFactory: StorageFileSystemsFactory;
@@ -41,7 +42,8 @@ export class StoragesBroker extends KernelElement implements IStorageBroker {
   async initialize(): Promise<void> {
     await this.pathsFactory.initialize();
     await this.fileSystemsFactory.initialize();
-
+    const logsVolume = new LogsVolume(this.kernel, this);
+    this.volumes.set(logsVolume.id, logsVolume);
     const runspaceVolume = new RunspaceVolume(this.kernel, this);
     this.volumes.set(runspaceVolume.id, runspaceVolume);
     const workspaceVolume = new WorkspaceVolume(this.kernel, this);

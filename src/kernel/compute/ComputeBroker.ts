@@ -4,16 +4,17 @@ import { ComputeRuntimePython } from "../../runtimes/python-local";
 import { ComputeRuntimeTypescript } from "../../runtimes/typescript-local";
 import { KernelElement } from "../../shared/bases/KernelElement";
 import { BasicError } from "../../shared/errors/BasicError";
-import { Kernel } from "../kernel";
+
 import {
   IComputeExecuteResult,
   IComputeProjectCode,
   IComputeRuntime,
   IComputeSourceCode,
 } from "../../shared/compute/IComputeRuntime";
+import { IKernel } from "../../shared/kernel/IKernel";
 
 export class ComputeBroker extends KernelElement {
-  constructor(readonly kernel: Kernel) {
+  constructor(readonly kernel: IKernel) {
     super("compute-broker", kernel);
     this.runtimes = [
       new ComputeRuntimeBash(kernel, this),

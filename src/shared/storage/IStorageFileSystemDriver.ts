@@ -29,6 +29,7 @@ export interface IStorageFileSystemDriver extends IKernelElement {
   readFile: (path: string) => Promise<IStorageFileSystemDriverEntry<Buffer>>;
   writeTextFile: (path: string, body: string) => Promise<boolean>;
   writeFile: (path: string, body: Buffer) => Promise<boolean>;
+  appendFile: (path: string, body: Buffer) => Promise<boolean>;
   deleteFile: (path: string) => Promise<boolean>;
   deleteDirectory: (path: string) => Promise<boolean>;
 }

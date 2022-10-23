@@ -1,4 +1,5 @@
-import { Kernel } from "../../kernel/kernel";
+import { IKernel } from "../kernel/IKernel";
+import { IKernelElement } from "../kernel/IKernelElement";
 import { IMessageEvent } from "../messaging/IMessageEvent";
 import { KernelElement } from "./KernelElement";
 
@@ -10,8 +11,8 @@ export interface IAppElement {
 export abstract class AppElement extends KernelElement implements IAppElement {
   constructor(
     readonly name: string,
-    readonly parent: KernelElement,
-    readonly kernel: Kernel,
+    readonly parent: IKernelElement,
+    readonly kernel: IKernel,
     readonly subscriptions?: string[]
   ) {
     super(name, kernel, parent, subscriptions);

@@ -1,10 +1,12 @@
 import { KernelElement } from "../../shared/bases/KernelElement";
 import { BasicError } from "../../shared/errors/BasicError";
 import { IKernel } from "../../shared/kernel/IKernel";
+import { IKernelElement } from "../../shared/kernel/IKernelElement";
+import { IMessagingBroker } from "../../shared/messaging/IMessagingBroker";
 import { QueuesStore } from "./QueuesStore";
 import { TopicsStore } from "./TopicsStore";
 
-export class MessagingBroker extends KernelElement {
+export class MessagingBroker extends KernelElement implements IMessagingBroker {
   constructor(kernel: IKernel) {
     super("topic-broker", kernel);
     this.topicsStore = new TopicsStore(this.kernel, this);
@@ -16,7 +18,7 @@ export class MessagingBroker extends KernelElement {
 
   async subscribeTopic(
     topic: string,
-    subscriber: KernelElement
+    subscriber: IKernelElement
   ): Promise<void> {
     this.log.debug("subscribe", topic, "by", subscriber.fullName);
     if (!this.topicsStore.topics.has(topic)) {
@@ -44,7 +46,7 @@ export class MessagingBroker extends KernelElement {
 
   async subscribeQueue(
     queue: string,
-    subscriber: KernelElement
+    subscriber: IKernelElement
   ): Promise<void> {
     this.log.debug("subscribe", queue, "by", subscriber.fullName);
     if (!this.queuesStore.queues.has(queue)) {

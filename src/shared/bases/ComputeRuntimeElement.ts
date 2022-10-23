@@ -12,6 +12,7 @@ import { BasicError } from "../errors/BasicError";
 import childProc from "child_process";
 import { LocalFileSystemDriver } from "../../kernel/storage/filesystems/drivers/LocalFileSystemDriver";
 import { IKernel } from "../kernel/IKernel";
+import { IKernelElement } from "../kernel/IKernelElement";
 
 export abstract class ComputeRuntimeElement
   extends KernelElement
@@ -21,7 +22,7 @@ export abstract class ComputeRuntimeElement
     name: string,
     readonly commandPrefix: string,
     readonly kernel: IKernel,
-    parent: KernelElement,
+    parent: IKernelElement,
     subscriptions?: string[]
   ) {
     super(name, kernel, parent, subscriptions);

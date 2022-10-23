@@ -1,9 +1,10 @@
 import { IMessageEvent } from "../messaging/IMessageEvent";
 import { IKernel } from "../kernel/IKernel";
 import { KernelElement } from "./KernelElement";
+import { IKernelElement } from "../kernel/IKernelElement";
 
 export interface IObservableElement {
-  register: (observer: KernelElement) => void;
+  register: (observer: IKernelElement) => void;
   unregister: (observerName: string) => void;
 }
 
@@ -14,16 +15,16 @@ export abstract class ObservableElement
   constructor(
     readonly name: string,
     readonly kernel: IKernel,
-    readonly parent: KernelElement,
+    readonly parent: IKernelElement,
     readonly subscriptions?: string[]
   ) {
     super(name, kernel, parent, subscriptions);
     this.observers = new Map();
   }
 
-  observers: Map<string, KernelElement>;
+  observers: Map<string, IKernelElement>;
 
-  register(observer: KernelElement): void {
+  register(observer: IKernelElement): void {
     this.observers.set(observer.fullName, observer);
   }
 

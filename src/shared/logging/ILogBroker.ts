@@ -1,6 +1,6 @@
 import { IKernelElement } from "../kernel/IKernelElement";
-import { LogLevels } from "./types/LogLevels";
+import { ILogLine } from "./types/ILogLine";
 
 export interface ILogBroker extends IKernelElement {
-  output: (level: LogLevels, line: string) => void;
+  output: (line: ILogLine) => void;
 }

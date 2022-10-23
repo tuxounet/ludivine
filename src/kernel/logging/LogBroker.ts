@@ -5,7 +5,7 @@ import { LogTargetFile } from "./targets/LogFile";
 import { ILogTarget } from "../../shared/logging/types/ILogTarget";
 import { ILogBroker } from "../../shared/logging/ILogBroker";
 import { IKernel } from "../../shared/kernel/IKernel";
-import { LogLevels } from "../../shared/logging/_index";
+import { ILogLine } from "../../shared/logging/types/ILogLine";
 
 export class LogBroker extends KernelElement implements ILogBroker {
   constructor(readonly kernel: IKernel) {
@@ -16,8 +16,18 @@ export class LogBroker extends KernelElement implements ILogBroker {
     ];
   }
 
-  output(level: LogLevels, line: string): void {
-    this.targets.forEach((target) => target.appendLog(level, line));
+  async initialize(): Promise<void> {
+    await Promise.all(
+      this.targets.map(async (item) => await item.initialize())
+    );
+  }
+
+  async shutdown(): Promise<void> {
+    await Promise.all(this.targets.map(async (item) => await item.shutdown()));
+  }
+
+  output(line: ILogLine): void {
+    this.targets.forEach((target) => target.appendLog(line));
   }
 
   targets: ILogTarget[];

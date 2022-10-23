@@ -40,17 +40,16 @@ export class Kernel implements IKernel {
   }
 
   askShutdown = async (): Promise<void> => {
-    this.logging.output("DEBUG", "ask for shutdown");
     await new Promise<void>((resolve) => {
       this.started = false;
       setTimeout(() => {
-        this.logging.output("DEBUG", "asked for shutdown");
         resolve();
       }, 100);
     });
   };
 
   async initialize(): Promise<void> {
+    await this.logging.initialize();
     await this.storage.initialize();
     await this.compute.initialize();
     await this.channels.initialize();
@@ -72,5 +71,6 @@ export class Kernel implements IKernel {
     await this.channels.shutdown();
     await this.compute.shutdown();
     await this.storage.shutdown();
+    await this.logging.shutdown();
   }
 }

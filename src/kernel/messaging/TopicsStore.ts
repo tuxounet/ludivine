@@ -1,9 +1,10 @@
 import { KernelElement } from "../../shared/bases/KernelElement";
 import { IKernel } from "../../shared/kernel/IKernel";
+import { IKernelElement } from "../../shared/kernel/IKernelElement";
 import { Topic } from "./Topic";
 
 export class TopicsStore extends KernelElement {
-  constructor(readonly kernel: IKernel, readonly parent: KernelElement) {
+  constructor(readonly kernel: IKernel, readonly parent: IKernelElement) {
     super("topics-store", kernel, parent);
     this.topics = new Map();
   }

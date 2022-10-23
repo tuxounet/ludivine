@@ -11,8 +11,8 @@ export abstract class KernelElement extends Observer implements IKernelElement {
     readonly substriptions?: string[]
   ) {
     super();
-    this.log = new Logger(this, (level, line) => {
-      this.kernel.logging.output(level, line);
+    this.log = new Logger(this, (line) => {
+      this.kernel.logging.output(line);
     });
   }
 

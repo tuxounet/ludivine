@@ -3,6 +3,7 @@ import path from "path";
 import { KernelElement } from "../../../../shared/bases/KernelElement";
 import { BasicError } from "../../../../shared/errors/BasicError";
 import { IKernel } from "../../../../shared/kernel/IKernel";
+import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
 import {
   IStorageFileSystemDriver,
   IStorageFileSystemDriverEntry,
@@ -23,7 +24,7 @@ export class LocalFileSystemDriver
   constructor(
     readonly properties: Record<string, unknown>,
     readonly kernel: IKernel,
-    parent: KernelElement
+    readonly parent: IKernelElement
   ) {
     super("local-fs", kernel, parent);
     this.id = "local";
@@ -157,6 +158,16 @@ export class LocalFileSystemDriver
       provider: this.id,
       body: stat,
     };
+  }
+
+  async appendFile(fullPath: string, body: Buffer): Promise<boolean> {
+    const realPath = await this.getRealPath(fullPath);
+    const folder = path.dirname(realPath);
+    if (!fs.existsSync(folder)) {
+      fs.mkdirSync(folder);
+    }
+    fs.appendFileSync(realPath, body);
+    return true;
   }
 
   async writeFile(fullPath: string, body: Buffer): Promise<boolean> {

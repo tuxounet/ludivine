@@ -1,5 +1,6 @@
-import { LogLevels } from "./LogLevels";
+import { IKernelElement } from "../../kernel/IKernelElement";
+import { ILogLine } from "./ILogLine";
 
-export interface ILogTarget {
-  appendLog: (level: LogLevels, ...parts: string[]) => void;
+export interface ILogTarget extends IKernelElement {
+  appendLog: (line: ILogLine) => void;
 }
