@@ -1,5 +1,5 @@
-import { KernelElement } from "../../bases/KernelElement";
-import { BasicError } from "../../errors/BasicError";
+import { KernelElement } from "../../../shared/bases/KernelElement";
+import { BasicError } from "../../../shared/errors/BasicError";
 import { StoragesBroker } from "../StoragesBroker";
 import { LocalFileSystemDriver } from "./drivers/LocalFileSystemDriver";
 import { IStorageFileSystemCtor } from "./types/IStorageFileSystemCtor";

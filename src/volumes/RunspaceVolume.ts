@@ -1,9 +1,9 @@
-import { KernelElement } from "../kernel/bases/KernelElement";
-import { StorageVolume } from "../kernel/bases/StorageVolume";
-import { Kernel } from "../kernel/kernel";
+import { KernelElement } from "../shared/bases/KernelElement";
+import { StorageVolume } from "../shared/bases/StorageVolume";
+import { IKernel } from "../shared/kernel/IKernel";
 
 export class RunspaceVolume extends StorageVolume {
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
+  constructor(readonly kernel: IKernel, parent: KernelElement) {
     super(
       "runspace-volume",
       "runspace",

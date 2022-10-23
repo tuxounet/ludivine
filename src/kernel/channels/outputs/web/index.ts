@@ -1,9 +1,9 @@
 import path from "path";
-import { KernelElement } from "../../../bases/KernelElement";
-import { IOutputChannel } from "../../types/IOutputChannel";
+import { KernelElement } from "../../../../shared/bases/KernelElement";
+import { IOutputChannel } from "../../../../shared/channels/IOutputChannel";
 import { Kernel } from "../../../kernel";
 import express from "express";
-import { IOutputMessage } from "../../types/IOutputMessage";
+import { IOutputMessage } from "../../../../shared/channels/IOutputMessage";
 export class WebOutputChannel extends KernelElement implements IOutputChannel {
   constructor(readonly kernel: Kernel, parent: KernelElement) {
     super("web-output", parent);

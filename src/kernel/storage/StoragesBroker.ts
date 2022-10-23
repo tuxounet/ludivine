@@ -1,17 +1,18 @@
 import { RunspaceVolume } from "../../volumes/RunspaceVolume";
 import { WorkspaceVolume } from "../../volumes/WorkspaceVolume";
-import { KernelElement } from "../bases/KernelElement";
-import { BasicError } from "../errors/BasicError";
+import { KernelElement } from "../../shared/bases/KernelElement";
+import { BasicError } from "../../shared/errors/BasicError";
 import { Kernel } from "../kernel";
 import { StorageFileSystemsFactory } from "./filesystems/StorageFileSystemsFactory";
 import { StoragePathsFactory } from "./paths/StoragePathsFactory";
 import { IStorageVolume } from "./types/IStorageVolume";
+import { IKernel } from "../../shared/kernel/IKernel";
 
 export class StoragesBroker extends KernelElement {
   fileSystemsFactory: StorageFileSystemsFactory;
   pathsFactory: StoragePathsFactory;
   volumes: Map<string, IStorageVolume>;
-  constructor(readonly kernel: Kernel) {
+  constructor(readonly kernel: IKernel) {
     super("storage", kernel);
     this.fileSystemsFactory = new StorageFileSystemsFactory(this);
     this.pathsFactory = new StoragePathsFactory(this);

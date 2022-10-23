@@ -1,4 +1,4 @@
-import { KernelElement } from "../../../bases/KernelElement";
+import { KernelElement } from "../../../../shared/bases/KernelElement";
 import { IStoragePathsDriver } from "../types/IStoragePathsDriver";
 import path from "path";
 export class LocalPathDriver

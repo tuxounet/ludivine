@@ -1,34 +1,37 @@
 import { KernelElement } from "../bases/KernelElement";
 
 export class Logger {
-  constructor(readonly sender: KernelElement) {}
+  constructor(
+    readonly sender: KernelElement,
+    readonly callback: (line: string) => void
+  ) {}
 
   debug(...messageParts: unknown[]): void {
-    console.debug(
+    this.callback(
       this.buildOutput("DBG", this.sender.fullName, ...messageParts)
     );
   }
 
   input(...messageParts: unknown[]): void {
-    console.info(
+    this.callback(
       this.buildOutput("INP", this.sender.fullName, ...messageParts)
     );
   }
 
   info(...messageParts: unknown[]): void {
-    console.info(
+    this.callback(
       this.buildOutput("INF", this.sender.fullName, ...messageParts)
     );
   }
 
   warn(...messageParts: unknown[]): void {
-    console.warn(
+    this.callback(
       this.buildOutput("WRN", this.sender.fullName, ...messageParts)
     );
   }
 
   error(...messageParts: unknown[]): void {
-    console.error(
+    this.callback(
       this.buildOutput("ERR", this.sender.fullName, ...messageParts)
     );
   }

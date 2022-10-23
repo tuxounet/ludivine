@@ -1,4 +1,4 @@
-import { KernelElement } from "../bases/KernelElement";
+import { KernelElement } from "../../shared/bases/KernelElement";
 import { Queue } from "./Queue";
 
 export class QueuesStore extends KernelElement {

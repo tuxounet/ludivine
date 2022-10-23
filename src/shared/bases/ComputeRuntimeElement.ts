@@ -5,13 +5,13 @@ import {
   IComputeProjectCode,
   IComputeRuntime,
   IComputeSourceCode,
-} from "../compute/types/IComputeRuntime";
+} from "../compute/IComputeRuntime";
 import { KernelElement } from "./KernelElement";
 import commandExists from "command-exists";
 import { BasicError } from "../errors/BasicError";
 import childProc from "child_process";
-import { Kernel } from "../kernel";
-import { LocalFileSystemDriver } from "../storage/filesystems/drivers/LocalFileSystemDriver";
+import { LocalFileSystemDriver } from "../../kernel/storage/filesystems/drivers/LocalFileSystemDriver";
+import { IKernel } from "../kernel/IKernel";
 
 export abstract class ComputeRuntimeElement
   extends KernelElement
@@ -20,11 +20,11 @@ export abstract class ComputeRuntimeElement
   constructor(
     name: string,
     readonly commandPrefix: string,
-    readonly kernel: Kernel,
+    readonly kernel: IKernel,
     parent: KernelElement,
     subscriptions?: string[]
   ) {
-    super(name, parent, subscriptions);
+    super(name, kernel, parent, subscriptions);
     this.commandsDependencies = [];
   }
 
@@ -92,6 +92,7 @@ export abstract class ComputeRuntimeElement
       );
     const projectVolume = new LocalFileSystemDriver(
       { folder: project.path },
+      this.kernel,
       this
     );
     const runVolume = await this.kernel.storage.getVolume("runspace");

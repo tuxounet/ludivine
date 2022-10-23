@@ -1,8 +1,8 @@
-import { ComputeRuntimeElement } from "../kernel/bases/ComputeRuntimeElement";
-import { KernelElement } from "../kernel/bases/KernelElement";
+import { ComputeRuntimeElement } from "../shared/bases/ComputeRuntimeElement";
+import { KernelElement } from "../shared/bases/KernelElement";
 import { Kernel } from "../kernel/kernel";
-import { IComputeDependency } from "../kernel/compute/types/IComputeRuntime";
-import { BasicError } from "../kernel/errors/BasicError";
+import { IComputeDependency } from "../shared/compute/IComputeRuntime";
+import { BasicError } from "../shared/errors/BasicError";
 
 export class ComputeRuntimeJavascript extends ComputeRuntimeElement {
   constructor(readonly kernel: Kernel, parent: KernelElement) {

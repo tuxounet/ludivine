@@ -1,7 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { KernelElement } from "../../../bases/KernelElement";
-import { BasicError } from "../../../errors/BasicError";
+import { KernelElement } from "../../../../shared/bases/KernelElement";
+import { BasicError } from "../../../../shared/errors/BasicError";
+import { IKernel } from "../../../../shared/kernel/IKernel";
 
 import {
   IStorageFileSystemDriver,
@@ -22,9 +23,10 @@ export class LocalFileSystemDriver
 
   constructor(
     readonly properties: Record<string, unknown>,
+    readonly kernel: IKernel,
     parent: KernelElement
   ) {
-    super("local-fs", parent);
+    super("local-fs", kernel, parent);
     this.id = "local";
   }
 

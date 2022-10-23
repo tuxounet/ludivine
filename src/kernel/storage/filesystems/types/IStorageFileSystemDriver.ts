@@ -1,5 +1,5 @@
 import type { Stats } from "fs";
-import { IKernelElement } from "../../../bases/KernelElement";
+import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
 
 export interface IStorageFileSystemDriverEntry<T = Record<string, unknown>> {
   path: string;

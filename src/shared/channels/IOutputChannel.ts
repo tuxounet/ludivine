@@ -1,4 +1,4 @@
-import { IKernelElement } from "../../bases/KernelElement";
+import { IKernelElement } from "../kernel/IKernelElement";
 import { IOutputMessage } from "./IOutputMessage";
 
 export interface IOutputChannel extends IKernelElement {

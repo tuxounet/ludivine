@@ -1,6 +1,6 @@
 import { ShellApp } from "../../apps/shell";
-import { IAppElement } from "../bases/AppElement";
-import { KernelElement } from "../bases/KernelElement";
+import { IAppElement } from "../../shared/bases/AppElement";
+import { KernelElement } from "../../shared/bases/KernelElement";
 
 import { Kernel } from "../kernel";
 

@@ -1,4 +1,4 @@
-import { IMessageEvent } from "../messaging/IMessageEvent";
+import { IMessageEvent } from "../../kernel/messaging/IMessageEvent";
 import { KernelElement } from "./KernelElement";
 
 export interface IObservableElement {

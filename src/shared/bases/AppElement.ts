@@ -1,5 +1,5 @@
-import { Kernel } from "../kernel";
-import { IMessageEvent } from "../messaging/IMessageEvent";
+import { Kernel } from "../../kernel/kernel";
+import { IMessageEvent } from "../../kernel/messaging/IMessageEvent";
 import { KernelElement } from "./KernelElement";
 
 export interface IAppElement {

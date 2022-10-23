@@ -1,6 +1,7 @@
-import { IStorageFileSystemDriver } from "../storage/filesystems/types/IStorageFileSystemDriver";
-import { IStoragePathsDriver } from "../storage/paths/types/IStoragePathsDriver";
-import { IStorageVolume } from "../storage/types/IStorageVolume";
+import { IStorageFileSystemDriver } from "../../kernel/storage/filesystems/types/IStorageFileSystemDriver";
+import { IStoragePathsDriver } from "../../kernel/storage/paths/types/IStoragePathsDriver";
+import { IStorageVolume } from "../../kernel/storage/types/IStorageVolume";
+import { IKernel } from "../kernel/IKernel";
 import { KernelElement } from "./KernelElement";
 
 export abstract class StorageVolume
@@ -14,9 +15,10 @@ export abstract class StorageVolume
     readonly ephemeral: boolean,
     readonly paths: IStoragePathsDriver,
     readonly fileSystem: IStorageFileSystemDriver,
+    readonly kernel: IKernel,
     parent: KernelElement
   ) {
-    super(name, parent);
+    super(name, kernel, parent);
   }
 
   async initialize(): Promise<void> {

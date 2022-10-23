@@ -1,4 +1,4 @@
-import { IKernelElement } from "../../bases/KernelElement";
+import { IKernelElement } from "../kernel/IKernelElement";
 
 export interface IChannelInputResult {
   sender: IInputChannel;

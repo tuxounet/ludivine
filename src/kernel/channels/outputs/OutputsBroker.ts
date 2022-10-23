@@ -1,6 +1,6 @@
-import { KernelElement } from "../../bases/KernelElement";
+import { KernelElement } from "../../../shared/bases/KernelElement";
 import { Kernel } from "../../kernel";
-import { IOutputChannel } from "../types/IOutputChannel";
+import { IOutputChannel } from "../../../shared/channels/IOutputChannel";
 import { CLIOutputChannel } from "./cli";
 import { WebOutputChannel } from "./web";
 

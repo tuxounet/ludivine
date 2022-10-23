@@ -1,4 +1,4 @@
-import { IKernelElement } from "../../bases/KernelElement";
+import { IKernelElement } from "../../../shared/kernel/IKernelElement";
 import { IStorageFileSystemDriver } from "../filesystems/types/IStorageFileSystemDriver";
 import { IStoragePathsDriver } from "../paths/types/IStoragePathsDriver";
 

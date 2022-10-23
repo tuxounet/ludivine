@@ -1,11 +1,11 @@
-import { KernelElement } from "../../bases/KernelElement";
-import { Kernel } from "../../kernel";
-import { ILogTarget } from "../types/ILogTarget";
-import { LogLevels } from "../types/LogLevels";
+import { KernelElement } from "../../../shared/bases/KernelElement";
+import { ILogTarget } from "../../../shared/logging/types/ILogTarget";
+import { LogLevels } from "../../../shared/logging/types/LogLevels";
+import { IKernel } from "../../../shared/kernel/IKernel";
 
-export class LogTargetFIle extends KernelElement implements ILogTarget {
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
-    super("log-target-file", parent);
+export class LogTargetFile extends KernelElement implements ILogTarget {
+  constructor(readonly kernel: IKernel, parent: KernelElement) {
+    super("log-target-file", kernel, parent);
   }
 
   appendLog(level: LogLevels, ...parts: string[]): void {

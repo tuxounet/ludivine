@@ -1,6 +1,6 @@
-import { KernelElement } from "../bases/KernelElement";
-import { ObservableElement } from "../bases/ObservableElement";
-import { BasicError } from "../errors/BasicError";
+import { KernelElement } from "../../shared/bases/KernelElement";
+import { ObservableElement } from "../../shared/bases/ObservableElement";
+import { BasicError } from "../../shared/errors/BasicError";
 
 export class Queue<T = Record<string, unknown>> extends ObservableElement {
   q: T[];

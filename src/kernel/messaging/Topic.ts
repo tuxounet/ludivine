@@ -1,5 +1,5 @@
-import { KernelElement } from "../bases/KernelElement";
-import { ObservableElement } from "../bases/ObservableElement";
+import { KernelElement } from "../../shared/bases/KernelElement";
+import { ObservableElement } from "../../shared/bases/ObservableElement";
 import { IMessageEvent } from "./IMessageEvent";
 
 export class Topic extends ObservableElement {

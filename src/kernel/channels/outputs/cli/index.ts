@@ -1,8 +1,8 @@
-import { KernelElement } from "../../../bases/KernelElement";
+import { KernelElement } from "../../../../shared/bases/KernelElement";
 import { Kernel } from "../../../kernel";
 
-import { IOutputChannel } from "../../types/IOutputChannel";
-import { IOutputMessage } from "../../types/IOutputMessage";
+import { IOutputChannel } from "../../../../shared/channels/IOutputChannel";
+import { IOutputMessage } from "../../../../shared/channels/IOutputMessage";
 
 export class CLIOutputChannel extends KernelElement implements IOutputChannel {
   constructor(readonly kernel: Kernel, parent: KernelElement) {

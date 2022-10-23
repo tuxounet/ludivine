@@ -1,4 +1,3 @@
-import { KernelElement } from "./bases/KernelElement";
 import { MessagingBroker } from "./messaging/MessagingBroker";
 import { ChannelsBroker } from "./channels/ChannelsBroker";
 import { EndpointsBroker } from "./endpoints/EndpointsBroker";
@@ -6,8 +5,9 @@ import { ComputeBroker } from "./compute/ComputeBroker";
 import { ApplicationsBroker } from "./applications/ApplicationsBroker";
 import { LogBroker } from "./logging/LogBroker";
 import { StoragesBroker } from "./storage/StoragesBroker";
+import { IKernel } from "../shared/kernel/IKernel";
 
-export class Kernel extends KernelElement {
+export class Kernel implements IKernel {
   production: boolean;
   started: boolean;
   applications: ApplicationsBroker;
@@ -18,7 +18,7 @@ export class Kernel extends KernelElement {
   logging: LogBroker;
   storage: StoragesBroker;
   constructor() {
-    super("kernel");
+    this.fullName = "kernel";
     this.production = process.env.NODE_ENV === "production";
     this.logging = new LogBroker(this);
     this.messaging = new MessagingBroker(this);
@@ -30,6 +30,8 @@ export class Kernel extends KernelElement {
     this.started = false;
   }
 
+  fullName: string;
+
   async run(): Promise<number> {
     await this.initialize();
     const rc = await this.listen();
@@ -38,14 +40,14 @@ export class Kernel extends KernelElement {
   }
 
   askShutdown = async (): Promise<void> => {
-    this.log.debug("ask for shutdown");
+    this.logging.output("DEBUG", "ask for shutdown");
     await new Promise<void>((resolve) => {
       this.started = false;
       setTimeout(() => {
+        this.logging.output("DEBUG", "asked for shutdown");
         resolve();
       }, 100);
     });
-    this.log.debug("asked for shutdown");
   };
 
   async initialize(): Promise<void> {
@@ -54,7 +56,6 @@ export class Kernel extends KernelElement {
     await this.channels.initialize();
     await this.endpoints.initialize();
     await this.applications.initialize();
-    await super.initialize();
     this.started = true;
   }
 
@@ -71,6 +72,5 @@ export class Kernel extends KernelElement {
     await this.channels.shutdown();
     await this.compute.shutdown();
     await this.storage.shutdown();
-    await super.shutdown();
   }
 }

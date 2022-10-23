@@ -1,4 +1,4 @@
-import { KernelElement } from "../bases/KernelElement";
+import { KernelElement } from "../../shared/bases/KernelElement";
 import { Topic } from "./Topic";
 
 export class TopicsStore extends KernelElement {

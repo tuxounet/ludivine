@@ -1,5 +1,5 @@
-import { KernelElement } from "../kernel/bases/KernelElement";
-import { StorageVolume } from "../kernel/bases/StorageVolume";
+import { KernelElement } from "../shared/bases/KernelElement";
+import { StorageVolume } from "../shared/bases/StorageVolume";
 import { Kernel } from "../kernel/kernel";
 
 export class WorkspaceVolume extends StorageVolume {
