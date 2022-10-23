@@ -24,9 +24,17 @@ export class CLIOutputChannel extends KernelElement implements IOutputChannel {
   listening: boolean;
 
   async output(message: IOutputMessage): Promise<void> {
-    this.log.debug("output arrival", message);
-    if (this.opened) {
-      console.info("*", message);
+    if (!this.opened) {
+      return;
     }
+    switch (message.type) {
+      case "message":
+        console.info("*", message.body);
+        break;
+      case "object":
+        console.info("*", JSON.stringify(message.body));
+        break;
+    }
+    this.log.debug("output complete", message);
   }
 }
