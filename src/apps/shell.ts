@@ -19,13 +19,13 @@ export class ShellApp extends AppElement {
   imperativeInterpreter: ImperativeInterpreterApp;
   naturalInterpreterApp: NaturalInterpreterApp;
   protected async main(): Promise<number> {
-    await this.kernel.channels.outputOnAll("bonjour");
+    await this.kernel.channels.broadcast("bonjour");
     await Promise.all([
       this.imperativeInterpreter.execute(),
       this.naturalInterpreterApp.execute(),
     ]);
 
-    await this.kernel.channels.outputOnAll("au revoir");
+    await this.kernel.channels.broadcast("au revoir");
     return 0;
   }
 

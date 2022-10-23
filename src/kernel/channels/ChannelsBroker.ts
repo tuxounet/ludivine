@@ -2,6 +2,7 @@ import { KernelElement } from "../bases/KernelElement";
 import { Kernel } from "../kernel";
 import { InputsBroker } from "./inputs/inputsBroker";
 import { OutputsBroker } from "./outputs/OutputsBroker";
+import { IOutputMessage } from "./types/IOutputMessage";
 
 export class ChannelsBroker extends KernelElement {
   inputs: InputsBroker;
@@ -65,7 +66,14 @@ export class ChannelsBroker extends KernelElement {
     );
   };
 
-  outputOnAll = async (message: string): Promise<void> => {
+  broadcast = async (message: string): Promise<void> => {
+    await this.outputOnAll({
+      type: "message",
+      body: message,
+    });
+  };
+
+  outputOnAll = async (message: IOutputMessage): Promise<void> => {
     await Promise.all(
       this.outputs.channels.map(async (item) => await item.output(message))
     );

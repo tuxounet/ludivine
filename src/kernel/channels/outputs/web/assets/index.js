@@ -37,7 +37,7 @@ function appendOutput(entry) {
   const output = document.getElementById("output");
   const appendix = document.createElement("div");
   appendix.setAttribute("class", "panel-block");
-  appendix.innerText = entry.message;
+  appendix.innerText = JSON.stringify(entry.message);
   output.appendChild(appendix);
   window.scrollTo(0, document.body.scrollHeight);
 }
