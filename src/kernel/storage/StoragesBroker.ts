@@ -1,6 +1,7 @@
 import { RunspaceVolume } from "../../volumes/RunspaceVolume";
 import { WorkspaceVolume } from "../../volumes/WorkspaceVolume";
 import { KernelElement } from "../bases/KernelElement";
+import { BasicError } from "../errors/BasicError";
 import { Kernel } from "../kernel";
 import { StorageFileSystemsFactory } from "./filesystems/StorageFileSystemsFactory";
 import { StoragePathsFactory } from "./paths/StoragePathsFactory";
@@ -42,6 +43,13 @@ export class StoragesBroker extends KernelElement {
         async (item) => await item.shutdown()
       )
     );
+  };
+
+  getVolume = async (id: string): Promise<IStorageVolume> => {
+    const volume = this.volumes.get(id);
+    if (volume == null)
+      throw BasicError.notFound(this.fullName, "getVolume", id);
+    return volume;
   };
 
   async shutdown(): Promise<void> {

@@ -37,7 +37,7 @@ export class LocalFileSystemDriver
   }
 
   async list(fullPath: string): Promise<IStorageFileSystemDriverEntry[]> {
-    const realPath = await this.computeRealPath(fullPath);
+    const realPath = await this.getRealPath(fullPath);
     if (!fs.existsSync(realPath)) {
       throw BasicError.notFound(this.fullName, "list", fullPath);
     }
@@ -56,7 +56,7 @@ export class LocalFileSystemDriver
   async readFile(
     fullPath: string
   ): Promise<IStorageFileSystemDriverEntry<Buffer>> {
-    const realPath = await this.computeRealPath(fullPath);
+    const realPath = await this.getRealPath(fullPath);
     if (!fs.existsSync(realPath)) {
       throw BasicError.notFound(this.fullName, "readFile", fullPath);
     }
@@ -71,7 +71,7 @@ export class LocalFileSystemDriver
   async readTextFile(
     fullPath: string
   ): Promise<IStorageFileSystemDriverEntry<string>> {
-    const realPath = await this.computeRealPath(fullPath);
+    const realPath = await this.getRealPath(fullPath);
     if (!fs.existsSync(realPath)) {
       throw BasicError.notFound(this.fullName, "readFile", realPath);
     }
@@ -84,7 +84,7 @@ export class LocalFileSystemDriver
   }
 
   async existsDirectory(folder: string): Promise<boolean> {
-    const realPath = await this.computeRealPath(folder);
+    const realPath = await this.getRealPath(folder);
 
     if (!fs.existsSync(realPath)) return false;
     if (!fs.statSync(realPath).isDirectory()) {
@@ -98,7 +98,7 @@ export class LocalFileSystemDriver
   }
 
   async existsFile(fullPath: string): Promise<boolean> {
-    const realPath = await this.computeRealPath(fullPath);
+    const realPath = await this.getRealPath(fullPath);
 
     if (!fs.existsSync(realPath)) return false;
     if (fs.statSync(realPath).isDirectory()) {
@@ -112,7 +112,7 @@ export class LocalFileSystemDriver
   }
 
   async createDirectory(fullPath: string): Promise<boolean> {
-    const realPath = await this.computeRealPath(fullPath);
+    const realPath = await this.getRealPath(fullPath);
 
     if (fs.existsSync(realPath)) {
       throw BasicError.badQuery(
@@ -132,8 +132,20 @@ export class LocalFileSystemDriver
     return true;
   }
 
+  async createTempDirectory(): Promise<string> {
+    const realPath = await this.getRealPath(".");
+
+    if (!fs.existsSync(realPath)) {
+      fs.mkdirSync(realPath);
+    }
+    const realTmp = fs.mkdtempSync(realPath + path.sep);
+    const relative = await this.getRelativePath(realTmp);
+
+    return relative + path.sep;
+  }
+
   async stat(fullPath: string): Promise<IStorageFileSystemDriverStat> {
-    const realPath = await this.computeRealPath(fullPath);
+    const realPath = await this.getRealPath(fullPath);
 
     if (!fs.existsSync(realPath)) {
       throw BasicError.notFound(this.fullName, "stat", fullPath);
@@ -146,26 +158,22 @@ export class LocalFileSystemDriver
     };
   }
 
-  async writeFile(
-    fullPath: string,
-    body: Buffer,
-    encoding: BufferEncoding
-  ): Promise<boolean> {
-    const realPath = await this.computeRealPath(fullPath);
+  async writeFile(fullPath: string, body: Buffer): Promise<boolean> {
+    const realPath = await this.getRealPath(fullPath);
 
-    fs.writeFileSync(realPath, body, { encoding });
+    fs.writeFileSync(realPath, body);
     return true;
   }
 
   async writeTextFile(fullPath: string, body: string): Promise<boolean> {
-    const realPath = await this.computeRealPath(fullPath);
+    const realPath = await this.getRealPath(fullPath);
 
     fs.writeFileSync(realPath, body, { encoding: "utf-8" });
     return true;
   }
 
   async deleteFile(fullPath: string): Promise<boolean> {
-    const realPath = await this.computeRealPath(fullPath);
+    const realPath = await this.getRealPath(fullPath);
 
     if (!fs.existsSync(realPath)) {
       return false;
@@ -175,7 +183,7 @@ export class LocalFileSystemDriver
   }
 
   async deleteDirectory(fullPath: string): Promise<boolean> {
-    const realPath = await this.computeRealPath(fullPath);
+    const realPath = await this.getRealPath(fullPath);
 
     if (!fs.existsSync(realPath)) {
       return false;
@@ -184,7 +192,7 @@ export class LocalFileSystemDriver
     return true;
   }
 
-  private async computeRealPath(relPath: string): Promise<string> {
+  async getRealPath(relPath: string): Promise<string> {
     const folderProperty = "folder";
     const folderValue = this.properties[folderProperty];
 
@@ -203,5 +211,11 @@ export class LocalFileSystemDriver
       );
     }
     return path.resolve(folderValue, relPath);
+  }
+
+  async getRelativePath(realPath: string): Promise<string> {
+    const rootRealPath = await this.getRealPath(".");
+
+    return realPath.replace(rootRealPath + path.sep, "").trim();
   }
 }

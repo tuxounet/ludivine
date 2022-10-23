@@ -11,11 +11,13 @@ export class LocalPathDriver
   ) {
     super("local-path", parent);
     this.id = "local";
+    this.sep = path.sep;
   }
 
+  sep: string;
   id: string;
   combinePaths(...parts: string[]): string {
-    return path.resolve(...parts);
+    return path.join(...parts);
   }
 
   fileExtension(filePart: string): string {

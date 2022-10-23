@@ -2,18 +2,12 @@ import { ComputeRuntimeElement } from "../kernel/bases/ComputeRuntimeElement";
 import { KernelElement } from "../kernel/bases/KernelElement";
 import { Kernel } from "../kernel/kernel";
 
-import {
-  IComputeDependency,
-  IComputeExecuteResult,
-  IComputeProjectCode,
-  IComputeSourceCode,
-} from "../kernel/compute/types/IComputeRuntime";
+import { IComputeDependency } from "../kernel/compute/types/IComputeRuntime";
 import { BasicError } from "../kernel/errors/BasicError";
-import fs from "fs";
-import path from "path";
+
 export class ComputeRuntimeBash extends ComputeRuntimeElement {
   constructor(readonly kernel: Kernel, parent: KernelElement) {
-    super("bash-local", parent);
+    super("bash-local", "bash ", kernel, parent);
     this.commandsDependencies = [
       {
         name: "bash",
@@ -41,65 +35,5 @@ export class ComputeRuntimeBash extends ComputeRuntimeElement {
 
   private async installPackage(name: string): Promise<number> {
     return 0;
-  }
-
-  async executeSource(
-    source: IComputeSourceCode
-  ): Promise<IComputeExecuteResult> {
-    await this.createNewRunDir();
-    const fileName = source.name + "." + source.extension;
-    const targetFilePath = path.resolve(this.runDirectory, fileName);
-    await this.ensureDependencies(source.dependencies);
-    await fs.promises.writeFile(targetFilePath, source.body, {
-      encoding: "utf-8",
-    });
-    const rc = await this.executeSystemCommand(
-      `bash ./${fileName} ${source.args != null ? source.args.join(" ") : " "}`
-    );
-
-    const logs = await this.extractRunLog();
-
-    await this.cleanupRunDir();
-
-    return {
-      rc,
-      output: logs,
-    };
-  }
-
-  async executeProject(
-    project: IComputeProjectCode
-  ): Promise<IComputeExecuteResult> {
-    await this.createNewRunDir();
-
-    const projectFiles = await fs.promises.readdir(project.path);
-    await Promise.all(
-      projectFiles
-        .map((item) => {
-          return {
-            ext: path.extname(item),
-            source: path.resolve(project.path, item),
-            dest: path.resolve(this.runDirectory, item),
-          };
-        })
-        .filter((item) => project.extensions.includes(item.ext))
-        .map(async (item) => await fs.promises.copyFile(item.source, item.dest))
-    );
-    await this.ensureDependencies(project.dependencies);
-
-    const rc = await this.executeSystemCommand(
-      `bash ./${project.entryPoint} ${
-        project.args != null ? project.args.join(" ") : " "
-      }`
-    );
-
-    const logs = await this.extractRunLog();
-
-    await this.cleanupRunDir();
-
-    return {
-      rc,
-      output: logs,
-    };
   }
 }
