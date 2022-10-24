@@ -1,6 +1,8 @@
-# @tuxounet/ludivine
+# Ludivine
 
 Ludivine, a(n individual) virtual digital assistant
+
+> Work in progress
 
 # Launch
 
