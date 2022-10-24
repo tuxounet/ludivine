@@ -1,10 +1,10 @@
 import { KernelElement } from "../../../shared/bases/KernelElement";
-import { ILogTarget } from "../../../shared/logging/types/ILogTarget";
 import { IKernel } from "../../../shared/kernel/IKernel";
-import { Queue } from "../../messaging/Queue";
-import { ILogLine } from "../../../shared/logging/types/ILogLine";
 import { IKernelElement } from "../../../shared/kernel/IKernelElement";
+import { ILogLine } from "../../../shared/logging/types/ILogLine";
 import { ILogTimeFormat } from "../../../shared/logging/types/ILogTimeFormat";
+import { ILogTarget } from "../../../shared/logging/_index";
+import { Queue } from "../../messaging/Queue";
 
 export class LogTargetFile extends KernelElement implements ILogTarget {
   constructor(readonly kernel: IKernel, parent: IKernelElement) {

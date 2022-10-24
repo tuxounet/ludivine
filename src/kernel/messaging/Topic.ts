@@ -1,13 +1,13 @@
-import { KernelElement } from "../../shared/bases/KernelElement";
 import { ObservableElement } from "../../shared/bases/ObservableElement";
 import { IKernel } from "../../shared/kernel/IKernel";
+import { IKernelElement } from "../../shared/kernel/IKernelElement";
 import { IMessageEvent } from "../../shared/messaging/IMessageEvent";
 
 export class Topic extends ObservableElement {
   constructor(
     readonly name: string,
     readonly kernel: IKernel,
-    readonly parent: KernelElement
+    readonly parent: IKernelElement
   ) {
     super(name, kernel, parent);
   }

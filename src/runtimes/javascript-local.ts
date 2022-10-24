@@ -1,5 +1,4 @@
 import { ComputeRuntimeElement } from "../shared/bases/ComputeRuntimeElement";
-
 import { IComputeDependency } from "../shared/compute/IComputeRuntime";
 import { BasicError } from "../shared/errors/BasicError";
 import { IKernel } from "../shared/kernel/IKernel";

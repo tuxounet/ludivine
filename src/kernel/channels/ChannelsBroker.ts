@@ -1,14 +1,16 @@
 import { KernelElement } from "../../shared/bases/KernelElement";
-import { Kernel } from "../kernel";
+import { IChannelsBroker } from "../../shared/channels/IChannelsBroker";
+import { IOutputMessage } from "../../shared/channels/IOutputMessage";
+import { IKernel } from "../../shared/kernel/IKernel";
+
 import { InputsBroker } from "./inputs/inputsBroker";
 import { OutputsBroker } from "./outputs/OutputsBroker";
-import { IOutputMessage } from "../../shared/channels/IOutputMessage";
 
-export class ChannelsBroker extends KernelElement {
+export class ChannelsBroker extends KernelElement implements IChannelsBroker {
   inputs: InputsBroker;
   outputs: OutputsBroker;
 
-  constructor(readonly kernel: Kernel) {
+  constructor(readonly kernel: IKernel) {
     super("channels", kernel);
     this.inputs = new InputsBroker(kernel, this);
     this.outputs = new OutputsBroker(kernel, this);

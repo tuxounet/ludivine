@@ -1,10 +1,10 @@
-import { AppElement } from "../../../shared/bases/AppElement";
-import { KernelElement } from "../../../shared/bases/KernelElement";
-import { Kernel } from "../../../kernel/kernel";
-import { IMessageEvent } from "../../../shared/messaging/IMessageEvent";
 import path from "path";
+import { AppElement } from "../../../shared/bases/AppElement";
+import { IKernel } from "../../../shared/kernel/IKernel";
+import { IKernelElement } from "../../../shared/kernel/IKernelElement";
+import { IMessageEvent } from "../../../shared/messaging/IMessageEvent";
 export class NaturalInterpreterApp extends AppElement {
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
+  constructor(readonly kernel: IKernel, parent: IKernelElement) {
     super("natural-interpreter", parent, kernel, ["/channels/input/natural"]);
   }
 

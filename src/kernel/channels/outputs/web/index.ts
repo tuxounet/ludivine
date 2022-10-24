@@ -1,12 +1,14 @@
 import path from "path";
+import express from "express";
 import { KernelElement } from "../../../../shared/bases/KernelElement";
 import { IOutputChannel } from "../../../../shared/channels/IOutputChannel";
-import express from "express";
 import { IOutputMessage } from "../../../../shared/channels/IOutputMessage";
 import { IKernel } from "../../../../shared/kernel/IKernel";
+import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
 import { vapidKeys } from "../push/keys";
+
 export class WebOutputChannel extends KernelElement implements IOutputChannel {
-  constructor(readonly kernel: IKernel, parent: KernelElement) {
+  constructor(readonly kernel: IKernel, parent: IKernelElement) {
     super("web-output", kernel, parent);
     this.opened = false;
 

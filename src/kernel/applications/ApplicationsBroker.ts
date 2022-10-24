@@ -1,11 +1,10 @@
 import { ShellApp } from "../../apps/shell";
 import { IAppElement } from "../../shared/bases/AppElement";
 import { KernelElement } from "../../shared/bases/KernelElement";
-
-import { Kernel } from "../kernel";
+import { IKernel } from "../../shared/kernel/IKernel";
 
 export class ApplicationsBroker extends KernelElement {
-  constructor(readonly kernel: Kernel) {
+  constructor(readonly kernel: IKernel) {
     super("applications-broker", kernel);
   }
 

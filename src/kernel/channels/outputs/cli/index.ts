@@ -1,11 +1,11 @@
 import { KernelElement } from "../../../../shared/bases/KernelElement";
-
 import { IOutputChannel } from "../../../../shared/channels/IOutputChannel";
 import { IOutputMessage } from "../../../../shared/channels/IOutputMessage";
 import { IKernel } from "../../../../shared/kernel/IKernel";
+import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
 
 export class CLIOutputChannel extends KernelElement implements IOutputChannel {
-  constructor(readonly kernel: IKernel, parent: KernelElement) {
+  constructor(readonly kernel: IKernel, parent: IKernelElement) {
     super("cli-output", kernel, parent);
     this.listening = false;
     this.opened = false;

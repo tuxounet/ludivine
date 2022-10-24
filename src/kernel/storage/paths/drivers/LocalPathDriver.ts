@@ -1,7 +1,8 @@
-import { KernelElement } from "../../../../shared/bases/KernelElement";
 import path from "path";
-import { IStoragePathsDriver } from "../../../../shared/storage/IStoragePathsDriver";
+import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
 import { IKernel } from "../../../../shared/kernel/IKernel";
+import { KernelElement } from "../../../../shared/bases/KernelElement";
+import { IStoragePathsDriver } from "../../../../shared/storage/IStoragePathsDriver";
 
 export class LocalPathDriver
   extends KernelElement
@@ -10,7 +11,7 @@ export class LocalPathDriver
   constructor(
     readonly properties: Record<string, unknown>,
     readonly kernel: IKernel,
-    readonly parent: KernelElement
+    readonly parent: IKernelElement
   ) {
     super("local-path", kernel, parent);
     this.id = "local";

@@ -1,15 +1,16 @@
 import { KernelElement } from "../../../shared/bases/KernelElement";
-import { Kernel } from "../../kernel";
 import { IEndpoint } from "../../../shared/endpoints/IEndpoint";
 import { IEndpointRoute } from "../../../shared/endpoints/IEndpointRoute";
 import express from "express";
 import bodyParser from "body-parser";
 import { Server } from "http";
 import { BasicError } from "../../../shared/errors/BasicError";
+import { IKernel } from "../../../shared/kernel/IKernel";
+import { IKernelElement } from "../../../shared/kernel/IKernelElement";
 export class HttpEndpoint extends KernelElement implements IEndpoint {
   name = "http";
   port = 8080;
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
+  constructor(readonly kernel: IKernel, parent: IKernelElement) {
     super("http-endpoint", kernel, parent);
     if (process.env.PORT != null) this.port = parseInt(process.env.PORT);
   }

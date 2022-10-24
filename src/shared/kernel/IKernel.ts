@@ -1,3 +1,5 @@
+import { IChannelsBroker } from "../channels/IChannelsBroker";
+import { IComputeBroker } from "../compute/IComputeBroker";
 import { IEndpointsBroker } from "../endpoints/IEndpointsBroker";
 import { ILogBroker } from "../logging/ILogBroker";
 import { IMessagingBroker } from "../messaging/IMessagingBroker";
@@ -10,7 +12,10 @@ export interface IKernel {
   storage: IStorageBroker;
   endpoints: IEndpointsBroker;
   messaging: IMessagingBroker;
+  compute: IComputeBroker;
+  channels: IChannelsBroker;
   readonly fullName: string;
   initialize: () => Promise<void>;
   shutdown: () => Promise<void>;
+  askShutdown: () => Promise<void>;
 }

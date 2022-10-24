@@ -1,6 +1,7 @@
 import { EndpointRouteMethod } from "./IEndpointRoute";
 import type { Handler } from "express";
-export interface IEndpointsBroker {
+import { IKernelElement } from "../kernel/IKernelElement";
+export interface IEndpointsBroker extends IKernelElement {
   registerRoute: (
     method: EndpointRouteMethod,
     path: string,

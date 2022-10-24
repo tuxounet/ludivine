@@ -1,13 +1,14 @@
 import readline from "readline";
 import { KernelElement } from "../../../../shared/bases/KernelElement";
-import { Kernel } from "../../../kernel";
 import {
-  IChannelInputResult,
   IInputChannel,
+  IChannelInputResult,
 } from "../../../../shared/channels/IInputChannel";
+import { IKernel } from "../../../../shared/kernel/IKernel";
+import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
 
 export class CLIInputChannel extends KernelElement implements IInputChannel {
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
+  constructor(readonly kernel: IKernel, parent: IKernelElement) {
     super("cli-input", kernel, parent);
     this.opened = false;
   }

@@ -2,8 +2,7 @@ import { KernelElement } from "../../../shared/bases/KernelElement";
 import { IKernel } from "../../../shared/kernel/IKernel";
 import { IKernelElement } from "../../../shared/kernel/IKernelElement";
 import { ILogLine } from "../../../shared/logging/types/ILogLine";
-
-import { ILogTarget } from "../../../shared/logging/types/ILogTarget";
+import { ILogTarget } from "../../../shared/logging/_index";
 
 export class LogTargetConsole extends KernelElement implements ILogTarget {
   constructor(readonly kernel: IKernel, parent: IKernelElement) {

@@ -1,5 +1,3 @@
-import { KernelElement } from "../../shared/bases/KernelElement";
-import { Kernel } from "../kernel";
 import { Handler } from "express";
 import { IEndpoint } from "../../shared/endpoints/IEndpoint";
 import { HttpEndpoint } from "./http/HttpEndpoint";
@@ -7,9 +5,12 @@ import {
   EndpointRouteMethod,
   IEndpointRoute,
 } from "../../shared/endpoints/IEndpointRoute";
+
+import { IKernel } from "../../shared/kernel/IKernel";
 import { IEndpointsBroker } from "../../shared/endpoints/IEndpointsBroker";
+import { KernelElement } from "../../shared/bases/KernelElement";
 export class EndpointsBroker extends KernelElement implements IEndpointsBroker {
-  constructor(readonly kernel: Kernel) {
+  constructor(readonly kernel: IKernel) {
     super("endpoints-broker", kernel);
     this.endpoints = [new HttpEndpoint(kernel, this)];
     this.routes = [];
