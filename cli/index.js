@@ -9,6 +9,6 @@ const ludivinePackageJson = JSON.parse(
   fs.readFileSync(ludivinePackageJsonFile, { encoding: "utf-8" })
 );
 
-const ludivineEntryPoint = path.resolve(__dirname, "..", "index.js");
+const ludivineEntryPoint = path.resolve(ludivineCodePath, "dist", "index");
 console.info(`Ludivine ${ludivinePackageJson.version} @ ${ludivineEntryPoint}`);
 require(ludivineEntryPoint);
