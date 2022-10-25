@@ -14,4 +14,11 @@ export interface IStorageBroker extends IKernelElement {
     name: string,
     params?: Record<string, unknown>
   ) => IStorageFileSystemDriver;
+
+  createEphemeralVolume: (
+    paths: string,
+    filesystem: string,
+    config: Record<string, unknown>,
+    parent: IKernelElement
+  ) => Promise<IStorageVolume>;
 }

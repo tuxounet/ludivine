@@ -10,7 +10,6 @@ import { KernelElement } from "./KernelElement";
 import commandExists from "command-exists";
 import { BasicError } from "../errors/BasicError";
 import childProc from "child_process";
-import { LocalFileSystemDriver } from "../../kernel/storage/filesystems/drivers/LocalFileSystemDriver";
 import { IKernel } from "../kernel/IKernel";
 import { IKernelElement } from "../kernel/IKernelElement";
 
@@ -91,18 +90,20 @@ export abstract class ComputeRuntimeElement
         "executeProject",
         "runDirectory"
       );
-    const projectVolume = new LocalFileSystemDriver(
+
+    const projectVolume = await this.kernel.storage.createEphemeralVolume(
+      "local",
+      "local",
       { folder: project.path },
-      this.kernel,
       this
     );
     const runVolume = await this.kernel.storage.getVolume("runspace");
 
-    const entries = await projectVolume.list(".");
+    const entries = await projectVolume.fileSystem.list(".");
 
     await Promise.all(
       entries.map(async (item) => {
-        const body = await projectVolume.readFile(item.path);
+        const body = await projectVolume.fileSystem.readFile(item.path);
         if (body.body == null) return;
         if (this.runDirectory == null) return;
         await runVolume.fileSystem.writeFile(
