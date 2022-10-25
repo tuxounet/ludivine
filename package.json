@@ -1,16 +1,16 @@
 {
   "name": "@ludivine/kernel",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "main": "dist/index.js",
   "bin": {
-    "ludivine": "dist/index.js"
+    "ludivine": "cli/index.js"
   },
   "scripts": {
     "prebuild": "npm run clean",
     "build": "esbuild src/index.ts --bundle --platform=node --minify --sourcemap=external --outfile=dist/index.js",
     "build:dev": "esbuild src/index.ts --bundle --platform=node --sourcemap=external --outfile=dist/index.js",
-    "start": "node dist/index.js",
+    "start": "node cli/index.js",
     "predev": "npm install --prefer-offline",
     "dev": "nodemon",
     "dev:start": "ts-node src/index.ts",
@@ -65,6 +65,7 @@
     "typescript": "^4.8.4"
   },
   "files": [
+    "cli/",
     "dist/",
     "LICENSE"
   ]
