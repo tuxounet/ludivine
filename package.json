@@ -1,8 +1,8 @@
 {
   "name": "@ludivine/kernel",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
   "bin": {
     "ludivine": "dist/index.js"
   },
