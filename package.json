@@ -1,6 +1,6 @@
 {
   "name": "@ludivine/kernel",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "",
   "main": "dist/index.js",
   "bin": {
@@ -13,7 +13,6 @@
     "start": "node cli/index.js",
     "predev": "npm install --prefer-offline",
     "dev": "nodemon",
-    "dev:start": "ts-node src/index.ts",
     "lint": "eslint ./ --fix",
     "clean": "rm -rf dist coverage",
     "test": "jest --coverage",
@@ -32,7 +31,7 @@
   },
   "license": "gplv3",
   "dependencies": {
-    "@ludivine/shared": "^0.1.3",
+    "@ludivine/shared": "^0.1.4",
     "body-parser": "^1.20.1",
     "command-exists": "1.2.9",
     "express": "^4.18.2",
@@ -65,6 +64,7 @@
     "typescript": "^4.8.4"
   },
   "files": [
+    "assets/",
     "cli/",
     "dist/",
     "LICENSE"
