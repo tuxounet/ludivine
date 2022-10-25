@@ -7,6 +7,7 @@
     "ludivine": "cli/index.js"
   },
   "scripts": {
+    "prebuild": "npm run clean",
     "build": "esbuild src/index.ts --bundle --platform=node --minify --sourcemap=external --outfile=out/index.js",
     "build:dev": "esbuild src/index.ts --bundle --platform=node --sourcemap=external --outfile=out/index.js",
     "start": "node cli/index.js",
@@ -32,6 +33,8 @@
   },
   "license": "gplv3",
   "dependencies": {
+    "-": "^0.0.1",
+    "@tuxounet/ludivine-shared": "file:../ludivine-shared",
     "body-parser": "^1.20.1",
     "command-exists": "1.2.9",
     "express": "^4.18.2",

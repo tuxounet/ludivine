@@ -1,9 +1,9 @@
-import { KernelElement } from "../bases/KernelElement";
+import { IKernelElement } from "../kernel/IKernelElement";
 import { ILogLine } from "./types/ILogLine";
 
 export class Logger {
   constructor(
-    readonly sender: KernelElement,
+    readonly sender: IKernelElement,
     readonly callback: (line: ILogLine) => void
   ) {}
 

@@ -1,18 +1,17 @@
-import { IKernelElement } from "../kernel/IKernelElement";
-import { Logger } from "../logging/Logger";
+import { kernel, logging, messaging } from "@tuxounet/ludivine-shared";
 
-import { IKernel } from "../kernel/IKernel";
-import { Observer } from "../messaging/Observer";
-
-export abstract class KernelElement extends Observer implements IKernelElement {
+export abstract class KernelElement
+  extends messaging.Observer
+  implements kernel.IKernelElement
+{
   constructor(
     readonly name: string,
-    readonly kernel: IKernel,
-    readonly parent?: IKernelElement,
+    readonly kernel: kernel.IKernel,
+    readonly parent?: kernel.IKernelElement,
     readonly substriptions?: string[]
   ) {
     super();
-    this.log = new Logger(this, (line) => {
+    this.log = new logging.Logger(this, (line: logging.ILogLine) => {
       this.kernel.logging.output(line);
     });
   }
@@ -25,7 +24,7 @@ export abstract class KernelElement extends Observer implements IKernelElement {
     this.log.debug("stopped");
   }
 
-  protected log: Logger;
+  protected log: logging.Logger;
   get fullName(): string {
     if (this.parent != null) {
       return this.parent.fullName + "." + this.name;
