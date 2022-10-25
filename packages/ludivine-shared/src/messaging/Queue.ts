@@ -1,7 +1,7 @@
-import { ObservableElement } from "../../shared/bases/ObservableElement";
-import { BasicError } from "../../shared/errors/BasicError";
-import { IKernel } from "../../shared/kernel/IKernel";
-import { IKernelElement } from "../../shared/kernel/IKernelElement";
+import { ObservableElement } from "../bases/ObservableElement";
+import { BasicError } from "../errors/BasicError";
+import { IKernel } from "../kernel/IKernel";
+import { IKernelElement } from "../kernel/IKernelElement";
 
 export class Queue<T = Record<string, unknown>> extends ObservableElement {
   q: T[];

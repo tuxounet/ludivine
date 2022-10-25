@@ -1,7 +1,7 @@
-import { ObservableElement } from "../../shared/bases/ObservableElement";
-import { IKernel } from "../../shared/kernel/IKernel";
-import { IKernelElement } from "../../shared/kernel/IKernelElement";
-import { IMessageEvent } from "../../shared/messaging/IMessageEvent";
+import { ObservableElement } from "../bases/ObservableElement";
+import { IKernel } from "../kernel/IKernel";
+import { IKernelElement } from "../kernel/IKernelElement";
+import { IMessageEvent } from "./IMessageEvent";
 
 export class Topic extends ObservableElement {
   constructor(

@@ -1,7 +1,8 @@
 import { IKernelElement } from "../kernel/IKernelElement";
 import { Logger } from "../logging/Logger";
-import { Observer } from "../../kernel/messaging/Observer";
+
 import { IKernel } from "../kernel/IKernel";
+import { Observer } from "../messaging/Observer";
 
 export abstract class KernelElement extends Observer implements IKernelElement {
   constructor(
