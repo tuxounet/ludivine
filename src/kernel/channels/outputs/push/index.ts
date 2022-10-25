@@ -1,8 +1,4 @@
-import { KernelElement } from "../../../../shared/bases/KernelElement";
-import { IOutputChannel } from "../../../../shared/channels/IOutputChannel";
-import { IOutputMessage } from "../../../../shared/channels/IOutputMessage";
-import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
-import { IKernel } from "../../../../shared/kernel/IKernel";
+import { bases, kernel, channels } from "@ludivine/shared";
 import webpush from "web-push";
 import { vapidKeys } from "./keys";
 
@@ -17,15 +13,15 @@ export interface IDevice extends Record<string, unknown> {
 }
 
 export class WebPushOutputChannel
-  extends kernel.KernelElement
-  implements IOutputChannel
+  extends bases.KernelElement
+  implements channels.IOutputChannel
 {
-  constructor(readonly kernel: kernel.IKernel, parent: IKernelElement) {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("web-push", kernel, parent);
     this.opened = false;
   }
 
-  async output(message: IOutputMessage): Promise<void> {
+  async output(message: channels.IOutputMessage): Promise<void> {
     const volume = await this.kernel.storage.getVolume("runspace");
     let devices: IDevice[] = [];
     const existsDeviceFile = await volume.fileSystem.existsFile("devices.json");

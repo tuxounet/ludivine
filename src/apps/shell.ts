@@ -1,13 +1,9 @@
-import { AppElement } from "../shared/bases/AppElement";
-import { IKernel } from "../shared/kernel/IKernel";
-import { IKernelElement } from "../shared/kernel/IKernelElement";
-import { IMessageEvent } from "../shared/messaging/IMessageEvent";
-
 import { ImperativeInterpreterApp } from "./interpreters/imperative";
 import { NaturalInterpreterApp } from "./interpreters/natural";
+import { bases, kernel, messaging } from "@ludivine/shared";
 
-export class ShellApp extends AppElement {
-  constructor(readonly kernel: kernel.IKernel, parent: IKernelElement) {
+export class ShellApp extends bases.AppElement {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("shell", parent, kernel, ["/channels/input"]);
 
     this.imperativeInterpreter = new ImperativeInterpreterApp(
@@ -30,7 +26,7 @@ export class ShellApp extends AppElement {
     return 0;
   }
 
-  async onMessage(message: IMessageEvent): Promise<void> {
+  async onMessage(message: messaging.IMessageEvent): Promise<void> {
     this.log.debug(
       "message arrival",
       message.recipient,

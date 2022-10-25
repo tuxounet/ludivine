@@ -1,22 +1,16 @@
-import { KernelElement } from "../../../shared/bases/KernelElement";
-import { BasicError } from "../../../shared/errors/BasicError";
-import { StoragesBroker } from "../StoragesBroker";
+import { bases, kernel, storage, errors } from "@ludivine/shared";
 import { LocalFileSystemDriver } from "./drivers/LocalFileSystemDriver";
-import { IStorageFileSystemCtor } from "../../../shared/storage/IStorageFileSystemCtor";
 
-import { IKernel } from "../../../shared/kernel/IKernel";
-import { IStorageFileSystemDriver } from "../../../shared/storage/IStorageFileSystemDriver";
-
-export class StorageFileSystemsFactory extends kernel.KernelElement {
-  constructor(readonly kernel: kernel.IKernel, parent: StoragesBroker) {
+export class StorageFileSystemsFactory extends bases.KernelElement {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("storage-filesystems", kernel, parent);
     this.providers = new Map();
     this.drivers = new Set();
   }
 
-  providers: Map<string, IStorageFileSystemCtor>;
+  providers: Map<string, storage.IStorageFileSystemCtor>;
 
-  drivers: Set<IStorageFileSystemDriver>;
+  drivers: Set<storage.IStorageFileSystemDriver>;
 
   async initialize(): Promise<void> {
     this.providers.clear();
@@ -30,12 +24,16 @@ export class StorageFileSystemsFactory extends kernel.KernelElement {
   async shutdown(): Promise<void> {}
 
   getOneDriver<
-    T extends IStorageFileSystemDriver,
+    T extends storage.IStorageFileSystemDriver,
     TProps extends Record<string, unknown>
   >(id: string, props: TProps): T {
     const driver = this.providers.get(id);
     if (driver == null)
-      throw BasicError.notFound(this.fullName, "getOneDriver/provider", id);
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "getOneDriver/provider",
+        id
+      );
     const instance = driver(props);
     return instance as T;
   }

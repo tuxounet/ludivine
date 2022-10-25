@@ -1,4 +1,4 @@
-import { bases, kernel, logging } from "@tuxounet/ludivine-shared";
+import { bases, kernel, logging } from "@ludivine/shared";
 
 export class LogTargetConsole
   extends bases.KernelElement

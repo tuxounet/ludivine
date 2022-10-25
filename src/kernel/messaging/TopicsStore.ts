@@ -1,4 +1,4 @@
-import { bases, kernel, messaging } from "@tuxounet/ludivine-shared";
+import { bases, kernel, messaging } from "@ludivine/shared";
 
 export class TopicsStore extends bases.KernelElement {
   constructor(

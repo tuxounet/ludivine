@@ -1,13 +1,10 @@
-import { KernelElement } from "../../../../shared/bases/KernelElement";
-import { IInputChannel } from "../../../../shared/channels/IInputChannel";
-import { IKernel } from "../../../../shared/kernel/IKernel";
-import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
+import { bases, kernel, channels } from "@ludivine/shared";
 
 export class HttpInputChannel
-  extends kernel.KernelElement
-  implements IInputChannel
+  extends bases.KernelElement
+  implements channels.IInputChannel
 {
-  constructor(readonly kernel: kernel.IKernel, parent: IKernelElement) {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("http-input", kernel, parent);
     this.opened = false;
   }

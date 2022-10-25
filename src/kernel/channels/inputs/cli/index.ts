@@ -1,17 +1,11 @@
 import readline from "readline";
-import { KernelElement } from "../../../../shared/bases/KernelElement";
-import {
-  IInputChannel,
-  IChannelInputResult,
-} from "../../../../shared/channels/IInputChannel";
-import { IKernel } from "../../../../shared/kernel/IKernel";
-import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
+import { bases, kernel, channels } from "@ludivine/shared";
 
 export class CLIInputChannel
-  extends kernel.KernelElement
-  implements IInputChannel
+  extends bases.KernelElement
+  implements channels.IInputChannel
 {
-  constructor(readonly kernel: kernel.IKernel, parent: IKernelElement) {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("cli-input", kernel, parent);
     this.opened = false;
   }
@@ -23,7 +17,7 @@ export class CLIInputChannel
     this.opened = true;
     const loop = async (): Promise<void> => {
       if (this.opened) {
-        await new Promise<IChannelInputResult>((resolve, reject) => {
+        await new Promise<channels.IChannelInputResult>((resolve, reject) => {
           this.currentRl = readline.createInterface({
             input: process.stdin,
             output: process.stdout,

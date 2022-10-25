@@ -1,11 +1,7 @@
-import { AppElement } from "../../../shared/bases/AppElement";
-import { KernelElement } from "../../../shared/bases/KernelElement";
-import { IKernel } from "../../../shared/kernel/IKernel";
-import { IKernelElement } from "../../../shared/kernel/IKernelElement";
-import { IMessageEvent } from "../../../shared/messaging/IMessageEvent";
+import { bases, kernel, messaging } from "@ludivine/shared";
 
-export class ImperativeInterpreterApp extends AppElement {
-  constructor(readonly kernel: kernel.IKernel, parent: IKernelElement) {
+export class ImperativeInterpreterApp extends bases.AppElement {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("imperative-interpreter", parent, kernel, [
       "/channels/input/imperative",
     ]);
@@ -13,7 +9,7 @@ export class ImperativeInterpreterApp extends AppElement {
 
   readonly imperativePrefix = "!";
 
-  async onMessage(message: IMessageEvent): Promise<void> {
+  async onMessage(message: messaging.IMessageEvent): Promise<void> {
     this.log.debug(
       "message arrival",
       message.recipient,
@@ -49,7 +45,10 @@ export class ImperativeInterpreterApp extends AppElement {
         return await this.kernel.askShutdown();
     }
 
-    function walkToken(object: IKernelElement | IKernel, token: string): any {
+    function walkToken(
+      object: kernel.IKernelElement | kernel.IKernel,
+      token: string
+    ): any {
       for (const key in object) {
         const lowerKey = key.toLowerCase();
         if (lowerKey === token) {
@@ -60,7 +59,7 @@ export class ImperativeInterpreterApp extends AppElement {
       }
     }
 
-    let broker: IKernelElement | IKernel = this.kernel;
+    let broker: kernel.IKernelElement | kernel.IKernel = this.kernel;
     for (let i = 0; i < tokens.length; i++) {
       const result = walkToken(broker, tokens[i]);
       if (result === undefined) {
@@ -88,7 +87,7 @@ export class ImperativeInterpreterApp extends AppElement {
       const anyBroker: any = broker;
       return (
         typeof anyBroker[item] === "function" ||
-        anyBroker[item] instanceof KernelElement
+        Object.keys(anyBroker[item]).includes("fullName")
       );
     });
     await this.kernel.channels.broadcast(

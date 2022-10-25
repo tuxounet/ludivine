@@ -1,8 +1,8 @@
 import { ShellApp } from "../../apps/shell";
 
-import { bases, kernel, endpoints } from "@tuxounet/ludivine-shared";
+import { bases, kernel } from "@ludivine/shared";
 
-export class ApplicationsBroker extends kernel.KernelElement {
+export class ApplicationsBroker extends bases.KernelElement {
   constructor(readonly kernel: kernel.IKernel) {
     super("applications-broker", kernel);
   }
@@ -17,7 +17,7 @@ export class ApplicationsBroker extends kernel.KernelElement {
     });
   }
 
-  async executeAndWait(app: IAppElement): Promise<number> {
+  async executeAndWait(app: bases.IAppElement): Promise<number> {
     return await app.execute();
   }
 

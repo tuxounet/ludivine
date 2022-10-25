@@ -1,17 +1,14 @@
 import path from "path";
-import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
-import { IKernel } from "../../../../shared/kernel/IKernel";
-import { KernelElement } from "../../../../shared/bases/KernelElement";
-import { IStoragePathsDriver } from "../../../../shared/storage/IStoragePathsDriver";
+import { bases, kernel, storage } from "@ludivine/shared";
 
 export class LocalPathDriver
-  extends kernel.KernelElement
-  implements IStoragePathsDriver
+  extends bases.KernelElement
+  implements storage.IStoragePathsDriver
 {
   constructor(
     readonly properties: Record<string, unknown>,
     readonly kernel: kernel.IKernel,
-    readonly parent: IKernelElement
+    readonly parent: kernel.IKernelElement
   ) {
     super("local-path", kernel, parent);
     this.id = "local";

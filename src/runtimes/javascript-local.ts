@@ -1,11 +1,7 @@
-import { ComputeRuntimeElement } from "../shared/bases/ComputeRuntimeElement";
-import { IComputeDependency } from "../shared/compute/IComputeRuntime";
-import { BasicError } from "../shared/errors/BasicError";
-import { IKernel } from "../shared/kernel/IKernel";
-import { IKernelElement } from "../shared/kernel/IKernelElement";
+import { bases, kernel, errors, compute } from "@ludivine/shared";
 
-export class ComputeRuntimeJavascript extends ComputeRuntimeElement {
-  constructor(readonly kernel: kernel.IKernel, parent: IKernelElement) {
+export class ComputeRuntimeJavascript extends bases.ComputeRuntimeElement {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("javascript-local", "node ", kernel, parent);
     this.commandsDependencies = [
       {
@@ -14,8 +10,8 @@ export class ComputeRuntimeJavascript extends ComputeRuntimeElement {
     ];
   }
 
-  async ensureDependencies(deps: IComputeDependency[]): Promise<void> {
-    const failed: IComputeDependency[] = [];
+  async ensureDependencies(deps: compute.IComputeDependency[]): Promise<void> {
+    const failed: compute.IComputeDependency[] = [];
     for (const dep of deps) {
       try {
         await this.installPackage(dep.name);
@@ -24,7 +20,7 @@ export class ComputeRuntimeJavascript extends ComputeRuntimeElement {
       }
     }
     if (failed.length > 0) {
-      throw BasicError.notFound(
+      throw errors.BasicError.notFound(
         this.name,
         "dependencies failed",
         failed.map((item) => item.name).join(",")

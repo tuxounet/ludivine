@@ -1,5 +1,5 @@
 import { Handler } from "express";
-import { bases, kernel, endpoints } from "@tuxounet/ludivine-shared";
+import { bases, kernel, endpoints } from "@ludivine/shared";
 import { HttpEndpoint } from "./http/HttpEndpoint";
 export class EndpointsBroker
   extends bases.KernelElement

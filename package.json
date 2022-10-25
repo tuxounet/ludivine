@@ -1,22 +1,21 @@
 {
-  "name": "@ludivine/cli",
+  "name": "@ludivine/kernel",
   "version": "0.1.0",
   "description": "",
-  "main": "src/shared.ts",
+  "main": "dist/index.ts",
   "bin": {
-    "ludivine": "cli/index.js"
+    "ludivine": "dist/index.js"
   },
   "scripts": {
     "prebuild": "npm run clean",
-    "build": "esbuild src/index.ts --bundle --platform=node --minify --sourcemap=external --outfile=out/index.js",
-    "build:dev": "esbuild src/index.ts --bundle --platform=node --sourcemap=external --outfile=out/index.js",
-    "start": "node cli/index.js",
+    "build": "esbuild src/index.ts --bundle --platform=node --minify --sourcemap=external --outfile=dist/index.js",
+    "build:dev": "esbuild src/index.ts --bundle --platform=node --sourcemap=external --outfile=dist/index.js",
+    "start": "node dist/index.js",
     "predev": "npm install --prefer-offline",
-    "typecheck": "tsc",
     "dev": "nodemon",
     "dev:start": "ts-node src/index.ts",
     "lint": "eslint ./ --fix",
-    "clean": "rm -rf dist build out coverage",
+    "clean": "rm -rf dist coverage",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "test:watch-coverage": "jest --watch --coverage"
@@ -33,7 +32,7 @@
   },
   "license": "gplv3",
   "dependencies": {
-    "@ludivine/shared": "^0.1.1",
+    "@ludivine/shared": "^0.1.3",
     "body-parser": "^1.20.1",
     "command-exists": "1.2.9",
     "express": "^4.18.2",
@@ -66,11 +65,7 @@
     "typescript": "^4.8.4"
   },
   "files": [
-    "src",
-    "cli",
-    "tsconfig.json"
-  ],
-  "workspaces": [
-    "true"
+    "dist/",
+    "LICENSE"
   ]
 }

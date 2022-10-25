@@ -1,9 +1,6 @@
-import { StorageVolume } from "../shared/bases/StorageVolume";
-import { IKernel } from "../shared/kernel/IKernel";
-import { IKernelElement } from "../shared/kernel/IKernelElement";
-
-export class RunspaceVolume extends StorageVolume {
-  constructor(readonly kernel: kernel.IKernel, parent: IKernelElement) {
+import { bases, kernel } from "@ludivine/shared";
+export class RunspaceVolume extends bases.StorageVolume {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super(
       "runspace-volume",
       "runspace",

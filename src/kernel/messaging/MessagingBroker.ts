@@ -1,4 +1,4 @@
-import { bases, kernel, errors, messaging } from "@tuxounet/ludivine-shared";
+import { bases, kernel, errors, messaging } from "@ludivine/shared";
 
 import { QueuesStore } from "./QueuesStore";
 import { TopicsStore } from "./TopicsStore";

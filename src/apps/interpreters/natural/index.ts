@@ -1,10 +1,8 @@
 import path from "path";
-import { AppElement } from "../../../shared/bases/AppElement";
-import { IKernel } from "../../../shared/kernel/IKernel";
-import { IKernelElement } from "../../../shared/kernel/IKernelElement";
-import { IMessageEvent } from "../../../shared/messaging/IMessageEvent";
-export class NaturalInterpreterApp extends AppElement {
-  constructor(readonly kernel: kernel.IKernel, parent: IKernelElement) {
+import { bases, kernel, messaging } from "@ludivine/shared";
+
+export class NaturalInterpreterApp extends bases.AppElement {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("natural-interpreter", parent, kernel, ["/channels/input/natural"]);
   }
 
@@ -15,7 +13,7 @@ export class NaturalInterpreterApp extends AppElement {
     return 0;
   }
 
-  async onMessage(message: IMessageEvent): Promise<void> {
+  async onMessage(message: messaging.IMessageEvent): Promise<void> {
     this.log.debug(
       "message arrival",
       message.recipient,

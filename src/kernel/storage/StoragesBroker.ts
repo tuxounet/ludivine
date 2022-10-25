@@ -1,10 +1,4 @@
-import { KernelElement } from "../../shared/bases/KernelElement";
-import { BasicError } from "../../shared/errors/BasicError";
-import { IKernel } from "../../shared/kernel/IKernel";
-import { IStorageBroker } from "../../shared/storage/IStorageBroker";
-import { IStorageFileSystemDriver } from "../../shared/storage/IStorageFileSystemDriver";
-import { IStoragePathsDriver } from "../../shared/storage/IStoragePathsDriver";
-import { IStorageVolume } from "../../shared/storage/IStorageVolume";
+import { bases, kernel, storage, errors } from "@ludivine/shared";
 import { LogsVolume } from "../../volumes/LogsVolume";
 import { RunspaceVolume } from "../../volumes/RunspaceVolume";
 import { WorkspaceVolume } from "../../volumes/WorkspaceVolume";
@@ -12,12 +6,12 @@ import { StorageFileSystemsFactory } from "./filesystems/StorageFileSystemsFacto
 import { StoragePathsFactory } from "./paths/StoragePathsFactory";
 
 export class StoragesBroker
-  extends kernel.KernelElement
-  implements IStorageBroker
+  extends bases.KernelElement
+  implements storage.IStorageBroker
 {
   fileSystemsFactory: StorageFileSystemsFactory;
   pathsFactory: StoragePathsFactory;
-  volumes: Map<string, IStorageVolume>;
+  volumes: Map<string, storage.IStorageVolume>;
   constructor(readonly kernel: kernel.IKernel) {
     super("storage", kernel);
     this.fileSystemsFactory = new StorageFileSystemsFactory(this.kernel, this);
@@ -28,14 +22,14 @@ export class StoragesBroker
   createPathsDriver(
     name: string,
     params?: Record<string, unknown>
-  ): IStoragePathsDriver {
+  ): storage.IStoragePathsDriver {
     return this.pathsFactory.getOneDriver(name, params != null ? params : {});
   }
 
   createFileSystemDriver(
     name: string,
     params?: Record<string, unknown>
-  ): IStorageFileSystemDriver {
+  ): storage.IStorageFileSystemDriver {
     return this.fileSystemsFactory.getOneDriver(
       name,
       params != null ? params : {}
@@ -70,11 +64,20 @@ export class StoragesBroker
     );
   };
 
-  getVolume = async (id: string): Promise<IStorageVolume> => {
+  getVolume = async (id: string): Promise<storage.IStorageVolume> => {
     const volume = this.volumes.get(id);
     if (volume == null)
-      throw BasicError.notFound(this.fullName, "getVolume", id);
+      throw errors.BasicError.notFound(this.fullName, "getVolume", id);
     return volume;
+  };
+
+  createEphemeralVolume = async (
+    paths: string,
+    filesystem: string,
+    config: Record<string, unknown>,
+    parent: kernel.IKernelElement
+  ): Promise<storage.IStorageVolume> => {
+    throw new Error("niy");
   };
 
   async shutdown(): Promise<void> {

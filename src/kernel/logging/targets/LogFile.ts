@@ -1,13 +1,13 @@
-import { bases, kernel, logging, messaging } from "@tuxounet/ludivine-shared";
+import { bases, kernel, logging, messaging } from "@ludivine/shared";
 
 export class LogTargetFile
-  extends bases.ernelElement
+  extends bases.KernelElement
   implements logging.ILogTarget
 {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("log-target-file", kernel, parent);
 
-    this.queue = new Queue("logging", kernel, this);
+    this.queue = new messaging.Queue("logging", kernel, this);
   }
 
   private outputInterval?: NodeJS.Timer;
@@ -51,7 +51,7 @@ export class LogTargetFile
       }, this.WRITE_DEQUEUE_INTERNAL);
   }
 
-  private async appendLines(lines: ILogLine[]): Promise<boolean> {
+  private async appendLines(lines: logging.ILogLine[]): Promise<boolean> {
     const logVolume = await this.kernel.storage.getVolume(this.LOG_VOLUME_NAME);
     let dump = lines
       .map((item) => {
@@ -123,14 +123,14 @@ export class LogTargetFile
     return `${format.YYYY}-${format.MM}-${format.DD}-${format.HH}`;
   }
 
-  private serializeTimeLogString(timestamp: Date): ILogTimeFormat {
+  private serializeTimeLogString(timestamp: Date): logging.ILogTimeFormat {
     const formatData = (input: number): string => {
       if (input > 9) {
         return String(input);
       } else return `0${input}`;
     };
 
-    const format: ILogTimeFormat = {
+    const format: logging.ILogTimeFormat = {
       YYYY: String(timestamp.getFullYear()),
       MM: formatData(timestamp.getMonth()),
       DD: formatData(timestamp.getDate()),
@@ -139,13 +139,15 @@ export class LogTargetFile
     return format;
   }
 
-  private parseTimeLogsString(input: string): ILogTimeFormat | undefined {
+  private parseTimeLogsString(
+    input: string
+  ): logging.ILogTimeFormat | undefined {
     if (input == null || input.length === 0 || input.trim().length === 0) {
       return undefined;
     }
     const tokens = input.split("-");
     if (tokens.length !== 4) return undefined;
-    const result: ILogTimeFormat = {
+    const result: logging.ILogTimeFormat = {
       YYYY: tokens[0].trim(),
       MM: tokens[1].trim(),
       DD: tokens[2].trim(),
