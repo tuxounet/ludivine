@@ -39,7 +39,7 @@ export class NaturalInterpreterApp extends bases.AppElement {
         name: "nlp",
         dependencies: [{ name: "nltk" }],
         extensions: [".py", ".txt"],
-        path: path.resolve(__dirname, "assets"),
+        path: path.resolve(__dirname, "..", "assets", "interpreters"),
         entryPoint: "nlp.py",
         args: [command],
       }

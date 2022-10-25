@@ -11,7 +11,7 @@ export class WebOutputChannel
     super("web-output", kernel, parent);
     this.opened = false;
 
-    this.assetsFolder = path.join(__dirname, "assets");
+    this.assetsFolder = path.join(__dirname, "..", "assets", "channels");
   }
 
   opened: boolean;

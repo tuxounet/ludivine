@@ -7,5 +7,5 @@
     "./node_modules/**",
     "package-lock.json"
   ],
-  "exec": "npm run dev:start"
+  "exec": "npm run build:dev && npm start"
 }

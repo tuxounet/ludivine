@@ -77,7 +77,22 @@ export class StoragesBroker
     config: Record<string, unknown>,
     parent: kernel.IKernelElement
   ): Promise<storage.IStorageVolume> => {
-    throw new Error("niy");
+    const pathsDriver = this.createPathsDriver(paths, config);
+    const filesystemDriver = this.createFileSystemDriver(filesystem, config);
+
+    const ephVolume = new bases.StorageVolume(
+      "eph",
+      "eph",
+      false,
+      true,
+      pathsDriver,
+      filesystemDriver,
+      this.kernel,
+      parent
+    );
+    this.volumes.set(ephVolume.id, ephVolume);
+
+    return ephVolume;
   };
 
   async shutdown(): Promise<void> {
