@@ -1,10 +1,10 @@
 {
   "name": "@ludivine/kernel",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "main": "dist/index.js",
   "bin": {
-    "ludivine": "dist/index.js"
+    "ludivine": "cli/index.js"
   },
   "scripts": {
     "prebuild": "npm run clean",
@@ -65,6 +65,7 @@
     "typescript": "^4.8.4"
   },
   "files": [
+    "cli/",
     "dist/",
     "LICENSE"
   ]
