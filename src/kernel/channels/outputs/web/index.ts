@@ -1,12 +1,13 @@
 import path from "path";
-import { KernelElement } from "../../../../shared/bases/KernelElement";
-import { IOutputChannel } from "../../../../shared/channels/IOutputChannel";
 import express from "express";
-import { IOutputMessage } from "../../../../shared/channels/IOutputMessage";
-import { IKernel } from "../../../../shared/kernel/IKernel";
+import { bases, kernel, channels } from "@ludivine/shared";
 import { vapidKeys } from "../push/keys";
-export class WebOutputChannel extends KernelElement implements IOutputChannel {
-  constructor(readonly kernel: IKernel, parent: KernelElement) {
+
+export class WebOutputChannel
+  extends bases.KernelElement
+  implements channels.IOutputChannel
+{
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("web-output", kernel, parent);
     this.opened = false;
 
@@ -102,7 +103,7 @@ export class WebOutputChannel extends KernelElement implements IOutputChannel {
     );
   }
 
-  async output(message: IOutputMessage): Promise<void> {
+  async output(message: channels.IOutputMessage): Promise<void> {
     this.log.info("output", message);
     const ev = {
       date: new Date().toISOString(),

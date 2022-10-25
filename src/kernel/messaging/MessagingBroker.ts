@@ -1,13 +1,13 @@
-import { KernelElement } from "../../shared/bases/KernelElement";
-import { BasicError } from "../../shared/errors/BasicError";
-import { IKernel } from "../../shared/kernel/IKernel";
-import { IKernelElement } from "../../shared/kernel/IKernelElement";
-import { IMessagingBroker } from "../../shared/messaging/IMessagingBroker";
+import { bases, kernel, errors, messaging } from "@ludivine/shared";
+
 import { QueuesStore } from "./QueuesStore";
 import { TopicsStore } from "./TopicsStore";
 
-export class MessagingBroker extends KernelElement implements IMessagingBroker {
-  constructor(kernel: IKernel) {
+export class MessagingBroker
+  extends bases.KernelElement
+  implements messaging.IMessagingBroker
+{
+  constructor(kernel: kernel.IKernel) {
     super("topic-broker", kernel);
     this.topicsStore = new TopicsStore(this.kernel, this);
     this.queuesStore = new QueuesStore(this.kernel, this);
@@ -18,7 +18,7 @@ export class MessagingBroker extends KernelElement implements IMessagingBroker {
 
   async subscribeTopic(
     topic: string,
-    subscriber: IKernelElement
+    subscriber: kernel.IKernelElement
   ): Promise<void> {
     this.log.debug("subscribe", topic, "by", subscriber.fullName);
     if (!this.topicsStore.topics.has(topic)) {
@@ -26,7 +26,7 @@ export class MessagingBroker extends KernelElement implements IMessagingBroker {
     }
     const currentTopic = this.topicsStore.topics.get(topic);
     if (currentTopic == null) {
-      throw BasicError.notFound(this.fullName, "topic", topic);
+      throw errors.BasicError.notFound(this.fullName, "topic", topic);
     }
 
     currentTopic.register(subscriber);
@@ -46,7 +46,7 @@ export class MessagingBroker extends KernelElement implements IMessagingBroker {
 
   async subscribeQueue(
     queue: string,
-    subscriber: IKernelElement
+    subscriber: kernel.IKernelElement
   ): Promise<void> {
     this.log.debug("subscribe", queue, "by", subscriber.fullName);
     if (!this.queuesStore.queues.has(queue)) {
@@ -54,7 +54,7 @@ export class MessagingBroker extends KernelElement implements IMessagingBroker {
     }
     const current = this.queuesStore.queues.get(queue);
     if (current == null) {
-      throw BasicError.notFound(this.fullName, "queue", queue);
+      throw errors.BasicError.notFound(this.fullName, "queue", queue);
     }
 
     current.register(subscriber);
@@ -79,7 +79,7 @@ export class MessagingBroker extends KernelElement implements IMessagingBroker {
     }
     const currentTopic = this.topicsStore.topics.get(topic);
     if (currentTopic == null) {
-      throw BasicError.notFound(this.fullName, "topic", topic);
+      throw errors.BasicError.notFound(this.fullName, "topic", topic);
     }
     await currentTopic.publish(message);
     this.log.debug("published", topic, "with", message);
@@ -92,7 +92,7 @@ export class MessagingBroker extends KernelElement implements IMessagingBroker {
     }
     const current = this.queuesStore.queues.get(queue);
     if (current == null) {
-      throw BasicError.notFound(this.fullName, "topic", queue);
+      throw errors.BasicError.notFound(this.fullName, "topic", queue);
     }
     await current.enqueue(message);
     this.log.debug("enqueued", queue, "with", message);

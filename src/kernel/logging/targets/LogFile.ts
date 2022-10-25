@@ -1,25 +1,22 @@
-import { KernelElement } from "../../../shared/bases/KernelElement";
-import { ILogTarget } from "../../../shared/logging/types/ILogTarget";
-import { IKernel } from "../../../shared/kernel/IKernel";
-import { Queue } from "../../messaging/Queue";
-import { ILogLine } from "../../../shared/logging/types/ILogLine";
-import { IKernelElement } from "../../../shared/kernel/IKernelElement";
-import { ILogTimeFormat } from "../../../shared/logging/types/ILogTimeFormat";
+import { bases, kernel, logging, messaging } from "@ludivine/shared";
 
-export class LogTargetFile extends KernelElement implements ILogTarget {
-  constructor(readonly kernel: IKernel, parent: IKernelElement) {
+export class LogTargetFile
+  extends bases.KernelElement
+  implements logging.ILogTarget
+{
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("log-target-file", kernel, parent);
 
-    this.queue = new Queue("logging", kernel, this);
+    this.queue = new messaging.Queue("logging", kernel, this);
   }
 
   private outputInterval?: NodeJS.Timer;
-  queue: Queue<ILogLine>;
+  queue: messaging.Queue<logging.ILogLine>;
   private readonly LOG_VOLUME_NAME = "logs";
   private readonly WRITE_DEQUEUE_INTERNAL = 200;
   private readonly LOG_RETENTION_HOURS = 24;
   private readonly LOG_FILENAME_SUFFIX = "-ludivine.log";
-  appendLog(line: ILogLine): void {
+  appendLog(line: logging.ILogLine): void {
     this.queue.enqueue(line);
   }
 
@@ -39,7 +36,7 @@ export class LogTargetFile extends KernelElement implements ILogTarget {
   }
 
   private async dequeueLogs(): Promise<void> {
-    const buffer: ILogLine[] = [];
+    const buffer: logging.ILogLine[] = [];
 
     while (this.queue.canDequeue() && buffer.length < 20) {
       const line = this.queue.dequeue();
@@ -54,7 +51,7 @@ export class LogTargetFile extends KernelElement implements ILogTarget {
       }, this.WRITE_DEQUEUE_INTERNAL);
   }
 
-  private async appendLines(lines: ILogLine[]): Promise<boolean> {
+  private async appendLines(lines: logging.ILogLine[]): Promise<boolean> {
     const logVolume = await this.kernel.storage.getVolume(this.LOG_VOLUME_NAME);
     let dump = lines
       .map((item) => {
@@ -126,14 +123,14 @@ export class LogTargetFile extends KernelElement implements ILogTarget {
     return `${format.YYYY}-${format.MM}-${format.DD}-${format.HH}`;
   }
 
-  private serializeTimeLogString(timestamp: Date): ILogTimeFormat {
+  private serializeTimeLogString(timestamp: Date): logging.ILogTimeFormat {
     const formatData = (input: number): string => {
       if (input > 9) {
         return String(input);
       } else return `0${input}`;
     };
 
-    const format: ILogTimeFormat = {
+    const format: logging.ILogTimeFormat = {
       YYYY: String(timestamp.getFullYear()),
       MM: formatData(timestamp.getMonth()),
       DD: formatData(timestamp.getDate()),
@@ -142,13 +139,15 @@ export class LogTargetFile extends KernelElement implements ILogTarget {
     return format;
   }
 
-  private parseTimeLogsString(input: string): ILogTimeFormat | undefined {
+  private parseTimeLogsString(
+    input: string
+  ): logging.ILogTimeFormat | undefined {
     if (input == null || input.length === 0 || input.trim().length === 0) {
       return undefined;
     }
     const tokens = input.split("-");
     if (tokens.length !== 4) return undefined;
-    const result: ILogTimeFormat = {
+    const result: logging.ILogTimeFormat = {
       YYYY: tokens[0].trim(),
       MM: tokens[1].trim(),
       DD: tokens[2].trim(),

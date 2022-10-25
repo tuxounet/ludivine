@@ -1,20 +1,15 @@
-import { KernelElement } from "../../../shared/bases/KernelElement";
-import { BasicError } from "../../../shared/errors/BasicError";
-import { StoragesBroker } from "../StoragesBroker";
+import { bases, kernel, storage, errors } from "@ludivine/shared";
 import { LocalPathDriver } from "./drivers/LocalPathDriver";
-import { IStoragePathsCtor } from "../../../shared/storage/IStoragePathsCtor";
-import { IKernel } from "../../../shared/kernel/IKernel";
-import { IStoragePathsDriver } from "../../../shared/storage/IStoragePathsDriver";
 
-export class StoragePathsFactory extends KernelElement {
-  constructor(readonly kernel: IKernel, parent: StoragesBroker) {
+export class StoragePathsFactory extends bases.KernelElement {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("storage-paths", kernel, parent);
     this.providers = new Map();
     this.drivers = new Set();
   }
 
-  providers: Map<string, IStoragePathsCtor>;
-  drivers: Set<IStoragePathsDriver>;
+  providers: Map<string, storage.IStoragePathsCtor>;
+  drivers: Set<storage.IStoragePathsDriver>;
 
   async initialize(): Promise<void> {
     this.providers.clear();
@@ -27,19 +22,21 @@ export class StoragePathsFactory extends KernelElement {
 
   async shutdown(): Promise<void> {
     await Promise.all(
-      Array.from(this.drivers.values()).map(
-        async (item) => await item.shutdown()
-      )
+      Array.from(this.drivers.values()).map((item) => item.shutdown())
     );
   }
 
   getOneDriver<
-    T extends IStoragePathsDriver,
+    T extends storage.IStoragePathsDriver,
     TProps extends Record<string, unknown>
   >(id: string, props: TProps): T {
     const driver = this.providers.get(id);
     if (driver == null)
-      throw BasicError.notFound(this.fullName, "getOneDriver/provider", id);
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "getOneDriver/provider",
+        id
+      );
     const instance = driver(props);
     return instance as T;
   }

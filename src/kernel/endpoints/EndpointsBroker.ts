@@ -1,22 +1,18 @@
-import { KernelElement } from "../../shared/bases/KernelElement";
-import { Kernel } from "../kernel";
 import { Handler } from "express";
-import { IEndpoint } from "../../shared/endpoints/IEndpoint";
+import { bases, kernel, endpoints } from "@ludivine/shared";
 import { HttpEndpoint } from "./http/HttpEndpoint";
-import {
-  EndpointRouteMethod,
-  IEndpointRoute,
-} from "../../shared/endpoints/IEndpointRoute";
-import { IEndpointsBroker } from "../../shared/endpoints/IEndpointsBroker";
-export class EndpointsBroker extends KernelElement implements IEndpointsBroker {
-  constructor(readonly kernel: Kernel) {
+export class EndpointsBroker
+  extends bases.KernelElement
+  implements endpoints.IEndpointsBroker
+{
+  constructor(readonly kernel: kernel.IKernel) {
     super("endpoints-broker", kernel);
     this.endpoints = [new HttpEndpoint(kernel, this)];
     this.routes = [];
   }
 
-  endpoints: IEndpoint[];
-  routes: IEndpointRoute[];
+  endpoints: endpoints.IEndpoint[];
+  routes: endpoints.IEndpointRoute[];
 
   async initialize(): Promise<void> {
     await this.openEndpoints();
@@ -37,7 +33,7 @@ export class EndpointsBroker extends KernelElement implements IEndpointsBroker {
   }
 
   async registerRoute(
-    method: EndpointRouteMethod,
+    method: endpoints.EndpointRouteMethod,
     path: string,
     handler: Handler
   ): Promise<void> {
@@ -49,7 +45,7 @@ export class EndpointsBroker extends KernelElement implements IEndpointsBroker {
   }
 
   async unregisterRoute(
-    method: EndpointRouteMethod,
+    method: endpoints.EndpointRouteMethod,
     path: string
   ): Promise<void> {
     this.routes = this.routes.filter(

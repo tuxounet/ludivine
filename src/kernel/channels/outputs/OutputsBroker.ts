@@ -1,13 +1,10 @@
-import { KernelElement } from "../../../shared/bases/KernelElement";
-import { IOutputChannel } from "../../../shared/channels/IOutputChannel";
+import { bases, kernel, channels } from "@ludivine/shared";
 import { CLIOutputChannel } from "./cli";
-import { WebOutputChannel } from "./web";
-import { IKernel } from "../../../shared/kernel/IKernel";
-import { IKernelElement } from "../../../shared/kernel/IKernelElement";
 import { WebPushOutputChannel } from "./push";
+import { WebOutputChannel } from "./web";
 
-export class OutputsBroker extends KernelElement {
-  constructor(readonly kernel: IKernel, parent: IKernelElement) {
+export class OutputsBroker extends bases.KernelElement {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("outputs-broker", kernel, parent);
     this.channels = [
       new CLIOutputChannel(kernel, this),
@@ -16,5 +13,5 @@ export class OutputsBroker extends KernelElement {
     ];
   }
 
-  channels: IOutputChannel[];
+  channels: channels.IOutputChannel[];
 }

@@ -1,13 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { KernelElement } from "../../../../shared/bases/KernelElement";
-import { BasicError } from "../../../../shared/errors/BasicError";
-import { IKernel } from "../../../../shared/kernel/IKernel";
-import { IKernelElement } from "../../../../shared/kernel/IKernelElement";
-import {
-  IStorageFileSystemDriver,
-  IStorageFileSystemDriverEntry,
-} from "../../../../shared/storage/IStorageFileSystemDriver";
+import { bases, kernel, storage, errors } from "@ludivine/shared";
 
 export interface LocalFileSystemDriverProperties
   extends Record<string, unknown> {
@@ -15,15 +8,15 @@ export interface LocalFileSystemDriverProperties
 }
 
 export class LocalFileSystemDriver
-  extends KernelElement
-  implements IStorageFileSystemDriver
+  extends bases.KernelElement
+  implements storage.IStorageFileSystemDriver
 {
   id: string;
 
   constructor(
     readonly properties: Record<string, unknown>,
-    readonly kernel: IKernel,
-    readonly parent: IKernelElement
+    readonly kernel: kernel.IKernel,
+    readonly parent: kernel.IKernelElement
   ) {
     super("local-fs", kernel, parent);
     this.id = "local";
@@ -37,10 +30,12 @@ export class LocalFileSystemDriver
     return true;
   }
 
-  async list(fullPath: string): Promise<IStorageFileSystemDriverEntry[]> {
+  async list(
+    fullPath: string
+  ): Promise<storage.IStorageFileSystemDriverEntry[]> {
     const realPath = await this.getRealPath(fullPath);
     if (!fs.existsSync(realPath)) {
-      throw BasicError.notFound(this.fullName, "list", fullPath);
+      throw errors.BasicError.notFound(this.fullName, "list", fullPath);
     }
     return fs
       .readdirSync(realPath, {
@@ -56,10 +51,10 @@ export class LocalFileSystemDriver
 
   async readFile(
     fullPath: string
-  ): Promise<IStorageFileSystemDriverEntry<Buffer>> {
+  ): Promise<storage.IStorageFileSystemDriverEntry<Buffer>> {
     const realPath = await this.getRealPath(fullPath);
     if (!fs.existsSync(realPath)) {
-      throw BasicError.notFound(this.fullName, "readFile", fullPath);
+      throw errors.BasicError.notFound(this.fullName, "readFile", fullPath);
     }
     const content = fs.readFileSync(realPath);
     return {
@@ -71,10 +66,10 @@ export class LocalFileSystemDriver
 
   async readTextFile(
     fullPath: string
-  ): Promise<IStorageFileSystemDriverEntry<string>> {
+  ): Promise<storage.IStorageFileSystemDriverEntry<string>> {
     const realPath = await this.getRealPath(fullPath);
     if (!fs.existsSync(realPath)) {
-      throw BasicError.notFound(this.fullName, "readFile", realPath);
+      throw errors.BasicError.notFound(this.fullName, "readFile", realPath);
     }
     const content = fs.readFileSync(realPath, { encoding: "utf-8" });
     return {
@@ -86,10 +81,10 @@ export class LocalFileSystemDriver
 
   async readObjectFile<T = Record<string, unknown>>(
     fullPath: string
-  ): Promise<IStorageFileSystemDriverEntry<T>> {
+  ): Promise<storage.IStorageFileSystemDriverEntry<T>> {
     const realPath = await this.getRealPath(fullPath);
     if (!fs.existsSync(realPath)) {
-      throw BasicError.notFound(this.fullName, "readFile", realPath);
+      throw errors.BasicError.notFound(this.fullName, "readFile", realPath);
     }
     const content = fs.readFileSync(realPath, { encoding: "utf-8" });
 
@@ -105,7 +100,7 @@ export class LocalFileSystemDriver
 
     if (!fs.existsSync(realPath)) return false;
     if (!fs.statSync(realPath).isDirectory()) {
-      throw BasicError.badQuery(
+      throw errors.BasicError.badQuery(
         this.fullName,
         "existsDirectory/not-a-directory",
         folder
@@ -119,7 +114,7 @@ export class LocalFileSystemDriver
 
     if (!fs.existsSync(realPath)) return false;
     if (fs.statSync(realPath).isDirectory()) {
-      throw BasicError.badQuery(
+      throw errors.BasicError.badQuery(
         this.fullName,
         "existsFile/not-a-file",
         fullPath
@@ -132,14 +127,14 @@ export class LocalFileSystemDriver
     const realPath = await this.getRealPath(fullPath);
 
     if (fs.existsSync(realPath)) {
-      throw BasicError.badQuery(
+      throw errors.BasicError.badQuery(
         this.fullName,
         "createDirectory/already-exists",
         fullPath
       );
     }
     if (fs.statSync(realPath).isDirectory()) {
-      throw BasicError.badQuery(
+      throw errors.BasicError.badQuery(
         this.fullName,
         "existsFile/not-a-file",
         fullPath
@@ -220,14 +215,14 @@ export class LocalFileSystemDriver
     const folderValue = this.properties[folderProperty];
 
     if (folderValue === undefined)
-      throw BasicError.notFound(
+      throw errors.BasicError.notFound(
         this.fullName,
         "computeRealPath/" + folderProperty,
         folderProperty
       );
 
     if (typeof folderValue !== "string") {
-      throw BasicError.badQuery(
+      throw errors.BasicError.badQuery(
         this.fullName,
         "computeRealPath/" + folderProperty,
         String(folderValue)

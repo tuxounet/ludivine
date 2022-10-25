@@ -1,19 +1,19 @@
-import { KernelElement } from "../../shared/bases/KernelElement";
-import { IKernel } from "../../shared/kernel/IKernel";
-import { IKernelElement } from "../../shared/kernel/IKernelElement";
-import { Queue } from "./Queue";
+import { bases, kernel, messaging } from "@ludivine/shared";
 
-export class QueuesStore extends KernelElement {
-  constructor(readonly kernel: IKernel, readonly parent: IKernelElement) {
+export class QueuesStore extends bases.KernelElement {
+  constructor(
+    readonly kernel: kernel.IKernel,
+    readonly parent: kernel.IKernelElement
+  ) {
     super("queues-store", kernel, parent);
     this.queues = new Map();
   }
 
-  queues: Map<string, Queue>;
+  queues: Map<string, messaging.Queue>;
 
   async registerQueue(name: string): Promise<void> {
     this.log.debug("registering", name);
-    const queue = new Queue(name, this.kernel, this);
+    const queue = new messaging.Queue(name, this.kernel, this);
     this.queues.set(name, queue);
     this.log.debug("registed", name);
   }

@@ -1,16 +1,14 @@
-import { KernelElement } from "../../../shared/bases/KernelElement";
-import { IKernel } from "../../../shared/kernel/IKernel";
-import { IKernelElement } from "../../../shared/kernel/IKernelElement";
-import { ILogLine } from "../../../shared/logging/types/ILogLine";
+import { bases, kernel, logging } from "@ludivine/shared";
 
-import { ILogTarget } from "../../../shared/logging/types/ILogTarget";
-
-export class LogTargetConsole extends KernelElement implements ILogTarget {
-  constructor(readonly kernel: IKernel, parent: IKernelElement) {
+export class LogTargetConsole
+  extends bases.KernelElement
+  implements logging.ILogTarget
+{
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("log-target-console", kernel, parent);
   }
 
-  appendLog(line: ILogLine): void {
+  appendLog(line: logging.ILogLine): void {
     switch (line.level) {
       case "DEBUG":
         return console.debug(line.date, "DBG", line.sender, line.line);

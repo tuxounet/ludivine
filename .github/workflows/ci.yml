@@ -21,17 +21,17 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run lint
-      - run: npm run typecheck
       - run: npm run test
+      - run: npm run build
       - name: publish artifacts
         uses: actions/upload-artifact@v3
         with:
           name: delivery
           path: |
             coverage/**
-            src/**
-            cli/**
+            dist/**           
             package.json
             package-lock.json
             LICENSE
+            README
           retention-days: 3

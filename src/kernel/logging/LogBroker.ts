@@ -1,14 +1,14 @@
-import { KernelElement } from "../../shared/bases/KernelElement";
-
+import { bases, kernel, logging } from "@ludivine/shared";
 import { LogTargetConsole } from "./targets/LogConsole";
 import { LogTargetFile } from "./targets/LogFile";
-import { ILogTarget } from "../../shared/logging/types/ILogTarget";
-import { ILogBroker } from "../../shared/logging/ILogBroker";
-import { IKernel } from "../../shared/kernel/IKernel";
-import { ILogLine } from "../../shared/logging/types/ILogLine";
 
-export class LogBroker extends KernelElement implements ILogBroker {
-  constructor(readonly kernel: IKernel) {
+export class LogBroker
+  extends bases.KernelElement
+  implements logging.ILogBroker
+{
+  targets: logging.ILogTarget[];
+
+  constructor(readonly kernel: kernel.IKernel) {
     super("logs", kernel);
     this.targets = [
       new LogTargetFile(kernel, this),
@@ -26,9 +26,7 @@ export class LogBroker extends KernelElement implements ILogBroker {
     await Promise.all(this.targets.map(async (item) => await item.shutdown()));
   }
 
-  output(line: ILogLine): void {
+  output(line: logging.ILogLine): void {
     this.targets.forEach((target) => target.appendLog(line));
   }
-
-  targets: ILogTarget[];
 }

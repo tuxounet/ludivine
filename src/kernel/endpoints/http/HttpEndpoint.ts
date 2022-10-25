@@ -1,22 +1,21 @@
-import { KernelElement } from "../../../shared/bases/KernelElement";
-import { Kernel } from "../../kernel";
-import { IEndpoint } from "../../../shared/endpoints/IEndpoint";
-import { IEndpointRoute } from "../../../shared/endpoints/IEndpointRoute";
 import express from "express";
 import bodyParser from "body-parser";
 import { Server } from "http";
-import { BasicError } from "../../../shared/errors/BasicError";
-export class HttpEndpoint extends KernelElement implements IEndpoint {
+import { bases, kernel, endpoints, errors } from "@ludivine/shared";
+export class HttpEndpoint
+  extends bases.KernelElement
+  implements endpoints.IEndpoint
+{
   name = "http";
   port = 8080;
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("http-endpoint", kernel, parent);
     if (process.env.PORT != null) this.port = parseInt(process.env.PORT);
   }
 
   protected app?: express.Application;
   protected server?: Server;
-  async open(routes: IEndpointRoute[]): Promise<void> {
+  async open(routes: endpoints.IEndpointRoute[]): Promise<void> {
     if (this.app !== undefined) {
       await this.close();
     }
@@ -40,7 +39,7 @@ export class HttpEndpoint extends KernelElement implements IEndpoint {
                 app.use(item.path, item.handler);
                 return;
               default:
-                throw BasicError.badQuery(
+                throw errors.BasicError.badQuery(
                   this.fullName,
                   "route method",
                   item.method

@@ -1,11 +1,9 @@
-import { KernelElement } from "../../../shared/bases/KernelElement";
-import { Kernel } from "../../kernel";
-import { IInputChannel } from "../../../shared/channels/IInputChannel";
+import { bases, kernel, channels } from "@ludivine/shared";
 import { CLIInputChannel } from "./cli";
 import { HttpInputChannel } from "./http";
 
-export class InputsBroker extends KernelElement {
-  constructor(readonly kernel: Kernel, parent: KernelElement) {
+export class InputsBroker extends bases.KernelElement {
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("inputs-broker", kernel, parent);
     this.channels = [
       new CLIInputChannel(kernel, this),
@@ -13,5 +11,5 @@ export class InputsBroker extends KernelElement {
     ];
   }
 
-  channels: IInputChannel[];
+  channels: channels.IInputChannel[];
 }

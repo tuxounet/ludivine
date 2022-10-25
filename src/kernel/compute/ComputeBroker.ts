@@ -2,19 +2,12 @@ import { ComputeRuntimeBash } from "../../runtimes/bash-local";
 import { ComputeRuntimeJavascript } from "../../runtimes/javascript-local";
 import { ComputeRuntimePython } from "../../runtimes/python-local";
 import { ComputeRuntimeTypescript } from "../../runtimes/typescript-local";
-import { KernelElement } from "../../shared/bases/KernelElement";
-import { BasicError } from "../../shared/errors/BasicError";
-
-import {
-  IComputeExecuteResult,
-  IComputeProjectCode,
-  IComputeRuntime,
-  IComputeSourceCode,
-} from "../../shared/compute/IComputeRuntime";
-import { IKernel } from "../../shared/kernel/IKernel";
-
-export class ComputeBroker extends KernelElement {
-  constructor(readonly kernel: IKernel) {
+import { bases, kernel, compute, errors } from "@ludivine/shared";
+export class ComputeBroker
+  extends bases.KernelElement
+  implements compute.IComputeBroker
+{
+  constructor(readonly kernel: kernel.IKernel) {
     super("compute-broker", kernel);
     this.runtimes = [
       new ComputeRuntimeBash(kernel, this),
@@ -24,7 +17,7 @@ export class ComputeBroker extends KernelElement {
     ];
   }
 
-  runtimes: IComputeRuntime[];
+  runtimes: compute.IComputeRuntime[];
 
   async initialize(): Promise<void> {
     await Promise.all(
@@ -40,22 +33,30 @@ export class ComputeBroker extends KernelElement {
 
   async executeSource(
     runtime: string,
-    source: IComputeSourceCode
-  ): Promise<IComputeExecuteResult> {
+    source: compute.IComputeSourceCode
+  ): Promise<compute.IComputeExecuteResult> {
     const localRuntime = this.runtimes.find((item) => item.name === runtime);
     if (localRuntime == null) {
-      throw BasicError.notFound(this.fullName, "compute runtime", runtime);
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "compute runtime",
+        runtime
+      );
     }
     return await localRuntime.executeSource(source);
   }
 
   async executeProject(
     runtime: string,
-    project: IComputeProjectCode
-  ): Promise<IComputeExecuteResult> {
+    project: compute.IComputeProjectCode
+  ): Promise<compute.IComputeExecuteResult> {
     const localRuntime = this.runtimes.find((item) => item.name === runtime);
     if (localRuntime == null) {
-      throw BasicError.notFound(this.fullName, "compute runtime", runtime);
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "compute runtime",
+        runtime
+      );
     }
     return await localRuntime.executeProject(project);
   }

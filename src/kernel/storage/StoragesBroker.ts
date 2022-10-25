@@ -1,21 +1,18 @@
+import { bases, kernel, storage, errors } from "@ludivine/shared";
+import { LogsVolume } from "../../volumes/LogsVolume";
 import { RunspaceVolume } from "../../volumes/RunspaceVolume";
 import { WorkspaceVolume } from "../../volumes/WorkspaceVolume";
-import { KernelElement } from "../../shared/bases/KernelElement";
-import { BasicError } from "../../shared/errors/BasicError";
 import { StorageFileSystemsFactory } from "./filesystems/StorageFileSystemsFactory";
 import { StoragePathsFactory } from "./paths/StoragePathsFactory";
-import { IStorageVolume } from "../../shared/storage/IStorageVolume";
-import { IKernel } from "../../shared/kernel/IKernel";
-import { IStorageBroker } from "../../shared/storage/IStorageBroker";
-import { IStoragePathsDriver } from "../../shared/storage/IStoragePathsDriver";
-import { IStorageFileSystemDriver } from "../../shared/storage/IStorageFileSystemDriver";
-import { LogsVolume } from "../../volumes/LogsVolume";
 
-export class StoragesBroker extends KernelElement implements IStorageBroker {
+export class StoragesBroker
+  extends bases.KernelElement
+  implements storage.IStorageBroker
+{
   fileSystemsFactory: StorageFileSystemsFactory;
   pathsFactory: StoragePathsFactory;
-  volumes: Map<string, IStorageVolume>;
-  constructor(readonly kernel: IKernel) {
+  volumes: Map<string, storage.IStorageVolume>;
+  constructor(readonly kernel: kernel.IKernel) {
     super("storage", kernel);
     this.fileSystemsFactory = new StorageFileSystemsFactory(this.kernel, this);
     this.pathsFactory = new StoragePathsFactory(this.kernel, this);
@@ -25,14 +22,14 @@ export class StoragesBroker extends KernelElement implements IStorageBroker {
   createPathsDriver(
     name: string,
     params?: Record<string, unknown>
-  ): IStoragePathsDriver {
+  ): storage.IStoragePathsDriver {
     return this.pathsFactory.getOneDriver(name, params != null ? params : {});
   }
 
   createFileSystemDriver(
     name: string,
     params?: Record<string, unknown>
-  ): IStorageFileSystemDriver {
+  ): storage.IStorageFileSystemDriver {
     return this.fileSystemsFactory.getOneDriver(
       name,
       params != null ? params : {}
@@ -67,11 +64,20 @@ export class StoragesBroker extends KernelElement implements IStorageBroker {
     );
   };
 
-  getVolume = async (id: string): Promise<IStorageVolume> => {
+  getVolume = async (id: string): Promise<storage.IStorageVolume> => {
     const volume = this.volumes.get(id);
     if (volume == null)
-      throw BasicError.notFound(this.fullName, "getVolume", id);
+      throw errors.BasicError.notFound(this.fullName, "getVolume", id);
     return volume;
+  };
+
+  createEphemeralVolume = async (
+    paths: string,
+    filesystem: string,
+    config: Record<string, unknown>,
+    parent: kernel.IKernelElement
+  ): Promise<storage.IStorageVolume> => {
+    throw new Error("niy");
   };
 
   async shutdown(): Promise<void> {

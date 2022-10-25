@@ -1,14 +1,16 @@
-import { KernelElement } from "../../shared/bases/KernelElement";
-import { Kernel } from "../kernel";
+import { bases, kernel, channels } from "@ludivine/shared";
+
 import { InputsBroker } from "./inputs/inputsBroker";
 import { OutputsBroker } from "./outputs/OutputsBroker";
-import { IOutputMessage } from "../../shared/channels/IOutputMessage";
 
-export class ChannelsBroker extends KernelElement {
+export class ChannelsBroker
+  extends bases.KernelElement
+  implements channels.IChannelsBroker
+{
   inputs: InputsBroker;
   outputs: OutputsBroker;
 
-  constructor(readonly kernel: Kernel) {
+  constructor(readonly kernel: kernel.IKernel) {
     super("channels", kernel);
     this.inputs = new InputsBroker(kernel, this);
     this.outputs = new OutputsBroker(kernel, this);
@@ -73,7 +75,7 @@ export class ChannelsBroker extends KernelElement {
     });
   };
 
-  outputOnAll = async (message: IOutputMessage): Promise<void> => {
+  outputOnAll = async (message: channels.IOutputMessage): Promise<void> => {
     await Promise.all(
       this.outputs.channels.map(async (item) => await item.output(message))
     );

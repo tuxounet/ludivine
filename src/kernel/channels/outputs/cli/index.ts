@@ -1,11 +1,10 @@
-import { KernelElement } from "../../../../shared/bases/KernelElement";
+import { bases, kernel, channels } from "@ludivine/shared";
 
-import { IOutputChannel } from "../../../../shared/channels/IOutputChannel";
-import { IOutputMessage } from "../../../../shared/channels/IOutputMessage";
-import { IKernel } from "../../../../shared/kernel/IKernel";
-
-export class CLIOutputChannel extends KernelElement implements IOutputChannel {
-  constructor(readonly kernel: IKernel, parent: KernelElement) {
+export class CLIOutputChannel
+  extends bases.KernelElement
+  implements channels.IOutputChannel
+{
+  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("cli-output", kernel, parent);
     this.listening = false;
     this.opened = false;
@@ -23,7 +22,7 @@ export class CLIOutputChannel extends KernelElement implements IOutputChannel {
   promptPrefix = "> ";
   listening: boolean;
 
-  async output(message: IOutputMessage): Promise<void> {
+  async output(message: channels.IOutputMessage): Promise<void> {
     if (!this.opened) {
       return;
     }
