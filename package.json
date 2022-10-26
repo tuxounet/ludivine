@@ -1,11 +1,8 @@
 {
-  "name": "@ludivine/kernel",
-  "version": "0.1.4",
+  "name": "ludivine",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
-  "bin": {
-    "ludivine": "cli/index.js"
-  },
   "scripts": {
     "prebuild": "npm run clean",
     "build": "esbuild src/index.ts --bundle --platform=node --minify --sourcemap=external --outfile=dist/index.js",
