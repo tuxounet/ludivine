@@ -7,7 +7,7 @@ export class HttpEndpoint
   implements endpoints.IEndpoint
 {
   name = "http";
-  port = 8080;
+  port = 7727;
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("http-endpoint", kernel, parent);
     if (process.env.PORT != null) this.port = parseInt(process.env.PORT);
@@ -19,6 +19,7 @@ export class HttpEndpoint
     if (this.app !== undefined) {
       await this.close();
     }
+    this.port = process.env.PORT != null ? parseInt(process.env.PORT) : 7727;
     this.app = express();
     const app = this.app;
 

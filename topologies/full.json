@@ -1,0 +1,37 @@
+{
+  "$schema": "./_schema.json",
+  "id": "full",
+  "title": "full featured ludivine",
+  "channels": {
+    "inputs": ["readline", "http"],
+    "outputs": ["stdout", "web", "push"]
+  },
+  "compute": {
+    "runtimes": [
+      "bash-local",
+      "typescript-local",
+      "javascript-local",
+      "python3-local"
+    ]
+  },
+  "endpoints": {
+    "providers": [
+      "interactive-terminal",
+      {
+        "name": "local-http",
+        "properties": {
+          "port": 7727
+        }
+      }
+    ]
+  },
+  "logging": {
+    "targets": [
+      "console",
+      {
+        "name": "file",
+        "properties": { "fs": "local", "paths": "unix", "folder": "logs" }
+      }
+    ]
+  }
+}

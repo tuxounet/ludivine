@@ -22,7 +22,9 @@ export class StoragePathsFactory extends bases.KernelElement {
 
   async shutdown(): Promise<void> {
     await Promise.all(
-      Array.from(this.drivers.values()).map((item) => item.shutdown())
+      Array.from(this.drivers.values()).map(
+        async (item) => await item.shutdown()
+      )
     );
   }
 

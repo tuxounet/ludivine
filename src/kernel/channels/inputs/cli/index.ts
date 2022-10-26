@@ -14,6 +14,9 @@ export class CLIInputChannel
   opened: boolean;
   protected currentRl?: readline.Interface;
   async open(): Promise<void> {
+    if (this.opened) {
+      await this.close();
+    }
     this.opened = true;
     const loop = async (): Promise<void> => {
       if (this.opened) {
