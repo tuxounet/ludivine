@@ -2,6 +2,8 @@
 
 ## usage
 
+> magic oneline 
+
 ```bash
-npx --yes -p=@ludivine/kernel ludivine
+npx -y -p ludivine
 ```
