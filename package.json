@@ -1,6 +1,6 @@
 {
   "name": "ludivine",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "",
   "main": "dist/index.js",
   "bin": {
@@ -10,7 +10,7 @@
     "prebuild": "npm run clean",
     "build": "esbuild src/index.ts --bundle --platform=node --minify --sourcemap=external --outfile=dist/index.js",
     "build:dev": "esbuild src/index.ts --bundle --platform=node --sourcemap=external --outfile=dist/index.js",
-    "start": "node cli/index.js",
+    "start": "node cli/start.js",
     "predev": "npm install --prefer-offline",
     "dev": "nodemon",
     "lint": "eslint ./ --fix",
