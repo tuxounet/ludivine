@@ -1,6 +1,5 @@
 import { ShellApp } from "../../apps/shell";
-import { applications, kernel } from "@ludivine/types";
-import { bases } from "@ludivine/abstractions";
+import { bases, kernel, applications } from "@ludivine/runtime";
 export class ApplicationsBroker extends bases.KernelElement {
   constructor(readonly kernel: kernel.IKernel) {
     super("applications-broker", kernel);

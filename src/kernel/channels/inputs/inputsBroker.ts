@@ -1,7 +1,6 @@
-import { kernel, channels } from "@ludivine/types";
+import { bases, kernel, channels } from "@ludivine/runtime";
 import { CLIInputChannel } from "./cli";
 import { HttpInputChannel } from "./http";
-import { bases } from "@ludivine/abstractions";
 export class InputsBroker extends bases.KernelElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("inputs-broker", kernel, parent);

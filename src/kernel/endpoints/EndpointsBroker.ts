@@ -1,5 +1,4 @@
-import { kernel, endpoints } from "@ludivine/types";
-import { bases } from "@ludivine/abstractions";
+import { bases, kernel, endpoints } from "@ludivine/runtime";
 import { HttpEndpoint } from "./http/HttpEndpoint";
 
 export class EndpointsBroker

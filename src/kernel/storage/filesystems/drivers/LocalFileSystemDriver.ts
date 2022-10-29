@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { kernel, storage } from "@ludivine/types";
-import { bases, errors } from "@ludivine/abstractions";
+import { bases, kernel, storage, errors } from "@ludivine/runtime";
 export interface LocalFileSystemDriverProperties
   extends Record<string, unknown> {
   localFolder: string;

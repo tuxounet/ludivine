@@ -1,4 +1,4 @@
-import type { kernel } from "@ludivine/types";
+import { kernel } from "@ludivine/runtime";
 import { MessagingBroker } from "./messaging/MessagingBroker";
 import { ChannelsBroker } from "./channels/ChannelsBroker";
 import { EndpointsBroker } from "./endpoints/EndpointsBroker";

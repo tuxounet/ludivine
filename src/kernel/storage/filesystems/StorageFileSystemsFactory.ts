@@ -1,5 +1,4 @@
-import { kernel, storage } from "@ludivine/types";
-import { bases, errors } from "@ludivine/abstractions";
+import { bases, kernel, storage, errors } from "@ludivine/runtime";
 import { LocalFileSystemDriver } from "./drivers/LocalFileSystemDriver";
 export class StorageFileSystemsFactory extends bases.KernelElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {

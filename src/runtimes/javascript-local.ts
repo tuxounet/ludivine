@@ -1,5 +1,5 @@
-import { kernel, compute } from "@ludivine/types";
-import { bases, errors } from "@ludivine/abstractions";
+import { bases, kernel, compute, errors } from "@ludivine/runtime";
+
 export class ComputeRuntimeJavascript extends bases.ComputeRuntimeElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("javascript-local", "node ", kernel, parent);

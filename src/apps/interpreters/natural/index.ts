@@ -1,6 +1,5 @@
 import path from "path";
-import { kernel, messaging } from "@ludivine/types";
-import { bases } from "@ludivine/abstractions";
+import { bases, kernel, messaging } from "@ludivine/runtime";
 export class NaturalInterpreterApp extends bases.AppElement {
   constructor(
     readonly kernel: kernel.IKernel,

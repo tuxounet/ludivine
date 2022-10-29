@@ -1,6 +1,5 @@
 import readline from "readline";
-import { kernel, channels } from "@ludivine/types";
-import { bases } from "@ludivine/abstractions";
+import { bases, kernel, channels } from "@ludivine/runtime";
 export class CLIInputChannel
   extends bases.KernelElement
   implements channels.IInputChannel

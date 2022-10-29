@@ -1,5 +1,5 @@
-import { kernel, compute } from "@ludivine/types";
-import { bases, errors } from "@ludivine/abstractions";
+import { bases, kernel, compute, errors } from "@ludivine/runtime";
+
 export class ComputeRuntimePython extends bases.ComputeRuntimeElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("python-local", "python3", kernel, parent);
