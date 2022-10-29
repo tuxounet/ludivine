@@ -1,3 +1,4 @@
+import type { kernel } from "@ludivine/types";
 import { MessagingBroker } from "./messaging/MessagingBroker";
 import { ChannelsBroker } from "./channels/ChannelsBroker";
 import { EndpointsBroker } from "./endpoints/EndpointsBroker";
@@ -5,7 +6,6 @@ import { ComputeBroker } from "./compute/ComputeBroker";
 import { ApplicationsBroker } from "./applications/ApplicationsBroker";
 import { LogBroker } from "./logging/LogBroker";
 import { StoragesBroker } from "./storage/StoragesBroker";
-import type { kernel } from "@ludivine/types";
 
 export class Kernel implements kernel.IKernel {
   production: boolean;

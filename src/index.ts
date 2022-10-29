@@ -1,6 +1,6 @@
 import { Kernel } from "./kernel/kernel";
-import pkgJson from "../package.json";
-const kernel = new Kernel(pkgJson.version);
+
+const kernel = new Kernel("0.0");
 kernel
   .run()
   .then((rc) => {
