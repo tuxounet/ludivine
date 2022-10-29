@@ -13,6 +13,8 @@
     "predev": "npm install --prefer-offline",
     "dev": "nodemon",
     "lint": "eslint ./ --fix",
+    "nuke":  "rm -rf node_modules package-lock.json",
+    "prenuke" : "npm run clean", 
     "clean": "rm -rf dist coverage logs run",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
