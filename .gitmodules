@@ -1,0 +1,6 @@
+[submodule "libs/ludivine-types"]
+	path = libs/ludivine-types
+	url = https://github.com/tuxounet/ludivine-types.git
+[submodule "libs/ludivine-abstractions"]
+	path = libs/ludivine-abstractions
+	url = https://github.com/tuxounet/ludivine-abstractions.git
