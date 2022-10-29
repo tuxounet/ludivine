@@ -1,5 +1,4 @@
-import { bases, kernel, messaging } from "@ludivine/shared";
-
+import { bases, kernel, messaging } from "@ludivine/runtime";
 export class ImperativeInterpreterApp extends bases.AppElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("imperative-interpreter", parent, kernel, [

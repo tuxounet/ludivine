@@ -1,5 +1,4 @@
-import { bases, kernel, errors, messaging } from "@ludivine/shared";
-
+import { bases, kernel, messaging, errors } from "@ludivine/runtime";
 import { QueuesStore } from "./QueuesStore";
 import { TopicsStore } from "./TopicsStore";
 

@@ -1,7 +1,6 @@
-import { bases, kernel, logging } from "@ludivine/shared";
+import { bases, kernel, logging } from "@ludivine/runtime";
 import { LogTargetConsole } from "./targets/LogConsole";
 import { LogTargetFile } from "./targets/LogFile";
-
 export class LogBroker
   extends bases.KernelElement
   implements logging.ILogBroker

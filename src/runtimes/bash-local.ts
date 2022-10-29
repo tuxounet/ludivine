@@ -1,4 +1,4 @@
-import { bases, kernel, errors, compute } from "@ludivine/shared";
+import { bases, kernel, compute, errors } from "@ludivine/runtime";
 
 export class ComputeRuntimeBash extends bases.ComputeRuntimeElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {

@@ -1,5 +1,4 @@
-import { bases, kernel, channels } from "@ludivine/shared";
-
+import { bases, kernel, channels } from "@ludivine/runtime";
 import { InputsBroker } from "./inputs/inputsBroker";
 import { OutputsBroker } from "./outputs/OutputsBroker";
 

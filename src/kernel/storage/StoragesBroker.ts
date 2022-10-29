@@ -1,10 +1,9 @@
-import { bases, kernel, storage, errors } from "@ludivine/shared";
+import { bases, kernel, storage, errors } from "@ludivine/runtime";
 import { LogsVolume } from "../../volumes/LogsVolume";
 import { RunspaceVolume } from "../../volumes/RunspaceVolume";
 import { WorkspaceVolume } from "../../volumes/WorkspaceVolume";
 import { StorageFileSystemsFactory } from "./filesystems/StorageFileSystemsFactory";
 import { StoragePathsFactory } from "./paths/StoragePathsFactory";
-
 export class StoragesBroker
   extends bases.KernelElement
   implements storage.IStorageBroker
@@ -80,7 +79,7 @@ export class StoragesBroker
     const pathsDriver = this.createPathsDriver(paths, config);
     const filesystemDriver = this.createFileSystemDriver(filesystem, config);
 
-    const ephVolume = new bases.StorageVolume(
+    const ephVolume = new storage.StorageVolume(
       "eph",
       "eph",
       false,

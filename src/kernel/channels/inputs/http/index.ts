@@ -1,5 +1,4 @@
-import { bases, kernel, channels } from "@ludivine/shared";
-
+import { bases, kernel, channels } from "@ludivine/runtime";
 export class HttpInputChannel
   extends bases.KernelElement
   implements channels.IInputChannel

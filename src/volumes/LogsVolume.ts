@@ -1,5 +1,5 @@
-import { bases, kernel } from "@ludivine/shared";
-export class LogsVolume extends bases.StorageVolume {
+import { kernel, storage } from "@ludivine/runtime";
+export class LogsVolume extends storage.StorageVolume {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super(
       "logs-volume",

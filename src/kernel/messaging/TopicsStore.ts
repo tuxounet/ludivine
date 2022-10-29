@@ -1,5 +1,4 @@
-import { bases, kernel, messaging } from "@ludivine/shared";
-
+import { bases, kernel, messaging } from "@ludivine/runtime";
 export class TopicsStore extends bases.KernelElement {
   constructor(
     readonly kernel: kernel.IKernel,

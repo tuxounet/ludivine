@@ -1,8 +1,7 @@
 import path from "path";
 import express from "express";
-import { bases, kernel, channels } from "@ludivine/shared";
+import { bases, kernel, channels } from "@ludivine/runtime";
 import { vapidKeys } from "../push/keys";
-
 export class WebOutputChannel
   extends bases.KernelElement
   implements channels.IOutputChannel
