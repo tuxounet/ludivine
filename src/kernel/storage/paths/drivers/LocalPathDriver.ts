@@ -1,6 +1,6 @@
 import path from "path";
-import { bases, kernel, storage } from "@ludivine/shared";
-
+import { kernel, storage } from "@ludivine/types";
+import { bases } from "@ludivine/abstractions";
 export class LocalPathDriver
   extends bases.KernelElement
   implements storage.IStoragePathsDriver

@@ -1,6 +1,6 @@
-import { bases, kernel, storage, errors } from "@ludivine/shared";
+import { kernel, storage } from "@ludivine/types";
 import { LocalPathDriver } from "./drivers/LocalPathDriver";
-
+import { bases, errors } from "@ludivine/abstractions";
 export class StoragePathsFactory extends bases.KernelElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
     super("storage-paths", kernel, parent);

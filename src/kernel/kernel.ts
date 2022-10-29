@@ -5,7 +5,7 @@ import { ComputeBroker } from "./compute/ComputeBroker";
 import { ApplicationsBroker } from "./applications/ApplicationsBroker";
 import { LogBroker } from "./logging/LogBroker";
 import { StoragesBroker } from "./storage/StoragesBroker";
-import { kernel } from "@ludivine/shared";
+import type { kernel } from "@ludivine/types";
 
 export class Kernel implements kernel.IKernel {
   production: boolean;

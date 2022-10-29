@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { bases, kernel, storage, errors } from "@ludivine/shared";
-
+import { kernel, storage } from "@ludivine/types";
+import { bases, errors } from "@ludivine/abstractions";
 export interface LocalFileSystemDriverProperties
   extends Record<string, unknown> {
   localFolder: string;
@@ -156,7 +156,7 @@ export class LocalFileSystemDriver
     return relative + path.sep;
   }
 
-  async appendFile(fullPath: string, body: Buffer): Promise<boolean> {
+  async appendFile(fullPath: string, body: Uint8Array): Promise<boolean> {
     const realPath = await this.getRealPath(fullPath);
     const folder = path.dirname(realPath);
     if (!fs.existsSync(folder)) {
@@ -166,7 +166,7 @@ export class LocalFileSystemDriver
     return true;
   }
 
-  async writeFile(fullPath: string, body: Buffer): Promise<boolean> {
+  async writeFile(fullPath: string, body: Uint8Array): Promise<boolean> {
     const realPath = await this.getRealPath(fullPath);
 
     fs.writeFileSync(realPath, body);

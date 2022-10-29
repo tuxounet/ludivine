@@ -1,7 +1,7 @@
-import { bases, kernel, channels } from "@ludivine/shared";
+import { kernel, channels } from "@ludivine/types";
 import webpush from "web-push";
 import { vapidKeys } from "./keys";
-
+import { bases } from "@ludivine/abstractions";
 export interface IDeviceKeys {
   p256dh: string;
   auth: string;

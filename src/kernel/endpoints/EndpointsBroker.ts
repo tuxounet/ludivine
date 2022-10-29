@@ -1,6 +1,7 @@
-import { Handler } from "express";
-import { bases, kernel, endpoints } from "@ludivine/shared";
+import { kernel, endpoints } from "@ludivine/types";
+import { bases } from "@ludivine/abstractions";
 import { HttpEndpoint } from "./http/HttpEndpoint";
+
 export class EndpointsBroker
   extends bases.KernelElement
   implements endpoints.IEndpointsBroker
@@ -35,7 +36,7 @@ export class EndpointsBroker
   async registerRoute(
     method: endpoints.EndpointRouteMethod,
     path: string,
-    handler: Handler
+    handler: endpoints.IEndpointRouteHandler
   ): Promise<void> {
     this.routes.push({
       path,

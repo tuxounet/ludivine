@@ -2,7 +2,8 @@ import { ComputeRuntimeBash } from "../../runtimes/bash-local";
 import { ComputeRuntimeJavascript } from "../../runtimes/javascript-local";
 import { ComputeRuntimePython } from "../../runtimes/python-local";
 import { ComputeRuntimeTypescript } from "../../runtimes/typescript-local";
-import { bases, kernel, compute, errors } from "@ludivine/shared";
+import { kernel, compute } from "@ludivine/types";
+import { bases, errors } from "@ludivine/abstractions";
 export class ComputeBroker
   extends bases.KernelElement
   implements compute.IComputeBroker

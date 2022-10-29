@@ -1,6 +1,7 @@
 import { ImperativeInterpreterApp } from "./interpreters/imperative";
 import { NaturalInterpreterApp } from "./interpreters/natural";
-import { bases, kernel, messaging } from "@ludivine/shared";
+import { kernel, messaging } from "@ludivine/types";
+import { bases } from "@ludivine/abstractions";
 
 export class ShellApp extends bases.AppElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {

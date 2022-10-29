@@ -1,4 +1,5 @@
-import { bases, kernel, messaging } from "@ludivine/shared";
+import { kernel } from "@ludivine/types";
+import { bases, messaging } from "@ludivine/abstractions";
 
 export class QueuesStore extends bases.KernelElement {
   constructor(

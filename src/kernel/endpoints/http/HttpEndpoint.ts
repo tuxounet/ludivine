@@ -1,7 +1,8 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { Server } from "http";
-import { bases, kernel, endpoints, errors } from "@ludivine/shared";
+import { kernel, endpoints } from "@ludivine/types";
+import { bases, errors } from "@ludivine/abstractions";
 export class HttpEndpoint
   extends bases.KernelElement
   implements endpoints.IEndpoint

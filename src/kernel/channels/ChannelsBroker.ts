@@ -1,5 +1,5 @@
-import { bases, kernel, channels } from "@ludivine/shared";
-
+import { kernel, channels } from "@ludivine/types";
+import { bases } from "@ludivine/abstractions";
 import { InputsBroker } from "./inputs/inputsBroker";
 import { OutputsBroker } from "./outputs/OutputsBroker";
 

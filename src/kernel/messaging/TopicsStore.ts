@@ -1,5 +1,5 @@
-import { bases, kernel, messaging } from "@ludivine/shared";
-
+import { kernel } from "@ludivine/types";
+import { bases, messaging } from "@ludivine/abstractions";
 export class TopicsStore extends bases.KernelElement {
   constructor(
     readonly kernel: kernel.IKernel,

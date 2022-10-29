@@ -1,4 +1,5 @@
-import { bases, kernel, logging, messaging } from "@ludivine/shared";
+import { kernel, logging } from "@ludivine/types";
+import { bases, messaging } from "@ludivine/abstractions";
 
 export class LogTargetFile
   extends bases.KernelElement
