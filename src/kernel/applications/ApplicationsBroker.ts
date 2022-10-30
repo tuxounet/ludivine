@@ -31,6 +31,7 @@ export class ApplicationsBroker
   }
 
   async executeAndWait(app: applications.IAppElement): Promise<number> {
+    this.applications.set(app.fullName, app);
     return await app.execute();
   }
 

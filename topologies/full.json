@@ -2,6 +2,8 @@
   "$schema": "./_schema.json",
   "id": "full",
   "title": "full featured ludivine",
+  "modules": {},
+  "applications": {},
   "channels": {
     "inputs": ["readline", "http"],
     "outputs": ["stdout", "web", "push"]
