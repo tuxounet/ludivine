@@ -141,7 +141,7 @@ export class ModulesBroker
     const module: modules.IRuntimeModule = {
       id: modulePackageJsonObj.body.name,
       source,
-      definition: definition,
+      definition,
     };
 
     this.modules.set(module.id, module);

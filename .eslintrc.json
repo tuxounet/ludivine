@@ -21,7 +21,6 @@
     "project": ["./tsconfig.json"]
   },
   "rules": {
-    "@typescript-eslint/no-var-require": 0,
     "prettier/prettier": [
       "error",
       {},
