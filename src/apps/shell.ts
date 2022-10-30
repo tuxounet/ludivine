@@ -9,6 +9,7 @@ export class ShellApp extends bases.AppElement {
 
   protected async main(): Promise<number> {
     await this.kernel.channels.broadcast("bonjour");
+
     await this.waitForShutdown();
     await this.kernel.channels.broadcast("au revoir");
     return 0;
@@ -31,11 +32,16 @@ export class ShellApp extends bases.AppElement {
       return;
     }
     const command = message.body.command;
+
     switch (message.recipient) {
       case "/channels/input":
         if (command.startsWith(this.imperativePrefix)) {
           await this.processCommand(command);
-        }
+        } else
+          await this.kernel.messaging.publish(
+            "/channels/input/natural",
+            message.body
+          );
         break;
     }
   }

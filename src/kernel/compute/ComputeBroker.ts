@@ -2,7 +2,7 @@ import { ComputeRuntimeBash } from "../../runtimes/bash-local";
 import { ComputeRuntimeJavascript } from "../../runtimes/javascript-local";
 import { ComputeRuntimePython } from "../../runtimes/python-local";
 import { ComputeRuntimeTypescript } from "../../runtimes/typescript-local";
-import { bases, kernel, compute, errors } from "@ludivine/runtime";
+import { bases, kernel, compute, errors, storage } from "@ludivine/runtime";
 export class ComputeBroker
   extends bases.KernelElement
   implements compute.IComputeBroker
@@ -59,5 +59,22 @@ export class ComputeBroker
       );
     }
     return await localRuntime.executeProject(project);
+  }
+
+  async executeEval(
+    runtime: string,
+    strToEval: string,
+    runVolume: storage.IStorageVolume
+  ): Promise<compute.IComputeExecuteResult> {
+    const localRuntime = this.runtimes.find((item) => item.name === runtime);
+    if (localRuntime == null) {
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "compute runtime",
+        runtime
+      );
+    }
+
+    return await localRuntime.executeEval(strToEval, runVolume);
   }
 }

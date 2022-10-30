@@ -2,7 +2,7 @@ import { bases, kernel, compute, errors } from "@ludivine/runtime";
 
 export class ComputeRuntimeJavascript extends bases.ComputeRuntimeElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
-    super("javascript-local", "node ", kernel, parent);
+    super("javascript-local", "node ", "--eval", kernel, parent);
     this.commandsDependencies = [
       {
         name: "node",

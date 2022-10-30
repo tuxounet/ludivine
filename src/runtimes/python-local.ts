@@ -2,7 +2,7 @@ import { bases, kernel, compute, errors } from "@ludivine/runtime";
 
 export class ComputeRuntimePython extends bases.ComputeRuntimeElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
-    super("python-local", "python3", kernel, parent);
+    super("python-local", "python3", "-c", kernel, parent);
     this.commandsDependencies = [
       {
         name: "python3",

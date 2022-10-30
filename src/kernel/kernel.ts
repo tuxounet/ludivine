@@ -54,9 +54,9 @@ export class Kernel implements kernel.IKernel {
   };
 
   async initialize(): Promise<void> {
+    await this.storage.initialize();
     await this.logging.initialize();
     await this.modules.initialize();
-    await this.storage.initialize();
     await this.compute.initialize();
     await this.channels.initialize();
     await this.endpoints.initialize();
@@ -76,8 +76,8 @@ export class Kernel implements kernel.IKernel {
     await this.endpoints.shutdown();
     await this.channels.shutdown();
     await this.compute.shutdown();
-    await this.storage.shutdown();
     await this.modules.shutdown();
     await this.logging.shutdown();
+    await this.storage.shutdown();
   }
 }
