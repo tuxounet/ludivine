@@ -1,11 +1,25 @@
 import { ShellApp } from "../../apps/shell";
-import { bases, kernel, applications } from "@ludivine/runtime";
-export class ApplicationsBroker extends bases.KernelElement {
+import {
+  bases,
+  kernel,
+  applications,
+  modules,
+  errors,
+} from "@ludivine/runtime";
+export class ApplicationsBroker
+  extends bases.KernelElement
+  implements applications.IApplicationsBroker
+{
   constructor(readonly kernel: kernel.IKernel) {
     super("applications-broker", kernel);
+    this.applications = new Map();
   }
 
-  async initialize(): Promise<void> {}
+  applications: Map<string, applications.IAppElement>;
+
+  async initialize(): Promise<void> {
+    await this.launchApplication("shell-natural");
+  }
 
   async shutdown(): Promise<void> {
     await new Promise<void>((resolve) => {
@@ -21,7 +35,55 @@ export class ApplicationsBroker extends bases.KernelElement {
 
   async executeRootProcess(): Promise<number> {
     const shellApp = new ShellApp(this.kernel, this);
-    const rc = await this.executeAndWait(shellApp);
-    return rc;
+
+    const apps = [
+      this.executeAndWait(shellApp),
+      this.launchApplication("shell-natural"),
+    ];
+
+    const rcs = await Promise.all(apps);
+    return rcs.filter((item) => item > 0).length;
   }
+
+  private readonly findApplicationDescriptor = async (
+    name: string
+  ): Promise<modules.IModuleApplicationDescriptor | undefined> => {
+    const result = Array.from(this.kernel.modules.modules.values())
+      .map((item) => item.definition.applications)
+      .flat()
+      .find((item) => item?.name === name);
+
+    return result;
+  };
+
+  launchApplication = async (name: string): Promise<number> => {
+    const descriptor = await this.findApplicationDescriptor(name);
+    if (descriptor == null) {
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "launchApplication/descriptor",
+        name
+      );
+    }
+
+    const app: applications.IAppElement = descriptor.ctor(this.kernel, this);
+    const key = app.fullName;
+    this.applications.set(key, app);
+
+    return await app
+      .execute()
+      .then((rc) => {
+        this.applications.delete(key);
+        return rc;
+      })
+      .catch((e) => {
+        this.log.error("application failed", descriptor.name, e);
+        this.applications.delete(key);
+        throw errors.BasicError.badQuery(
+          app.fullName,
+          "application failed",
+          descriptor.name
+        );
+      });
+  };
 }

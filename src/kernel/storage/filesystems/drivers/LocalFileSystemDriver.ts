@@ -19,6 +19,32 @@ export class LocalFileSystemDriver
   ) {
     super("local-fs", kernel, parent);
     this.id = "local";
+    this.ensureRootFolder();
+  }
+
+  private ensureRootFolder(): string {
+    const folderProperty = "folder";
+    const folderValue = this.properties[folderProperty];
+
+    if (folderValue === undefined)
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "computeRealPath/" + folderProperty,
+        folderProperty
+      );
+
+    if (typeof folderValue !== "string") {
+      throw errors.BasicError.badQuery(
+        this.fullName,
+        "computeRealPath/" + folderProperty,
+        String(folderValue)
+      );
+    }
+    const folderPath = path.resolve(folderValue);
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath);
+    }
+    return folderPath;
   }
 
   async bind(): Promise<boolean> {
@@ -210,24 +236,9 @@ export class LocalFileSystemDriver
   }
 
   async getRealPath(relPath: string): Promise<string> {
-    const folderProperty = "folder";
-    const folderValue = this.properties[folderProperty];
+    const rootPath = this.ensureRootFolder();
 
-    if (folderValue === undefined)
-      throw errors.BasicError.notFound(
-        this.fullName,
-        "computeRealPath/" + folderProperty,
-        folderProperty
-      );
-
-    if (typeof folderValue !== "string") {
-      throw errors.BasicError.badQuery(
-        this.fullName,
-        "computeRealPath/" + folderProperty,
-        String(folderValue)
-      );
-    }
-    return path.resolve(folderValue, relPath);
+    return path.resolve(rootPath, relPath);
   }
 
   async getRelativePath(realPath: string): Promise<string> {

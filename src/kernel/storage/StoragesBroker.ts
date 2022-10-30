@@ -1,5 +1,6 @@
 import { bases, kernel, storage, errors } from "@ludivine/runtime";
 import { LogsVolume } from "../../volumes/LogsVolume";
+import { ModulesVolume } from "../../volumes/ModulesVolume";
 import { RunspaceVolume } from "../../volumes/RunspaceVolume";
 import { WorkspaceVolume } from "../../volumes/WorkspaceVolume";
 import { StorageFileSystemsFactory } from "./filesystems/StorageFileSystemsFactory";
@@ -40,6 +41,8 @@ export class StoragesBroker
     await this.fileSystemsFactory.initialize();
     const logsVolume = new LogsVolume(this.kernel, this);
     this.volumes.set(logsVolume.id, logsVolume);
+    const modulesVolume = new ModulesVolume(this.kernel, this);
+    this.volumes.set(modulesVolume.id, modulesVolume);
     const runspaceVolume = new RunspaceVolume(this.kernel, this);
     this.volumes.set(runspaceVolume.id, runspaceVolume);
     const workspaceVolume = new WorkspaceVolume(this.kernel, this);

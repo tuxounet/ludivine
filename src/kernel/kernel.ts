@@ -6,6 +6,7 @@ import { ComputeBroker } from "./compute/ComputeBroker";
 import { ApplicationsBroker } from "./applications/ApplicationsBroker";
 import { LogBroker } from "./logging/LogBroker";
 import { StoragesBroker } from "./storage/StoragesBroker";
+import { ModulesBroker } from "./modules/ModulesBroker";
 
 export class Kernel implements kernel.IKernel {
   production: boolean;
@@ -17,8 +18,10 @@ export class Kernel implements kernel.IKernel {
   compute: ComputeBroker;
   logging: LogBroker;
   storage: StoragesBroker;
-  constructor(readonly version: string) {
+  modules: ModulesBroker;
+  constructor(readonly entryPoint: string) {
     this.fullName = "kernel";
+    this.version = "0.0";
     this.production = process.env.NODE_ENV === "production";
     this.logging = new LogBroker(this);
     this.messaging = new MessagingBroker(this);
@@ -27,9 +30,11 @@ export class Kernel implements kernel.IKernel {
     this.applications = new ApplicationsBroker(this);
     this.storage = new StoragesBroker(this);
     this.endpoints = new EndpointsBroker(this);
+    this.modules = new ModulesBroker(this);
     this.started = false;
   }
 
+  version: string;
   fullName: string;
 
   async run(): Promise<number> {
@@ -49,8 +54,9 @@ export class Kernel implements kernel.IKernel {
   };
 
   async initialize(): Promise<void> {
-    await this.logging.initialize();
     await this.storage.initialize();
+    await this.logging.initialize();
+    await this.modules.initialize();
     await this.compute.initialize();
     await this.channels.initialize();
     await this.endpoints.initialize();
@@ -70,7 +76,8 @@ export class Kernel implements kernel.IKernel {
     await this.endpoints.shutdown();
     await this.channels.shutdown();
     await this.compute.shutdown();
-    await this.storage.shutdown();
+    await this.modules.shutdown();
     await this.logging.shutdown();
+    await this.storage.shutdown();
   }
 }

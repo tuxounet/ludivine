@@ -1,6 +1,6 @@
 import { Kernel } from "./kernel/kernel";
 
-const kernel = new Kernel("0.0");
+const kernel = new Kernel(__dirname);
 kernel
   .run()
   .then((rc) => {

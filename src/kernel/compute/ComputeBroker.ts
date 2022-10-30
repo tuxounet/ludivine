@@ -2,7 +2,7 @@ import { ComputeRuntimeBash } from "../../runtimes/bash-local";
 import { ComputeRuntimeJavascript } from "../../runtimes/javascript-local";
 import { ComputeRuntimePython } from "../../runtimes/python-local";
 import { ComputeRuntimeTypescript } from "../../runtimes/typescript-local";
-import { bases, kernel, compute, errors } from "@ludivine/runtime";
+import { bases, kernel, compute, errors, storage } from "@ludivine/runtime";
 export class ComputeBroker
   extends bases.KernelElement
   implements compute.IComputeBroker
@@ -31,9 +31,10 @@ export class ComputeBroker
     );
   }
 
-  async executeSource(
+  async executeEval(
     runtime: string,
-    source: compute.IComputeSourceCode
+    strToEval: string,
+    runVolume: storage.IStorageVolume
   ): Promise<compute.IComputeExecuteResult> {
     const localRuntime = this.runtimes.find((item) => item.name === runtime);
     if (localRuntime == null) {
@@ -43,12 +44,16 @@ export class ComputeBroker
         runtime
       );
     }
-    return await localRuntime.executeSource(source);
+
+    return await localRuntime.executeEval(strToEval, runVolume);
   }
 
-  async executeProject(
+  async executeSource(
     runtime: string,
-    project: compute.IComputeProjectCode
+    sourceVolume: storage.IStorageVolume,
+    dependencies: compute.IComputeDependency[],
+    entryPoint: string,
+    args?: string[]
   ): Promise<compute.IComputeExecuteResult> {
     const localRuntime = this.runtimes.find((item) => item.name === runtime);
     if (localRuntime == null) {
@@ -58,6 +63,11 @@ export class ComputeBroker
         runtime
       );
     }
-    return await localRuntime.executeProject(project);
+    return await localRuntime.executeSource(
+      sourceVolume,
+      dependencies,
+      entryPoint,
+      args
+    );
   }
 }
