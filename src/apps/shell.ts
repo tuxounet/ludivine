@@ -1,4 +1,4 @@
-import { bases, kernel, messaging } from "@ludivine/runtime";
+import { bases, kernel, messaging, logging } from "@ludivine/runtime";
 
 export class ShellApp extends bases.AppElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {

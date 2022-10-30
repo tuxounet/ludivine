@@ -8,7 +8,7 @@ export class RunspaceVolume extends storage.StorageVolume {
       true,
       kernel.storage.createPathsDriver("local"),
       kernel.storage.createFileSystemDriver("local", {
-        folder: "run",
+        folder: "run/task",
       }),
       kernel,
       parent

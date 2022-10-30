@@ -6,13 +6,14 @@ export class LogBroker
   implements logging.ILogBroker
 {
   targets: logging.ILogTarget[];
-
+  level: logging.LogLevel;
   constructor(readonly kernel: kernel.IKernel) {
     super("logs", kernel);
     this.targets = [
       new LogTargetFile(kernel, this),
       new LogTargetConsole(kernel, this),
     ];
+    this.level = logging.LogLevel.INFO;
   }
 
   async initialize(): Promise<void> {
@@ -26,6 +27,7 @@ export class LogBroker
   }
 
   output(line: logging.ILogLine): void {
-    this.targets.forEach((target) => target.appendLog(line));
+    if (line.level < this.level) return;
+    if (this.targets) this.targets.forEach((target) => target.appendLog(line));
   }
 }

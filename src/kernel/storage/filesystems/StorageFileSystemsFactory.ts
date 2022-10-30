@@ -1,4 +1,4 @@
-import { bases, kernel, storage, errors } from "@ludivine/runtime";
+import { bases, kernel, storage, errors, logging } from "@ludivine/runtime";
 import { LocalFileSystemDriver } from "./drivers/LocalFileSystemDriver";
 export class StorageFileSystemsFactory extends bases.KernelElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
@@ -10,7 +10,7 @@ export class StorageFileSystemsFactory extends bases.KernelElement {
   providers: Map<string, storage.IStorageFileSystemCtor>;
 
   drivers: Set<storage.IStorageFileSystemDriver>;
-
+  @logging.logMethod()
   async initialize(): Promise<void> {
     this.providers.clear();
     this.providers.set(
@@ -18,9 +18,12 @@ export class StorageFileSystemsFactory extends bases.KernelElement {
       (props) => new LocalFileSystemDriver(props, this.kernel, this)
     );
     this.drivers.clear();
+    await super.initialize();
   }
-
-  async shutdown(): Promise<void> {}
+  @logging.logMethod()
+  async shutdown(): Promise<void> {
+    await super.shutdown();
+  }
 
   getOneDriver<
     T extends storage.IStorageFileSystemDriver,

@@ -8,7 +8,7 @@ export class WorkspaceVolume extends storage.StorageVolume {
       true,
       kernel.storage.createPathsDriver("local"),
       kernel.storage.createFileSystemDriver("local", {
-        folder: "home",
+        folder: "run/home",
       }),
       kernel,
       parent

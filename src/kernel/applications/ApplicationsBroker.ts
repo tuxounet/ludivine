@@ -18,7 +18,7 @@ export class ApplicationsBroker
   applications: Map<string, applications.IAppElement>;
 
   async initialize(): Promise<void> {
-    await this.launchApplication("shell-natural");
+    await super.initialize();
   }
 
   async shutdown(): Promise<void> {
@@ -27,6 +27,7 @@ export class ApplicationsBroker
         resolve();
       }, 100);
     });
+    await super.shutdown();
   }
 
   async executeAndWait(app: applications.IAppElement): Promise<number> {
@@ -38,7 +39,7 @@ export class ApplicationsBroker
 
     const apps = [
       this.executeAndWait(shellApp),
-      this.launchApplication("shell-natural"),
+      // this.launchApplication("shell-natural"),
     ];
 
     const rcs = await Promise.all(apps);
