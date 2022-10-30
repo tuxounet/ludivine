@@ -10,26 +10,17 @@ export class ModulesBroker
     this.requiredModules = [
       {
         name: "@ludivine-apps/shell-natural",
-        upstream: "../../ludivine-apps-shell-natural",
+        upstream: "@ludivine-apps/shell-natural",
       },
     ];
   }
+
   modules: Map<string, modules.IRuntimeModule>;
 
   requiredModules: modules.IRuntimeModuleSource[];
 
   async initialize(): Promise<void> {
     const modulesVolume = await this.kernel.storage.getVolume("modules");
-    const modulesPath = await modulesVolume.fileSystem.getRealPath(".");
-    //prepare npm context
-    this.log.error(
-      "pwd",
-      process.cwd(),
-      "source",
-      __dirname,
-      "modules",
-      modulesPath
-    );
 
     const setuped = await modulesVolume.fileSystem.existsFile("package.json");
     if (!setuped) {
@@ -42,7 +33,7 @@ export class ModulesBroker
 
     for (const requiredModule of this.requiredModules) {
       const modulePresent = await this.findModule(requiredModule.name);
-      if (modulePresent) continue;
+      if (modulePresent != null) continue;
       const module = await this.registerModule(requiredModule);
       this.modules.set(module.id, module);
     }
@@ -51,7 +42,7 @@ export class ModulesBroker
   }
 
   async shutdown(): Promise<void> {
-    //cleanup npm context
+    // cleanup npm context
     await super.shutdown();
   }
 
@@ -71,7 +62,7 @@ export class ModulesBroker
     const pkgBody = await modulesVolume.fileSystem.readObjectFile(
       "package.json"
     );
-    if (!pkgBody.body) {
+    if (pkgBody.body == null) {
       throw errors.BasicError.notFound(
         this.fullName,
         "findModule/package.json/body",
@@ -79,7 +70,8 @@ export class ModulesBroker
       );
     }
     const deps = pkgBody.body.dependencies as Record<string, string>;
-    if (!deps || !Object.keys(deps).includes(name)) {
+    if (deps == null) return undefined;
+    if (!Object.keys(deps).includes(name)) {
       return undefined;
     }
     const instance = this.modules.get(name);
@@ -90,13 +82,19 @@ export class ModulesBroker
     source: modules.IRuntimeModuleSource
   ): Promise<modules.IRuntimeModule> => {
     const modulesVolume = await this.kernel.storage.getVolume("modules");
-
+    const cmd = `npm install --save ${source.upstream}`;
     const result = await this.kernel.compute.executeEval(
       "bash-local",
-      `npm install --save ${source.upstream}`,
+      cmd,
       modulesVolume
     );
-
+    if (result.rc !== 0) {
+      throw errors.BasicError.badQuery(
+        this.fullName,
+        "registerModule/" + cmd,
+        result.errors
+      );
+    }
     const modulePackagePath = modulesVolume.paths.combinePaths(
       "node_modules",
       source.name
@@ -110,7 +108,7 @@ export class ModulesBroker
     const modulePackageJsonObj = await modulesVolume.fileSystem.readObjectFile<
       Record<string, string>
     >(modulePackageJson);
-    if (!modulePackageJsonObj.body) {
+    if (modulePackageJsonObj.body == null) {
       throw errors.BasicError.notFound(
         this.fullName,
         "registerModule/package.json/body",
@@ -127,20 +125,25 @@ export class ModulesBroker
       moduleEntryPoint
     );
 
-    const moduleDefinition = require(realModuleEntryPoint);
-    if (moduleDefinition["default"] === undefined) {
+    const moduleDefinition = await import(realModuleEntryPoint);
+    if (
+      moduleDefinition.default === undefined ||
+      moduleDefinition.default.default === undefined
+    ) {
       throw errors.BasicError.notFound(
         this.fullName,
         "registerModule/default",
         moduleEntryPoint
       );
     }
+    const definition = moduleDefinition.default.default;
+
     const module: modules.IRuntimeModule = {
       id: modulePackageJsonObj.body.name,
-      source: source,
-      definition: moduleDefinition["default"],
+      source,
+      definition: definition,
     };
-    console.dir(module);
+
     this.modules.set(module.id, module);
     return module;
   };

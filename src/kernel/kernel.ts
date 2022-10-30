@@ -33,9 +33,9 @@ export class Kernel implements kernel.IKernel {
     this.modules = new ModulesBroker(this);
     this.started = false;
   }
+
   version: string;
   fullName: string;
-  async boot() {}
 
   async run(): Promise<number> {
     await this.initialize();

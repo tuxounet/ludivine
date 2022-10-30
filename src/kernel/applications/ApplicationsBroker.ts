@@ -45,7 +45,7 @@ export class ApplicationsBroker
     return rcs.filter((item) => item > 0).length;
   }
 
-  private findApplicationDescriptor = async (
+  private readonly findApplicationDescriptor = async (
     name: string
   ): Promise<modules.IModuleApplicationDescriptor | undefined> => {
     const result = Array.from(this.kernel.modules.modules.values())
@@ -58,7 +58,7 @@ export class ApplicationsBroker
 
   launchApplication = async (name: string): Promise<number> => {
     const descriptor = await this.findApplicationDescriptor(name);
-    if (!descriptor) {
+    if (descriptor == null) {
       throw errors.BasicError.notFound(
         this.fullName,
         "launchApplication/descriptor",
@@ -69,15 +69,15 @@ export class ApplicationsBroker
     const app: applications.IAppElement = descriptor.ctor(this.kernel, this);
     const key = app.fullName;
     this.applications.set(key, app);
-    console.dir(this.applications);
-    return app
+
+    return await app
       .execute()
       .then((rc) => {
         this.applications.delete(key);
         return rc;
       })
       .catch((e) => {
-        this.log.error(e);
+        this.log.error("application failed", descriptor.name, e);
         this.applications.delete(key);
         throw errors.BasicError.badQuery(
           app.fullName,

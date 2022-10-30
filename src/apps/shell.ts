@@ -9,7 +9,6 @@ export class ShellApp extends bases.AppElement {
 
   protected async main(): Promise<number> {
     await this.kernel.channels.broadcast("bonjour");
-
     await this.waitForShutdown();
     await this.kernel.channels.broadcast("au revoir");
     return 0;
@@ -45,6 +44,7 @@ export class ShellApp extends bases.AppElement {
         break;
     }
   }
+
   private async processCommand(raw: string): Promise<void> {
     const cleanCommand = raw.replace(this.imperativePrefix, "").trim();
 

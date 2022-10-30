@@ -31,36 +31,6 @@ export class ComputeBroker
     );
   }
 
-  async executeSource(
-    runtime: string,
-    source: compute.IComputeSourceCode
-  ): Promise<compute.IComputeExecuteResult> {
-    const localRuntime = this.runtimes.find((item) => item.name === runtime);
-    if (localRuntime == null) {
-      throw errors.BasicError.notFound(
-        this.fullName,
-        "compute runtime",
-        runtime
-      );
-    }
-    return await localRuntime.executeSource(source);
-  }
-
-  async executeProject(
-    runtime: string,
-    project: compute.IComputeProjectCode
-  ): Promise<compute.IComputeExecuteResult> {
-    const localRuntime = this.runtimes.find((item) => item.name === runtime);
-    if (localRuntime == null) {
-      throw errors.BasicError.notFound(
-        this.fullName,
-        "compute runtime",
-        runtime
-      );
-    }
-    return await localRuntime.executeProject(project);
-  }
-
   async executeEval(
     runtime: string,
     strToEval: string,
@@ -76,5 +46,28 @@ export class ComputeBroker
     }
 
     return await localRuntime.executeEval(strToEval, runVolume);
+  }
+
+  async executeSource(
+    runtime: string,
+    sourceVolume: storage.IStorageVolume,
+    dependencies: compute.IComputeDependency[],
+    entryPoint: string,
+    args?: string[]
+  ): Promise<compute.IComputeExecuteResult> {
+    const localRuntime = this.runtimes.find((item) => item.name === runtime);
+    if (localRuntime == null) {
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "compute runtime",
+        runtime
+      );
+    }
+    return await localRuntime.executeSource(
+      sourceVolume,
+      dependencies,
+      entryPoint,
+      args
+    );
   }
 }

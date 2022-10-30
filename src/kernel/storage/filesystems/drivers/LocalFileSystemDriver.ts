@@ -21,7 +21,8 @@ export class LocalFileSystemDriver
     this.id = "local";
     this.ensureRootFolder();
   }
-  private ensureRootFolder() {
+
+  private ensureRootFolder(): string {
     const folderProperty = "folder";
     const folderValue = this.properties[folderProperty];
 
@@ -45,6 +46,7 @@ export class LocalFileSystemDriver
     }
     return folderPath;
   }
+
   async bind(): Promise<boolean> {
     return true;
   }

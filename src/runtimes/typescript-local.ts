@@ -1,4 +1,4 @@
-import { bases, kernel, compute, errors } from "@ludivine/runtime";
+import { bases, kernel, storage } from "@ludivine/runtime";
 
 export class ComputeRuntimeTypescript extends bases.ComputeRuntimeElement {
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
@@ -10,27 +10,15 @@ export class ComputeRuntimeTypescript extends bases.ComputeRuntimeElement {
     ];
   }
 
-  async ensureDependencies(deps: compute.IComputeDependency[]): Promise<void> {
-    const failed: compute.IComputeDependency[] = [];
-    for (const dep of deps) {
-      try {
-        await this.installPackage(dep.name);
-      } catch {
-        failed.push(dep);
-      }
-    }
-    if (failed.length > 0) {
-      throw errors.BasicError.notFound(
-        this.name,
-        "dependencies failed",
-        failed.map((item) => item.name).join(",")
-      );
-    }
-  }
-
-  private async installPackage(name: string): Promise<number> {
-    return await this.executeSystemCommand(
-      `npm install --prefer-offline ${name}`
+  protected async installPackage(
+    name: string,
+    runVolume: storage.IStorageVolume
+  ): Promise<number> {
+    const result = await this.kernel.compute.executeEval(
+      "bash-local",
+      `npm install --prefer-offline ${name}`,
+      runVolume
     );
+    return result.rc;
   }
 }
