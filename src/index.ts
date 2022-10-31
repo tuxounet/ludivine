@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Kernel } from "./kernel/kernel";
 
 const kernel = new Kernel(__dirname);
