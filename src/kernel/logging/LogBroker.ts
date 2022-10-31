@@ -13,7 +13,7 @@ export class LogBroker
       new LogTargetFile(kernel, this),
       new LogTargetConsole(kernel, this),
     ];
-    this.level = logging.LogLevel.INFO;
+    this.level = logging.LogLevel.TRACE;
   }
 
   async initialize(): Promise<void> {

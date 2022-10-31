@@ -36,7 +36,10 @@ export class ApplicationsBroker
   }
 
   async executeRootProcess(): Promise<number> {
-    const shellApp = new ShellApp(this.kernel, this);
+    const sessionId = await this.kernel.sessions.begin();
+    const session = await this.kernel.sessions.get(sessionId);
+
+    const shellApp = new ShellApp(session);
 
     const apps = [
       this.executeAndWait(shellApp),

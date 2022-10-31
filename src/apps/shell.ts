@@ -1,16 +1,17 @@
-import { bases, kernel, messaging, logging } from "@ludivine/runtime";
+import { bases, kernel, messaging, logging, sessions } from "@ludivine/runtime";
 
 export class ShellApp extends bases.AppElement {
-  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
-    super("shell", kernel, parent, ["/channels/input"]);
+  constructor(readonly session: sessions.ISession) {
+    super("shell", session, ["/channels/input"]);
   }
 
   readonly imperativePrefix = "!";
 
   protected async main(): Promise<number> {
-    await this.kernel.channels.broadcast("bonjour");
-    await this.waitForShutdown();
-    await this.kernel.channels.broadcast("au revoir");
+    await this.session.output({ type: "message", body: "bonjour" });
+    // await this.session.input(">" ,)
+    // await this.waitForShutdown();
+    await this.session.output({ type: "message", body: "au revoir" });
     return 0;
   }
 

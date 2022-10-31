@@ -1,4 +1,4 @@
-import { bases, kernel, messaging, errors } from "@ludivine/runtime";
+import { bases, kernel, messaging, errors, logging } from "@ludivine/runtime";
 import { QueuesStore } from "./QueuesStore";
 import { TopicsStore } from "./TopicsStore";
 
@@ -15,6 +15,7 @@ export class MessagingBroker
   topicsStore: TopicsStore;
   queuesStore: QueuesStore;
 
+  @logging.logMethod()
   async subscribeTopic(
     topic: string,
     subscriber: kernel.IKernelElement
@@ -43,6 +44,7 @@ export class MessagingBroker
     this.log.debug("unsubscribed", topic, "by", subscriber);
   }
 
+  @logging.logMethod()
   async subscribeQueue(
     queue: string,
     subscriber: kernel.IKernelElement
@@ -60,6 +62,7 @@ export class MessagingBroker
     this.log.debug("subscribed", queue, "by", subscriber.fullName);
   }
 
+  @logging.logMethod()
   async unsubscribeQueue(queue: string, subscriber: string): Promise<void> {
     this.log.debug("unsubscribe", queue, "by", subscriber);
 
@@ -71,6 +74,7 @@ export class MessagingBroker
     this.log.debug("unsubscribed", queue, "by", subscriber);
   }
 
+  @logging.logMethod()
   async publish(topic: string, message: Record<string, string>): Promise<void> {
     this.log.debug("publish", topic, "with", message);
     if (!this.topicsStore.topics.has(topic)) {
@@ -84,6 +88,7 @@ export class MessagingBroker
     this.log.debug("published", topic, "with", message);
   }
 
+  @logging.logMethod()
   async enqueue(queue: string, message: Record<string, string>): Promise<void> {
     this.log.debug("enqueue", queue, "with", message);
     if (!this.queuesStore.queues.has(queue)) {
