@@ -40,30 +40,6 @@ export class MessagingBroker
   }
 
   @logging.logMethod()
-  async subscribeQueue(
-    queue: string,
-    subscriber: kernel.IKernelElement
-  ): Promise<void> {
-    if (!this.queuesStore.queues.has(queue)) {
-      await this.queuesStore.registerQueue(queue);
-    }
-    const current = this.queuesStore.queues.get(queue);
-    if (current == null) {
-      throw errors.BasicError.notFound(this.fullName, "queue", queue);
-    }
-
-    current.register(subscriber);
-  }
-
-  @logging.logMethod()
-  async unsubscribeQueue(queue: string, subscriber: string): Promise<void> {
-    const current = this.topicsStore.topics.get(queue);
-    if (current != null) {
-      current.unregister(subscriber);
-    }
-  }
-
-  @logging.logMethod()
   async publish(topic: string, message: Record<string, string>): Promise<void> {
     if (!this.topicsStore.topics.has(topic)) {
       await this.topicsStore.registerTopic(topic);
@@ -72,18 +48,6 @@ export class MessagingBroker
     if (currentTopic == null) {
       throw errors.BasicError.notFound(this.fullName, "topic", topic);
     }
-    await currentTopic.publish(message);
-  }
-
-  @logging.logMethod()
-  async enqueue(queue: string, message: Record<string, string>): Promise<void> {
-    if (!this.queuesStore.queues.has(queue)) {
-      await this.queuesStore.registerQueue(queue);
-    }
-    const current = this.queuesStore.queues.get(queue);
-    if (current == null) {
-      throw errors.BasicError.notFound(this.fullName, "topic", queue);
-    }
-    current.enqueue(message);
+    await currentTopic.notify(message);
   }
 }

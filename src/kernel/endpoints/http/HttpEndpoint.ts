@@ -2,10 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import { Server } from "http";
 import { bases, kernel, endpoints, errors } from "@ludivine/runtime";
-export class HttpEndpoint
-  extends bases.KernelElement
-  implements endpoints.IEndpoint
-{
+export class HttpEndpoint extends bases.KernelElement {
+  // implements endpoints.IEndpoint
   name = "http";
   port = 7727;
   constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {

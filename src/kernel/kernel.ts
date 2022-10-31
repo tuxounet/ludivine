@@ -13,7 +13,7 @@ export class Kernel implements kernel.IKernel {
   production: boolean;
   started: boolean;
   applications: ApplicationsBroker;
-  channels: ChannelsBroker;
+  // channels: ChannelsBroker;
   messaging: MessagingBroker;
   endpoints: EndpointsBroker;
   compute: ComputeBroker;
@@ -29,7 +29,7 @@ export class Kernel implements kernel.IKernel {
     this.messaging = new MessagingBroker(this);
     this.sessions = new SessionsBroker(this);
     this.compute = new ComputeBroker(this);
-    this.channels = new ChannelsBroker(this);
+    // this.channels = new ChannelsBroker(this);
     this.applications = new ApplicationsBroker(this);
     this.storage = new StoragesBroker(this);
     this.endpoints = new EndpointsBroker(this);
@@ -62,15 +62,15 @@ export class Kernel implements kernel.IKernel {
     await this.modules.initialize();
     await this.compute.initialize();
     await this.sessions.initialize();
-    await this.channels.initialize();
+    // await this.channels.initialize();
     await this.endpoints.initialize();
     await this.applications.initialize();
     this.started = true;
   }
 
   private async listen(): Promise<number> {
-    await this.channels.openAllInputs();
-    await this.channels.openAllOutputs();
+    // await this.channels.openAllInputs();
+    // await this.channels.openAllOutputs();
     return await this.applications.executeRootProcess();
   }
 
@@ -79,7 +79,7 @@ export class Kernel implements kernel.IKernel {
     await this.applications.shutdown();
     await this.endpoints.shutdown();
     await this.sessions.shutdown();
-    await this.channels.shutdown();
+    // await this.channels.shutdown();
     await this.compute.shutdown();
     await this.modules.shutdown();
     await this.logging.shutdown();

@@ -26,6 +26,8 @@ export class SessionsBroker
     const id = "session-" + this.sessions.size + 1;
     const session = new Session(id, this.kernel, this);
     this.sessions.set(id, session);
+    await session.initialize();
+    await this.kernel.endpoints.openEndpoint(session, "cli");
     return id;
   };
 
@@ -41,6 +43,7 @@ export class SessionsBroker
     if (!this.sessions.has(id)) return false;
     const session = this.sessions.get(id);
     if (!session) return false;
+    await this.kernel.endpoints.closeEndpoint(session.id);
     await session.terminate();
     await session.shutdown();
     this.sessions.delete(id);

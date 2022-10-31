@@ -11,13 +11,13 @@ export class QueuesStore extends bases.KernelElement {
   queues: Map<string, messaging.Queue>;
 
   @logging.logMethod()
-  async registerQueue(name: string): Promise<void> {
+  async createQueue(name: string): Promise<void> {
     const queue = new messaging.Queue(name, this.kernel, this);
     this.queues.set(name, queue);
   }
 
   @logging.logMethod()
-  async unregisterQueue(name: string): Promise<void> {
+  async deleteQueue(name: string): Promise<void> {
     this.queues.delete(name);
   }
 }
