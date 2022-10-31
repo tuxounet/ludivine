@@ -20,7 +20,6 @@ export class MessagingBroker
     topic: string,
     subscriber: kernel.IKernelElement
   ): Promise<void> {
-    this.log.debug("subscribe", topic, "by", subscriber.fullName);
     if (!this.topicsStore.topics.has(topic)) {
       await this.topicsStore.registerTopic(topic);
     }
@@ -30,18 +29,14 @@ export class MessagingBroker
     }
 
     currentTopic.register(subscriber);
-    this.log.debug("subscribed", topic, "by", subscriber.fullName);
   }
 
+  @logging.logMethod()
   async unsubscribeTopic(topic: string, subscriber: string): Promise<void> {
-    this.log.debug("unsubscribe", topic, "by", subscriber);
-
     const currentTopic = this.topicsStore.topics.get(topic);
     if (currentTopic != null) {
       currentTopic.unregister(subscriber);
     }
-
-    this.log.debug("unsubscribed", topic, "by", subscriber);
   }
 
   @logging.logMethod()
@@ -49,7 +44,6 @@ export class MessagingBroker
     queue: string,
     subscriber: kernel.IKernelElement
   ): Promise<void> {
-    this.log.debug("subscribe", queue, "by", subscriber.fullName);
     if (!this.queuesStore.queues.has(queue)) {
       await this.queuesStore.registerQueue(queue);
     }
@@ -59,24 +53,18 @@ export class MessagingBroker
     }
 
     current.register(subscriber);
-    this.log.debug("subscribed", queue, "by", subscriber.fullName);
   }
 
   @logging.logMethod()
   async unsubscribeQueue(queue: string, subscriber: string): Promise<void> {
-    this.log.debug("unsubscribe", queue, "by", subscriber);
-
     const current = this.topicsStore.topics.get(queue);
     if (current != null) {
       current.unregister(subscriber);
     }
-
-    this.log.debug("unsubscribed", queue, "by", subscriber);
   }
 
   @logging.logMethod()
   async publish(topic: string, message: Record<string, string>): Promise<void> {
-    this.log.debug("publish", topic, "with", message);
     if (!this.topicsStore.topics.has(topic)) {
       await this.topicsStore.registerTopic(topic);
     }
@@ -85,12 +73,10 @@ export class MessagingBroker
       throw errors.BasicError.notFound(this.fullName, "topic", topic);
     }
     await currentTopic.publish(message);
-    this.log.debug("published", topic, "with", message);
   }
 
   @logging.logMethod()
   async enqueue(queue: string, message: Record<string, string>): Promise<void> {
-    this.log.debug("enqueue", queue, "with", message);
     if (!this.queuesStore.queues.has(queue)) {
       await this.queuesStore.registerQueue(queue);
     }
@@ -98,7 +84,6 @@ export class MessagingBroker
     if (current == null) {
       throw errors.BasicError.notFound(this.fullName, "topic", queue);
     }
-    await current.enqueue(message);
-    this.log.debug("enqueued", queue, "with", message);
+    current.enqueue(message);
   }
 }

@@ -1,4 +1,4 @@
-import { bases, kernel, messaging } from "@ludivine/runtime";
+import { bases, kernel, logging, messaging } from "@ludivine/runtime";
 export class TopicsStore extends bases.KernelElement {
   constructor(
     readonly kernel: kernel.IKernel,
@@ -9,17 +9,13 @@ export class TopicsStore extends bases.KernelElement {
   }
 
   topics: Map<string, messaging.Topic>;
-
+  @logging.logMethod()
   async registerTopic(name: string): Promise<void> {
-    this.log.debug("registering", name);
     const topic = new messaging.Topic(name, this.kernel, this);
     this.topics.set(name, topic);
-    this.log.debug("registed", name);
   }
-
+  @logging.logMethod()
   async unregisterTopic(name: string): Promise<void> {
-    this.log.debug("unregistering", name);
     this.topics.delete(name);
-    this.log.debug("unregistered", name);
   }
 }
