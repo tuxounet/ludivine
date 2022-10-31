@@ -1,7 +1,6 @@
 import {
   bases,
   channels,
-  errors,
   kernel,
   logging,
   messaging,
@@ -20,6 +19,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
     this.emitter = new events.EventEmitter();
     this.replies = new Map();
   }
+
   waiters: Map<string, sessions.ISessionReplyWaiter>;
   emitter: events.EventEmitter;
   replies: Map<string, messaging.IMessageEvent>;
@@ -47,7 +47,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
     timeout: number = 30000
   ): Promise<void> {
     return await new Promise<void>((resolve, reject) => {
-      const solver = () => {
+      const solver = (): void => {
         clearTimeout(timoutTmr);
         resolve();
       };
@@ -60,6 +60,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
       this.emitter.once(sequence, solver);
     });
   }
+
   @logging.logMethod()
   async onMessage(messageEvent: messaging.IMessageEvent): Promise<void> {
     console.info("arrival", messageEvent);
@@ -72,25 +73,27 @@ export class Session extends bases.KernelElement implements sessions.ISession {
       this.emitter.emit(sequence);
     }
   }
+
   @logging.logMethod()
   async output(out: channels.IOutputMessage): Promise<void> {
     const endpoint = await this.kernel.endpoints.get(this.id);
     await endpoint.emitOutput(out);
   }
+
   @logging.logMethod()
   async input(
     query: channels.IInputQuery
   ): Promise<channels.IInputMessage<string>> {
     this.sequence++;
 
-    const sequence = "I" + this.sequence;
+    const sequence = "I" + String(this.sequence);
     const endpoint = await this.kernel.endpoints.get(this.id);
 
     await endpoint.emitEvent({
       type: "input",
       body: JSON.stringify({
         session: this.id,
-        sequence: sequence,
+        sequence,
         query,
       }),
     });
@@ -116,7 +119,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
   }
 
   @logging.logMethod()
-  async terminate() {
+  async terminate(): Promise<boolean> {
     this.log.warn("terminate query ");
     return true;
   }

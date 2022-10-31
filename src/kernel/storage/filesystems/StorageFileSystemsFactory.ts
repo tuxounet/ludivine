@@ -20,6 +20,7 @@ export class StorageFileSystemsFactory extends bases.KernelElement {
     this.drivers.clear();
     await super.initialize();
   }
+
   @logging.logMethod()
   async shutdown(): Promise<void> {
     await super.shutdown();

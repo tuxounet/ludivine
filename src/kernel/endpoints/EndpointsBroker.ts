@@ -16,9 +16,9 @@ export class EndpointsBroker
 
   sessions: Map<string, endpoints.IEndpoint>;
 
-  async openEndpoint(session: sessions.ISession, type: string) {
+  async openEndpoint(session: sessions.ISession, type: string): Promise<void> {
     const provider = this.providers.get(type);
-    if (!provider) {
+    if (provider == null) {
       throw errors.BasicError.notFound(
         this.fullName,
         "openEndpoint/provider",
@@ -31,11 +31,11 @@ export class EndpointsBroker
     this.sessions.set(session.id, endpointSession);
   }
 
-  async closeEndpoint(session: string) {}
+  async closeEndpoint(session: string): Promise<void> {}
 
   async get(session: string): Promise<endpoints.IEndpoint> {
     const endpoint = this.sessions.get(session);
-    if (!endpoint) {
+    if (endpoint == null) {
       throw errors.BasicError.notFound(this.fullName, "get/session", session);
     }
     return endpoint;

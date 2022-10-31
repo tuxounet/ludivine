@@ -1,6 +1,5 @@
 import { kernel } from "@ludivine/runtime";
 import { MessagingBroker } from "./messaging/MessagingBroker";
-import { ChannelsBroker } from "./channels/ChannelsBroker";
 import { EndpointsBroker } from "./endpoints/EndpointsBroker";
 import { ComputeBroker } from "./compute/ComputeBroker";
 import { ApplicationsBroker } from "./applications/ApplicationsBroker";
@@ -13,7 +12,6 @@ export class Kernel implements kernel.IKernel {
   production: boolean;
   started: boolean;
   applications: ApplicationsBroker;
-  // channels: ChannelsBroker;
   messaging: MessagingBroker;
   endpoints: EndpointsBroker;
   compute: ComputeBroker;

@@ -23,7 +23,7 @@ export class SessionsBroker
   }
 
   begin = async (): Promise<string> => {
-    const id = "session-" + this.sessions.size + 1;
+    const id = "session-" + String(this.sessions.size + 1);
     const session = new Session(id, this.kernel, this);
     this.sessions.set(id, session);
     await session.initialize();
@@ -33,7 +33,7 @@ export class SessionsBroker
 
   get = async (id: string): Promise<sessions.ISession> => {
     const instance = this.sessions.get(id);
-    if (!instance) {
+    if (instance == null) {
       throw errors.BasicError.notFound(this.fullName, "get", id);
     }
     return instance;
@@ -42,7 +42,7 @@ export class SessionsBroker
   terminate = async (id: string): Promise<boolean> => {
     if (!this.sessions.has(id)) return false;
     const session = this.sessions.get(id);
-    if (!session) return false;
+    if (session == null) return false;
     await this.kernel.endpoints.closeEndpoint(session.id);
     await session.terminate();
     await session.shutdown();

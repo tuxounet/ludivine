@@ -14,6 +14,7 @@ export class TopicsStore extends bases.KernelElement {
     const topic = new messaging.Topic(name, this.kernel, this);
     this.topics.set(name, topic);
   }
+
   @logging.logMethod()
   async unregisterTopic(name: string): Promise<void> {
     this.topics.delete(name);

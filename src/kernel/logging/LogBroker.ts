@@ -27,7 +27,8 @@ export class LogBroker
   }
 
   output(line: logging.ILogLine): void {
-    if (line.level < this.level) return;
-    if (this.targets) this.targets.forEach((target) => target.appendLog(line));
+    // if (line.level.valueOf() < this.level.valueOf()) return;
+    if (this.targets.length > 0)
+      this.targets.forEach((target) => target.appendLog(line));
   }
 }

@@ -1,4 +1,4 @@
-import { bases, kernel, messaging, logging, sessions } from "@ludivine/runtime";
+import { bases, kernel, sessions } from "@ludivine/runtime";
 
 export class ShellApp extends bases.AppElement {
   constructor(readonly session: sessions.ISession) {

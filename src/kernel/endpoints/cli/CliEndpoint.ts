@@ -17,7 +17,7 @@ export class CliEndpoint
     super("cli-endpoint", session.kernel, parent);
   }
 
-  async emitOutput(output: channels.IOutputMessage) {
+  async emitOutput(output: channels.IOutputMessage): Promise<void> {
     switch (output.type) {
       case "message":
         console.info("*", output.body);
@@ -28,32 +28,34 @@ export class CliEndpoint
     }
   }
 
-  emitEvent(output: channels.IEventMessage): Promise<void> {
+  async emitEvent(output: channels.IEventMessage): Promise<void> {
     switch (output.type) {
       case "input":
         setTimeout(() => {
-          let currentRl = readline.createInterface({
+          const currentRl = readline.createInterface({
             input: process.stdin,
           });
           const datas = JSON.parse(output.body);
 
           currentRl.question(
-            `${datas.sequence} ${datas.query.prompt} `,
+            `${String(datas.sequence)} ${String(datas.query.prompt)} `,
             (response) => {
               if (currentRl != null) currentRl.close();
 
-              this.kernel.messaging.publish("/sessions/" + this.session.id, {
-                session: this.session.id,
-                sequence: datas.sequence,
-                sender: this.fullName,
-                value: response,
-                type: "line",
-              });
+              this.kernel.messaging
+                .publish("/sessions/" + this.session.id, {
+                  session: this.session.id,
+                  sequence: datas.sequence,
+                  sender: this.fullName,
+                  value: response,
+                  type: "line",
+                })
+                .catch((e) => this.log.error(e));
             }
           );
         });
         break;
     }
-    return Promise.resolve();
+    return await Promise.resolve();
   }
 }
