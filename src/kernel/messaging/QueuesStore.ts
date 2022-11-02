@@ -1,4 +1,4 @@
-import { bases, kernel, messaging } from "@ludivine/runtime";
+import { bases, kernel, logging, messaging } from "@ludivine/runtime";
 export class QueuesStore extends bases.KernelElement {
   constructor(
     readonly kernel: kernel.IKernel,
@@ -10,16 +10,14 @@ export class QueuesStore extends bases.KernelElement {
 
   queues: Map<string, messaging.Queue>;
 
-  async registerQueue(name: string): Promise<void> {
-    this.log.debug("registering", name);
+  @logging.logMethod()
+  async createQueue(name: string): Promise<void> {
     const queue = new messaging.Queue(name, this.kernel, this);
     this.queues.set(name, queue);
-    this.log.debug("registed", name);
   }
 
-  async unregisterQueue(name: string): Promise<void> {
-    this.log.debug("unregistering", name);
+  @logging.logMethod()
+  async deleteQueue(name: string): Promise<void> {
     this.queues.delete(name);
-    this.log.debug("unregistered", name);
   }
 }

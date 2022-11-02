@@ -18,7 +18,7 @@ export class ApplicationsBroker
   applications: Map<string, applications.IAppElement>;
 
   async initialize(): Promise<void> {
-    await this.launchApplication("shell-natural");
+    await super.initialize();
   }
 
   async shutdown(): Promise<void> {
@@ -27,18 +27,23 @@ export class ApplicationsBroker
         resolve();
       }, 100);
     });
+    await super.shutdown();
   }
 
   async executeAndWait(app: applications.IAppElement): Promise<number> {
+    this.applications.set(app.fullName, app);
     return await app.execute();
   }
 
   async executeRootProcess(): Promise<number> {
-    const shellApp = new ShellApp(this.kernel, this);
+    const sessionId = await this.kernel.sessions.begin();
+    const session = await this.kernel.sessions.get(sessionId);
+
+    const shellApp = new ShellApp(session);
 
     const apps = [
       this.executeAndWait(shellApp),
-      this.launchApplication("shell-natural"),
+      // this.launchApplication("shell-natural"),
     ];
 
     const rcs = await Promise.all(apps);

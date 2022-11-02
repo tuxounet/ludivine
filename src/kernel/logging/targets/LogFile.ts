@@ -39,7 +39,7 @@ export class LogTargetFile
     const buffer: logging.ILogLine[] = [];
 
     while (this.queue.canDequeue() && buffer.length < 20) {
-      const line = this.queue.dequeue();
+      const line = await this.queue.dequeue();
       buffer.push(line);
     }
     await this.appendLines(buffer);

@@ -40,7 +40,7 @@ export class ComputeBroker
     if (localRuntime == null) {
       throw errors.BasicError.notFound(
         this.fullName,
-        "compute runtime",
+        "executeEval/runtime",
         runtime
       );
     }
@@ -59,7 +59,7 @@ export class ComputeBroker
     if (localRuntime == null) {
       throw errors.BasicError.notFound(
         this.fullName,
-        "compute runtime",
+        "executeSource/runtime",
         runtime
       );
     }

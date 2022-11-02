@@ -9,15 +9,17 @@ export class LogTargetConsole
 
   appendLog(line: logging.ILogLine): void {
     switch (line.level) {
-      case "DEBUG":
+      case logging.LogLevel.TRACE:
+        return console.debug(line.date, "TRA", line.sender, line.line);
+      case logging.LogLevel.DEBUG:
         return console.debug(line.date, "DBG", line.sender, line.line);
-      case "INPUT":
+      case logging.LogLevel.INPUT:
         return console.info(line.date, "INP", line.sender, line.line);
-      case "INFO":
+      case logging.LogLevel.INFO:
         return console.info(line.date, "INF", line.sender, line.line);
-      case "WARN":
+      case logging.LogLevel.WARN:
         return console.warn(line.date, "WRN", line.sender, line.line);
-      case "ERROR":
+      case logging.LogLevel.ERROR:
         return console.error(line.date, "ERR", line.sender, line.line);
       default:
         console.debug(line.date, "???", line.sender, line.line);

@@ -1,4 +1,4 @@
-import { bases, kernel, storage, errors } from "@ludivine/runtime";
+import { bases, kernel, storage, errors, logging } from "@ludivine/runtime";
 import { LogsVolume } from "../../volumes/LogsVolume";
 import { ModulesVolume } from "../../volumes/ModulesVolume";
 import { RunspaceVolume } from "../../volumes/RunspaceVolume";
@@ -19,6 +19,28 @@ export class StoragesBroker
     this.volumes = new Map();
   }
 
+  @logging.logMethod()
+  async initialize(): Promise<void> {
+    await this.pathsFactory.initialize();
+    await this.fileSystemsFactory.initialize();
+    const logsVolume = new LogsVolume(this.kernel, this);
+    this.volumes.set(logsVolume.id, logsVolume);
+    const modulesVolume = new ModulesVolume(this.kernel, this);
+    this.volumes.set(modulesVolume.id, modulesVolume);
+    const runspaceVolume = new RunspaceVolume(this.kernel, this);
+    this.volumes.set(runspaceVolume.id, runspaceVolume);
+    const workspaceVolume = new WorkspaceVolume(this.kernel, this);
+    this.volumes.set(workspaceVolume.id, workspaceVolume);
+    await this.mountAll();
+  }
+
+  @logging.logMethod()
+  async shutdown(): Promise<void> {
+    await this.unmountAll();
+    await this.fileSystemsFactory.shutdown();
+    await this.pathsFactory.shutdown();
+  }
+
   createPathsDriver(
     name: string,
     params?: Record<string, unknown>
@@ -34,20 +56,6 @@ export class StoragesBroker
       name,
       params != null ? params : {}
     );
-  }
-
-  async initialize(): Promise<void> {
-    await this.pathsFactory.initialize();
-    await this.fileSystemsFactory.initialize();
-    const logsVolume = new LogsVolume(this.kernel, this);
-    this.volumes.set(logsVolume.id, logsVolume);
-    const modulesVolume = new ModulesVolume(this.kernel, this);
-    this.volumes.set(modulesVolume.id, modulesVolume);
-    const runspaceVolume = new RunspaceVolume(this.kernel, this);
-    this.volumes.set(runspaceVolume.id, runspaceVolume);
-    const workspaceVolume = new WorkspaceVolume(this.kernel, this);
-    this.volumes.set(workspaceVolume.id, workspaceVolume);
-    await this.mountAll();
   }
 
   mountAll = async (): Promise<void> => {
@@ -96,10 +104,4 @@ export class StoragesBroker
 
     return ephVolume;
   };
-
-  async shutdown(): Promise<void> {
-    await this.unmountAll();
-    await this.fileSystemsFactory.shutdown();
-    await this.pathsFactory.shutdown();
-  }
 }

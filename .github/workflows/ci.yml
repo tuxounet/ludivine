@@ -23,3 +23,8 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build
+      - run: npm run exe
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: out/*

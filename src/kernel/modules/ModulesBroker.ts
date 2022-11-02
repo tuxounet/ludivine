@@ -8,10 +8,10 @@ export class ModulesBroker
     super("modules-broker", kernel);
     this.modules = new Map();
     this.requiredModules = [
-      {
-        name: "@ludivine-apps/shell-natural",
-        upstream: "@ludivine-apps/shell-natural",
-      },
+      // {
+      //   name: "@ludivine-apps/shell-natural",
+      //   upstream: "@ludivine-apps/shell-natural",
+      // },
     ];
   }
 

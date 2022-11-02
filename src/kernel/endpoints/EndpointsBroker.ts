@@ -1,5 +1,5 @@
-import { bases, kernel, endpoints } from "@ludivine/runtime";
-import { HttpEndpoint } from "./http/HttpEndpoint";
+import { bases, kernel, endpoints, sessions, errors } from "@ludivine/runtime";
+import { CliEndpoint } from "./cli/CliEndpoint";
 
 export class EndpointsBroker
   extends bases.KernelElement
@@ -7,49 +7,41 @@ export class EndpointsBroker
 {
   constructor(readonly kernel: kernel.IKernel) {
     super("endpoints-broker", kernel);
-    this.endpoints = [new HttpEndpoint(kernel, this)];
-    this.routes = [];
+    this.providers = new Map();
+    this.providers.set("cli", (session) => new CliEndpoint(session, this));
+    this.sessions = new Map();
   }
 
-  endpoints: endpoints.IEndpoint[];
-  routes: endpoints.IEndpointRoute[];
+  providers: Map<string, (session: sessions.ISession) => endpoints.IEndpoint>;
 
-  async initialize(): Promise<void> {
-    await this.openEndpoints();
+  sessions: Map<string, endpoints.IEndpoint>;
+
+  async openEndpoint(session: sessions.ISession, type: string): Promise<void> {
+    const provider = this.providers.get(type);
+    if (provider == null) {
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "openEndpoint/provider",
+        type
+      );
+    }
+
+    const endpointSession = provider(session);
+
+    this.sessions.set(session.id, endpointSession);
   }
 
-  async shutdown(): Promise<void> {
-    await this.closeEndpoints();
+  async closeEndpoint(session: string): Promise<void> {}
+
+  async get(session: string): Promise<endpoints.IEndpoint> {
+    const endpoint = this.sessions.get(session);
+    if (endpoint == null) {
+      throw errors.BasicError.notFound(this.fullName, "get/session", session);
+    }
+    return endpoint;
   }
 
-  async openEndpoints(): Promise<void> {
-    await Promise.all(
-      this.endpoints.map(async (item) => await item.open(this.routes))
-    );
-  }
+  async initialize(): Promise<void> {}
 
-  async closeEndpoints(): Promise<void> {
-    await Promise.all(this.endpoints.map(async (item) => await item.close()));
-  }
-
-  async registerRoute(
-    method: endpoints.EndpointRouteMethod,
-    path: string,
-    handler: endpoints.IEndpointRouteHandler
-  ): Promise<void> {
-    this.routes.push({
-      path,
-      method,
-      handler,
-    });
-  }
-
-  async unregisterRoute(
-    method: endpoints.EndpointRouteMethod,
-    path: string
-  ): Promise<void> {
-    this.routes = this.routes.filter(
-      (item) => item.method !== method && item.path !== path
-    );
-  }
+  async shutdown(): Promise<void> {}
 }

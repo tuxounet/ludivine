@@ -1,48 +1,41 @@
-import { bases, kernel, messaging } from "@ludivine/runtime";
+import { bases, kernel, sessions } from "@ludivine/runtime";
 
 export class ShellApp extends bases.AppElement {
-  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
-    super("shell", kernel, parent, ["/channels/input"]);
+  constructor(readonly session: sessions.ISession) {
+    super("shell", session);
   }
 
   readonly imperativePrefix = "!";
 
   protected async main(): Promise<number> {
-    await this.kernel.channels.broadcast("bonjour");
-    await this.waitForShutdown();
-    await this.kernel.channels.broadcast("au revoir");
-    return 0;
-  }
+    await this.session.output({ type: "message", body: "bonjour" });
 
-  async onMessage(message: messaging.IMessageEvent): Promise<void> {
-    this.log.debug(
-      "message arrival",
-      message.recipient,
-      message.sender,
-      message.body
-    );
-    if (
-      message.body === undefined ||
-      message.body.command === undefined ||
-      message.body.command === "" ||
-      message.body.command.trim() === ""
-    ) {
-      this.log.warn("commade vide");
-      return;
-    }
-    const command = message.body.command;
-
-    switch (message.recipient) {
-      case "/channels/input":
-        if (command.startsWith(this.imperativePrefix)) {
-          await this.processCommand(command);
-        } else
-          await this.kernel.messaging.publish(
-            "/channels/input/natural",
-            message.body
-          );
+    while (this.kernel.started) {
+      const inputMessage = await this.session.input({ prompt: ">" });
+      console.info("hoho", inputMessage);
+      if (inputMessage === undefined || inputMessage.value === undefined) {
+        await this.session.output({ type: "message", body: "commande vide" });
+        continue;
+      }
+      const inputLine = String(inputMessage.value);
+      console.info("!!!!!", inputLine);
+      if (inputLine.startsWith(this.imperativePrefix)) {
+        await this.processCommand(inputLine);
         break;
+      } else {
+        await this.kernel.messaging.publish("/channels/input/natural", {
+          command: inputLine,
+        });
+      }
+
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+      continue;
     }
+    return 0;
   }
 
   private async processCommand(raw: string): Promise<void> {
@@ -93,9 +86,11 @@ export class ShellApp extends bases.AppElement {
         }
 
         const output = await result.apply(broker, args);
-        await this.kernel.channels.broadcast(
-          "command ok:" + String(cleanCommand) + " : " + String(output)
-        );
+        await this.session.output({
+          type: "message",
+          body: "command ok:" + String(cleanCommand) + " : " + String(output),
+        });
+
         return;
       }
     }
@@ -106,8 +101,12 @@ export class ShellApp extends bases.AppElement {
         Object.keys(anyBroker[item]).includes("fullName")
       );
     });
-    await this.kernel.channels.broadcast(
-      "bad command : possible tokens " + possibleMethods.join(",")
-    );
+    await this.session.output({
+      type: "message",
+      body:
+        "command ok:" +
+        "bad command : possible tokens " +
+        possibleMethods.join(","),
+    });
   }
 }

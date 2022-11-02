@@ -1,11 +1,9 @@
-import { bases, kernel, channels } from "@ludivine/runtime";
+import { bases, kernel } from "@ludivine/runtime";
 import { InputsBroker } from "./inputs/inputsBroker";
 import { OutputsBroker } from "./outputs/OutputsBroker";
 
-export class ChannelsBroker
-  extends bases.KernelElement
-  implements channels.IChannelsBroker
-{
+export class ChannelsBroker extends bases.KernelElement {
+  // implements channels.IChannelsBroker
   inputs: InputsBroker;
   outputs: OutputsBroker;
 
@@ -16,67 +14,67 @@ export class ChannelsBroker
   }
 
   async initialize(): Promise<void> {
-    await Promise.all(
-      this.inputs.channels.map(async (item) => await item.initialize())
-    );
-    await Promise.all(
-      this.outputs.channels.map(async (item) => await item.initialize())
-    );
+    // await Promise.all(
+    //   this.inputs.channels.map(async (item) => await item.initialize())
+    // );
+    // await Promise.all(
+    //   this.outputs.channels.map(async (item) => await item.initialize())
+    // );
 
-    await this.openAllInputs();
-    await this.openAllOutputs();
+    // await this.openAllInputs();
+    // await this.openAllOutputs();
 
     await super.initialize();
   }
 
   async shutdown(): Promise<void> {
-    await this.closeAllInputs();
-    await this.closeAllOutputs();
+    // await this.closeAllInputs();
+    // await this.closeAllOutputs();
 
-    await Promise.all(
-      this.inputs.channels.reverse().map(async (item) => await item.shutdown())
-    );
+    // await Promise.all(
+    //   this.inputs.channels.reverse().map(async (item) => await item.shutdown())
+    // );
 
-    await Promise.all(
-      this.outputs.channels.reverse().map(async (item) => await item.shutdown())
-    );
+    // await Promise.all(
+    //   this.outputs.channels.reverse().map(async (item) => await item.shutdown())
+    // );
     await super.shutdown();
   }
 
-  openAllInputs = async (): Promise<void> => {
-    await Promise.all(
-      this.inputs.channels.map(async (item) => await item.open())
-    );
-  };
+  // openAllInputs = async (): Promise<void> => {
+  //   await Promise.all(
+  //     this.inputs.channels.map(async (item) => await item.open())
+  //   );
+  // };
 
-  openAllOutputs = async (): Promise<void> => {
-    await Promise.all(
-      this.outputs.channels.map(async (item) => await item.open())
-    );
-  };
+  // openAllOutputs = async (): Promise<void> => {
+  //   await Promise.all(
+  //     this.outputs.channels.map(async (item) => await item.open())
+  //   );
+  // };
 
-  closeAllInputs = async (): Promise<void> => {
-    await Promise.all(
-      this.inputs.channels.map(async (item) => await item.close())
-    );
-  };
+  // closeAllInputs = async (): Promise<void> => {
+  //   await Promise.all(
+  //     this.inputs.channels.map(async (item) => await item.close())
+  //   );
+  // };
 
-  closeAllOutputs = async (): Promise<void> => {
-    await Promise.all(
-      this.outputs.channels.map(async (item) => await item.close())
-    );
-  };
+  // closeAllOutputs = async (): Promise<void> => {
+  //   await Promise.all(
+  //     this.outputs.channels.map(async (item) => await item.close())
+  //   );
+  // };
 
-  broadcast = async (message: string): Promise<void> => {
-    await this.outputOnAll({
-      type: "message",
-      body: message,
-    });
-  };
+  // broadcast = async (message: string): Promise<void> => {
+  //   await this.outputOnAll({
+  //     type: "message",
+  //     body: message,
+  //   });
+  // };
 
-  outputOnAll = async (message: channels.IOutputMessage): Promise<void> => {
-    await Promise.all(
-      this.outputs.channels.map(async (item) => await item.output(message))
-    );
-  };
+  // outputOnAll = async (message: channels.IOutputMessage): Promise<void> => {
+  //   await Promise.all(
+  //     this.outputs.channels.map(async (item) => await item.output(message))
+  //   );
+  // };
 }

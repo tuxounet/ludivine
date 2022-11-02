@@ -8,7 +8,7 @@ export class ModulesVolume extends storage.StorageVolume {
       true,
       kernel.storage.createPathsDriver("local"),
       kernel.storage.createFileSystemDriver("local", {
-        folder: "modules",
+        folder: "run/modules",
       }),
       kernel,
       parent
