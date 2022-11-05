@@ -15,14 +15,11 @@ export class Session extends bases.KernelElement implements sessions.ISession {
   ) {
     super(id, kernel, parent);
     this.sequence = 0;
-    this.waiters = new Map();
+
     this.emitter = new events.EventEmitter();
-    this.replies = new Map();
   }
 
-  waiters: Map<string, sessions.ISessionReplyWaiter>;
   emitter: events.EventEmitter;
-  replies: Map<string, messaging.IMessageEvent>;
   sequence: number;
 
   @logging.logMethod()
@@ -45,11 +42,11 @@ export class Session extends bases.KernelElement implements sessions.ISession {
   protected async waitForReply(
     sequence: string,
     timeout: number = 30000
-  ): Promise<void> {
-    return await new Promise<void>((resolve, reject) => {
-      const solver = (): void => {
+  ): Promise<messaging.IMessageEvent> {
+    return await new Promise<messaging.IMessageEvent>((resolve, reject) => {
+      const solver = (message: messaging.IMessageEvent): void => {
         clearTimeout(timoutTmr);
-        resolve();
+        resolve(message);
       };
       const timoutTmr = setTimeout(() => {
         clearTimeout(timoutTmr);
@@ -63,14 +60,10 @@ export class Session extends bases.KernelElement implements sessions.ISession {
 
   @logging.logMethod()
   async onMessage(messageEvent: messaging.IMessageEvent): Promise<void> {
-    console.info("arrival", messageEvent);
     const sequence = messageEvent.body.sequence;
 
     if (sequence != null && typeof sequence === "string") {
-      this.replies.set(sequence, messageEvent);
-
-      console.info("onmessage", sequence, messageEvent);
-      this.emitter.emit(sequence);
+      this.emitter.emit(sequence, messageEvent);
     }
   }
 
@@ -98,23 +91,20 @@ export class Session extends bases.KernelElement implements sessions.ISession {
       }),
     });
 
-    await this.waitForReply(sequence);
-    const message = this.replies.get(sequence);
-    console.info("!!!", sequence, this.replies, message);
+    const message = await this.waitForReply(sequence);
+
     if (message === undefined) {
       throw new Error("no messsage in reply for sequence " + sequence);
     }
-    const final = Object.assign({}, message);
-    const line = String(final.body.value);
 
-    this.replies.delete(sequence);
-    console.info("line", line);
+    const line = String(message.body.value);
+
     const result: channels.IInputMessage<string> = {
-      sender: final.sender,
+      sender: message.sender,
       type: "line",
       value: line,
     };
-    console.info("xoxoxo", sequence, result);
+
     return result;
   }
 
