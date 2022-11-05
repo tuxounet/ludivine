@@ -13,9 +13,14 @@ export class ShellApp extends bases.AppElement {
     while (this.kernel.started) {
       const input = await this.session.input({ prompt: ">" });
       if (input === undefined || input.value === undefined) {
-        await this.session.output({ type: "message", body: "commande vide" });
+        await this.session.output({ type: "message", body: "aucune entrée" });
+        continue;
       }
-      const inputLine = String(input.value);
+      const inputLine = String(input.value).trim();
+      if (inputLine === "") {
+        await this.session.output({ type: "message", body: "commande vide" });
+        continue;
+      }
       await this.session.output({
         type: "message",
         body: "commande reçue : " + inputLine,

@@ -30,21 +30,14 @@ export class ApplicationsBroker
     await super.shutdown();
   }
 
-  async executeAndWait(app: applications.IAppElement): Promise<number> {
-    this.applications.set(app.fullName, app);
-    return await app.execute();
-  }
-
   async executeRootProcess(): Promise<number> {
     const sessionId = await this.kernel.sessions.begin();
     const session = await this.kernel.sessions.get(sessionId);
 
     const shellApp = new ShellApp(session);
+    this.applications.set(shellApp.fullName, shellApp);
 
-    const apps = [
-      this.executeAndWait(shellApp),
-      // this.launchApplication("shell-natural"),
-    ];
+    const apps = [shellApp.execute()];
 
     const rcs = await Promise.all(apps);
     return rcs.filter((item) => item > 0).length;
@@ -61,7 +54,12 @@ export class ApplicationsBroker
     return result;
   };
 
-  launchApplication = async (name: string): Promise<number> => {
+  launchApplication = async (
+    sessionId: string,
+    name: string
+  ): Promise<number> => {
+    const session = await this.kernel.sessions.get(sessionId);
+
     const descriptor = await this.findApplicationDescriptor(name);
     if (descriptor == null) {
       throw errors.BasicError.notFound(
@@ -71,7 +69,7 @@ export class ApplicationsBroker
       );
     }
 
-    const app: applications.IAppElement = descriptor.ctor(this.kernel, this);
+    const app: applications.IAppElement = descriptor.ctor(session);
     const key = app.fullName;
     this.applications.set(key, app);
 

@@ -37,17 +37,18 @@ export class Session extends bases.KernelElement implements sessions.ISession {
 
     await this.kernel.endpoints.closeEndpoint(this.id);
   }
+
   @logging.logMethod()
-  protected waitForReply(
+  protected async waitForReply(
     sequence: string,
     timeout: number = 30000
   ): Promise<messaging.IMessageEvent> {
-    return new Promise<messaging.IMessageEvent>((resolve, reject) => {
+    return await new Promise<messaging.IMessageEvent>((resolve, reject) => {
       const solver = (message: messaging.IMessageEvent): void => {
         clearTimeout(timoutTmr);
         resolve(message);
       };
-      let timoutTmr = setTimeout(() => {
+      const timoutTmr = setTimeout(() => {
         clearTimeout(timoutTmr);
         this.emitter.off(sequence, solver);
 
