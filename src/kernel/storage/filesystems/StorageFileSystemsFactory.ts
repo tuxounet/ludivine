@@ -26,6 +26,7 @@ export class StorageFileSystemsFactory extends bases.KernelElement {
     await super.shutdown();
   }
 
+  @logging.logMethod()
   getOneDriver<
     T extends storage.IStorageFileSystemDriver,
     TProps extends Record<string, unknown>

@@ -1,4 +1,4 @@
-import { bases, kernel, sessions } from "@ludivine/runtime";
+import { bases, kernel, logging, sessions } from "@ludivine/runtime";
 
 export class ShellApp extends bases.AppElement {
   constructor(readonly session: sessions.ISession) {
@@ -7,37 +7,32 @@ export class ShellApp extends bases.AppElement {
 
   readonly imperativePrefix = "!";
 
+  @logging.logMethod()
   protected async main(): Promise<number> {
     await this.session.output({ type: "message", body: "bonjour" });
-
     while (this.kernel.started) {
-      const inputMessage = await this.session.input({ prompt: ">" });
-      console.info("hoho", inputMessage);
-      if (inputMessage === undefined || inputMessage.value === undefined) {
+      const input = await this.session.input({ prompt: ">" });
+      if (input === undefined || input.value === undefined) {
         await this.session.output({ type: "message", body: "commande vide" });
-        continue;
       }
-      const inputLine = String(inputMessage.value);
-      console.info("!!!!!", inputLine);
+      const inputLine = String(input.value);
+      await this.session.output({
+        type: "message",
+        body: "commande reçue : " + inputLine,
+      });
+
       if (inputLine.startsWith(this.imperativePrefix)) {
         await this.processCommand(inputLine);
-        break;
       } else {
         await this.kernel.messaging.publish("/channels/input/natural", {
           command: inputLine,
         });
       }
-
-      await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 1000);
-      });
-      continue;
     }
     return 0;
   }
 
+  @logging.logMethod()
   private async processCommand(raw: string): Promise<void> {
     const cleanCommand = raw.replace(this.imperativePrefix, "").trim();
 
