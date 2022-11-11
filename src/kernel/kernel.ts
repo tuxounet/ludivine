@@ -1,6 +1,5 @@
 import { kernel, sys, ioc, logging, applications } from "@ludivine/runtime";
 import { MessagingBroker } from "./brokers/messaging/MessagingBroker";
-
 import { ComputeBroker } from "./brokers/compute/ComputeBroker";
 import { ApplicationsBroker } from "./brokers/applications/ApplicationsBroker";
 import { StoragesBroker } from "./brokers/storage/StoragesBroker";
@@ -31,7 +30,6 @@ export class Kernel implements kernel.IKernel {
     this.brokers = new Map();
     this.logs = new InitialLogBroker(this);
     this.container = new ioc.Container(this);
-
     this.started = false;
   }
 
@@ -50,9 +48,8 @@ export class Kernel implements kernel.IKernel {
     );
 
     // boot
-
     await this.initialize();
-    const rc = await this.listen();
+    const rc = await this.execute();
     await this.shutdown();
     return rc;
   };
@@ -66,7 +63,7 @@ export class Kernel implements kernel.IKernel {
     });
   };
 
-  async initialize(): Promise<void> {
+  private async initialize(): Promise<void> {
     this.container.registerType("storage", StoragesBroker, [this]);
     this.container.registerType("logs", LogsBroker, [this]);
     this.container.registerType("compute", ComputeBroker, [this]);
@@ -90,22 +87,21 @@ export class Kernel implements kernel.IKernel {
 
     this.started = true;
   }
+  private async shutdown(): Promise<void> {
+    this.started = false;
 
-  public async service(): Promise<number> {
+    await this.container.shutdown();
+  }
+
+  private async endpoint(): Promise<number> {
     return 0;
   }
 
-  private async listen(): Promise<number> {
+  private async execute(): Promise<number> {
     // await this.channels.openAllInputs();
     // await this.channels.openAllOutputs();
     const applications =
       this.container.get<applications.IApplicationsBroker>("applications");
     return await applications.executeRootProcess();
-  }
-
-  async shutdown(): Promise<void> {
-    this.started = false;
-
-    await this.container.shutdown();
   }
 }
