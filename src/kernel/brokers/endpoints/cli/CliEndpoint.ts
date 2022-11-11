@@ -1,10 +1,7 @@
 import { bases, channels, endpoints, sessions } from "@ludivine/runtime";
 import readline from "readline";
 import { EndpointsBroker } from "../EndpointsBroker";
-export class CliEndpoint
-  extends bases.KernelElement
-  implements endpoints.IEndpoint
-{
+export class CliEndpoint extends bases.KernelElement {
   constructor(
     readonly session: sessions.ISession,
     readonly parent: EndpointsBroker

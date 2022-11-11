@@ -1,4 +1,12 @@
-import { kernel, sys, ioc, logging, applications } from "@ludivine/runtime";
+import {
+  kernel,
+  sys,
+  ioc,
+  logging,
+  applications,
+  sessions,
+  endpoints,
+} from "@ludivine/runtime";
 import { MessagingBroker } from "./brokers/messaging/MessagingBroker";
 import { ComputeBroker } from "./brokers/compute/ComputeBroker";
 import { ApplicationsBroker } from "./brokers/applications/ApplicationsBroker";
@@ -26,6 +34,7 @@ export class Kernel implements kernel.IKernel {
       "package.json"
     );
     this.version = pkg.version;
+
     this.production = process.env.NODE_ENV === "production";
     this.brokers = new Map();
     this.logs = new InitialLogBroker(this);
@@ -35,21 +44,27 @@ export class Kernel implements kernel.IKernel {
 
   logs: logging.ILogsBroker;
 
-  run = async (commandLine?: string[]): Promise<number> => {
-    // Greetings
+  run = async (args: string[]): Promise<number> => {
     console.info(
       this.nickname,
       this.version,
       ">",
-      commandLine?.join(" "),
+      "[",
+      args.join(","),
+      "]",
       "(",
       this.options.cwdFolder,
       ")"
     );
 
-    // boot
     await this.initialize();
-    const rc = await this.execute();
+    let rc = 0;
+    if (args.length === 0) {
+      rc = await this.endpoint();
+    } else {
+      rc = await this.eval(args.join(" "));
+    }
+
     await this.shutdown();
     return rc;
   };
@@ -62,6 +77,24 @@ export class Kernel implements kernel.IKernel {
       }, 100);
     });
   };
+
+  async waitForShutdown(sender: string): Promise<void> {
+    this.logs.output({
+      level: logging.LogLevel.DEBUG,
+      date: new Date().toISOString(),
+      line: "waiting until end by " + sender,
+      sender: sender,
+    });
+    let loopinterval: NodeJS.Timer;
+    await new Promise<void>((resolve) => {
+      loopinterval = setInterval(() => {
+        if (!this.started) {
+          clearInterval(loopinterval);
+          resolve();
+        }
+      }, 50);
+    });
+  }
 
   private async initialize(): Promise<void> {
     this.container.registerType("storage", StoragesBroker, [this]);
@@ -89,19 +122,31 @@ export class Kernel implements kernel.IKernel {
   }
   private async shutdown(): Promise<void> {
     this.started = false;
-
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 100);
+    });
     await this.container.shutdown();
   }
 
   private async endpoint(): Promise<number> {
+    const endpoints =
+      this.container.get<endpoints.IEndpointsBroker>("endpoints");
+    await endpoints.openEndpoint("tui");
+    await endpoints.closeEndpoint("tui");
     return 0;
   }
 
-  private async execute(): Promise<number> {
-    // await this.channels.openAllInputs();
-    // await this.channels.openAllOutputs();
+  private async eval(request: string): Promise<number> {
+    const sessions = this.container.get<sessions.ISessionsBroker>("sessions");
+    const sessionId = await sessions.begin();
     const applications =
       this.container.get<applications.IApplicationsBroker>("applications");
-    return await applications.executeRootProcess();
+
+    const result = await applications.eval(sessionId, request);
+
+    await sessions.terminate(sessionId);
+    return result;
   }
 }

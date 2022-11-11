@@ -15,10 +15,10 @@ export class ModulesBroker
     super("modules", kernel);
     this.modules = new Map();
     this.requiredModules = [
-      // {
-      //   name: "@ludivine-apps/shell-natural",
-      //   upstream: "@ludivine-apps/shell-natural",
-      // },
+      {
+        name: "@ludivine/endpoints-tui",
+        upstream: "../../../ludivine-endpoints-tui",
+      },
     ];
     this.storage = this.kernel.container.get("storage");
     this.compute = this.kernel.container.get("compute");

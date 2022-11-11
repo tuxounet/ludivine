@@ -40,19 +40,6 @@ export class ApplicationsBroker
     await super.shutdown();
   }
 
-  async executeRootProcess(): Promise<number> {
-    const sessionId = await this.sessions.begin();
-    const session = await this.sessions.get(sessionId);
-
-    const shellApp = new ShellApp(session);
-    this.applications.set(shellApp.fullName, shellApp);
-
-    const apps = [shellApp.execute()];
-
-    const rcs = await Promise.all(apps);
-    return rcs.filter((item) => item > 0).length;
-  }
-
   private readonly findApplicationDescriptor = async (
     name: string
   ): Promise<modules.IModuleApplicationDescriptor | undefined> => {
@@ -61,6 +48,17 @@ export class ApplicationsBroker
       .flat()
       .find((item) => item?.name === name);
 
+    return result;
+  };
+
+  eval = async (sessionId: string, request: string): Promise<number> => {
+    const session = await this.sessions.get(sessionId);
+
+    const shellApp = new ShellApp(session, request);
+    this.applications.set(shellApp.fullName, shellApp);
+
+    const result = await shellApp.execute();
+    this.applications.delete(shellApp.fullName);
     return result;
   };
 

@@ -25,7 +25,6 @@ export class Session extends bases.KernelElement implements sessions.ISession {
 
   @logging.logMethod()
   async initialize(): Promise<void> {
-    await this.parent.endpoints.openEndpoint(this, "cli");
     await this.parent.messaging.subscribeTopic("/sessions/" + this.id, this);
   }
 
@@ -35,8 +34,6 @@ export class Session extends bases.KernelElement implements sessions.ISession {
       "/sessions/" + this.id,
       this.fullName
     );
-
-    await this.parent.endpoints.closeEndpoint(this.id);
   }
 
   @logging.logMethod()
@@ -70,8 +67,10 @@ export class Session extends bases.KernelElement implements sessions.ISession {
 
   @logging.logMethod()
   async output(out: channels.IOutputMessage): Promise<void> {
-    const endpoint = await this.parent.endpoints.get(this.id);
-    await endpoint.emitOutput(out);
+    this.sequence++;
+    const sequence = "O" + String(this.sequence);
+
+    await this.pushFact(sequence, "output", { ...out });
   }
 
   @logging.logMethod()
@@ -81,15 +80,11 @@ export class Session extends bases.KernelElement implements sessions.ISession {
     this.sequence++;
 
     const sequence = "I" + String(this.sequence);
-    const endpoint = await this.parent.endpoints.get(this.id);
 
-    await endpoint.emitEvent({
-      type: "input",
-      body: JSON.stringify({
-        session: this.id,
-        sequence,
-        query,
-      }),
+    await this.pushFact(sequence, "input", {
+      session: this.id,
+      sequence,
+      query,
     });
 
     const message = await this.waitForReply(sequence);
@@ -114,4 +109,11 @@ export class Session extends bases.KernelElement implements sessions.ISession {
     this.log.warn("terminate query ");
     return true;
   }
+
+  @logging.logMethod()
+  private async pushFact(
+    sequence: string,
+    type: string,
+    datas: Record<string, unknown>
+  ) {}
 }

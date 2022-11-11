@@ -3,7 +3,6 @@ import {
   errors,
   logging,
   sessions,
-  endpoints,
   messaging,
   kernel,
 } from "@ludivine/runtime";
@@ -17,11 +16,8 @@ export class SessionsBroker
   constructor(readonly kernel: kernel.IKernel) {
     super("sessions", kernel);
     this.sessions = new Map();
-    this.endpoints = this.kernel.container.get("endpoints");
     this.messaging = this.kernel.container.get("messaging");
   }
-
-  endpoints: endpoints.IEndpointsBroker;
 
   messaging: messaging.IMessagingBroker;
 
@@ -42,7 +38,7 @@ export class SessionsBroker
     const session = new Session(id, this);
     this.sessions.set(id, session);
     await session.initialize();
-    await this.endpoints.openEndpoint(session, "cli");
+
     return id;
   };
 
@@ -58,7 +54,7 @@ export class SessionsBroker
     if (!this.sessions.has(id)) return false;
     const session = this.sessions.get(id);
     if (session == null) return false;
-    await this.endpoints.closeEndpoint(session.id);
+
     await session.terminate();
     await session.shutdown();
     this.sessions.delete(id);
