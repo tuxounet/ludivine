@@ -9,7 +9,7 @@
     "build": "rollup -c",
     "start": "node .",
     "predev": "npm install --prefer-offline",
-    "dev": "nodemon",
+    "dev": "nodemon -I",
     "lint": "eslint ./ --fix",
     "nuke": "rm -rf node_modules package-lock.json",
     "prenuke": "npm run clean",

@@ -41,14 +41,8 @@ export class EndpointsBroker
     const endpoint = descriptor.ctor(this);
     await endpoint.initialize();
     this.endpoints.set(name, endpoint);
-
-    const endpointProms = [
-      endpoint.renderUI(),
-      endpoint.listenAPI(),
-      this.kernel.waitForShutdown(this.fullName),
-    ];
-
-    await Promise.race(endpointProms);
+    await endpoint.listenAPI();
+    await endpoint.renderUI();
   }
 
   @logging.logMethod()
