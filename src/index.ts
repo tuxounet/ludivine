@@ -2,9 +2,13 @@
 
 import { Kernel } from "./kernel/kernel";
 
-const kernel = new Kernel(__dirname);
+const kernel = new Kernel({
+  nickname: "ludivine",
+  cwdFolder: process.cwd(),
+  entryPoint: __dirname,
+});
 kernel
-  .run()
+  .run(process.argv)
   .then((rc) => {
     console.info("INFO", "end with result", rc);
     process.exit(rc);

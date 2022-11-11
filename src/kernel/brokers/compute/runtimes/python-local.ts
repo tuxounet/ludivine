@@ -1,8 +1,9 @@
-import { bases, kernel, storage } from "@ludivine/runtime";
+import { bases, storage } from "@ludivine/runtime";
+import { ComputeBroker } from "../ComputeBroker";
 
 export class ComputeRuntimePython extends bases.ComputeRuntimeElement {
-  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
-    super("python-local", "python3", "-c", kernel, parent);
+  constructor(readonly parent: ComputeBroker) {
+    super("python-local", "python3", "-c", parent.kernel, parent);
     this.commandsDependencies = [
       {
         name: "python3",
@@ -17,7 +18,7 @@ export class ComputeRuntimePython extends bases.ComputeRuntimeElement {
     name: string,
     runVolume: storage.IStorageVolume
   ): Promise<number> {
-    const result = await this.kernel.compute.executeEval(
+    const result = await this.parent.executeEval(
       "bash-local",
       `pip install ${name}`,
       runVolume

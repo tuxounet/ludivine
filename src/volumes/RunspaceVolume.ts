@@ -6,10 +6,14 @@ export class RunspaceVolume extends storage.StorageVolume {
       "runspace",
       false,
       true,
-      kernel.storage.createPathsDriver("local"),
-      kernel.storage.createFileSystemDriver("local", {
-        folder: "run/task",
-      }),
+      kernel.container
+        .get<storage.IStorageBroker>("storage")
+        .createPathsDriver("local"),
+      kernel.container
+        .get<storage.IStorageBroker>("storage")
+        .createFileSystemDriver("local", {
+          folder: "run/task",
+        }),
       kernel,
       parent
     );

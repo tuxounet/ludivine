@@ -1,19 +1,20 @@
 import {
   bases,
   channels,
-  kernel,
   logging,
   messaging,
   sessions,
 } from "@ludivine/runtime";
 import events from "events";
+import { SessionsBroker } from "./SessionsBroker";
+
 export class Session extends bases.KernelElement implements sessions.ISession {
   constructor(
     readonly id: string,
-    kernel: kernel.IKernel,
-    parent?: kernel.IKernelElement
+
+    readonly parent: SessionsBroker
   ) {
-    super(id, kernel, parent);
+    super(id, parent.kernel, parent);
     this.sequence = 0;
 
     this.emitter = new events.EventEmitter();
@@ -24,18 +25,18 @@ export class Session extends bases.KernelElement implements sessions.ISession {
 
   @logging.logMethod()
   async initialize(): Promise<void> {
-    await this.kernel.endpoints.openEndpoint(this, "cli");
-    await this.kernel.messaging.subscribeTopic("/sessions/" + this.id, this);
+    await this.parent.endpoints.openEndpoint(this, "cli");
+    await this.parent.messaging.subscribeTopic("/sessions/" + this.id, this);
   }
 
   @logging.logMethod()
   async shutdown(): Promise<void> {
-    await this.kernel.messaging.unsubscribeTopic(
+    await this.parent.messaging.unsubscribeTopic(
       "/sessions/" + this.id,
       this.fullName
     );
 
-    await this.kernel.endpoints.closeEndpoint(this.id);
+    await this.parent.endpoints.closeEndpoint(this.id);
   }
 
   @logging.logMethod()
@@ -69,7 +70,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
 
   @logging.logMethod()
   async output(out: channels.IOutputMessage): Promise<void> {
-    const endpoint = await this.kernel.endpoints.get(this.id);
+    const endpoint = await this.parent.endpoints.get(this.id);
     await endpoint.emitOutput(out);
   }
 
@@ -80,7 +81,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
     this.sequence++;
 
     const sequence = "I" + String(this.sequence);
-    const endpoint = await this.kernel.endpoints.get(this.id);
+    const endpoint = await this.parent.endpoints.get(this.id);
 
     await endpoint.emitEvent({
       type: "input",

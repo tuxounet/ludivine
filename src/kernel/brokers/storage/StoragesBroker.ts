@@ -1,10 +1,12 @@
-import { bases, kernel, storage, errors, logging } from "@ludivine/runtime";
-import { LogsVolume } from "../../volumes/LogsVolume";
-import { ModulesVolume } from "../../volumes/ModulesVolume";
-import { RunspaceVolume } from "../../volumes/RunspaceVolume";
-import { WorkspaceVolume } from "../../volumes/WorkspaceVolume";
+import { bases, storage, errors, logging, kernel } from "@ludivine/runtime";
+import { LogsVolume } from "../../../volumes/LogsVolume";
+import { ModulesVolume } from "../../../volumes/ModulesVolume";
+import { RunspaceVolume } from "../../../volumes/RunspaceVolume";
+import { WorkspaceVolume } from "../../../volumes/WorkspaceVolume";
+
 import { StorageFileSystemsFactory } from "./filesystems/StorageFileSystemsFactory";
 import { StoragePathsFactory } from "./paths/StoragePathsFactory";
+
 export class StoragesBroker
   extends bases.KernelElement
   implements storage.IStorageBroker

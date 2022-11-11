@@ -1,10 +1,10 @@
-import { bases, kernel, logging } from "@ludivine/runtime";
+import { bases, logging } from "@ludivine/runtime";
 export class LogTargetConsole
   extends bases.KernelElement
   implements logging.ILogTarget
 {
-  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
-    super("log-target-console", kernel, parent);
+  constructor(readonly parent: logging.ILogsBroker) {
+    super("log-target-console", parent.kernel, parent);
   }
 
   appendLog(line: logging.ILogLine): void {

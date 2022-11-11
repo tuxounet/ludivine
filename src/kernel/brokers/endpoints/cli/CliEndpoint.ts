@@ -1,18 +1,13 @@
-import {
-  bases,
-  channels,
-  endpoints,
-  kernel,
-  sessions,
-} from "@ludivine/runtime";
+import { bases, channels, endpoints, sessions } from "@ludivine/runtime";
 import readline from "readline";
+import { EndpointsBroker } from "../EndpointsBroker";
 export class CliEndpoint
   extends bases.KernelElement
   implements endpoints.IEndpoint
 {
   constructor(
     readonly session: sessions.ISession,
-    parent: kernel.IKernelElement
+    readonly parent: EndpointsBroker
   ) {
     super("cli-endpoint", session.kernel, parent);
   }
@@ -42,7 +37,7 @@ export class CliEndpoint
             (response) => {
               if (currentRl != null) currentRl.close();
 
-              this.kernel.messaging
+              this.parent.messaging
                 .publish("/sessions/" + this.session.id, {
                   session: this.session.id,
                   sequence: datas.sequence,

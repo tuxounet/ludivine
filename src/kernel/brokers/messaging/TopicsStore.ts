@@ -4,7 +4,7 @@ export class TopicsStore extends bases.KernelElement {
     readonly kernel: kernel.IKernel,
     readonly parent: kernel.IKernelElement
   ) {
-    super("topics-store", kernel, parent);
+    super("topics", kernel, parent);
     this.topics = new Map();
   }
 

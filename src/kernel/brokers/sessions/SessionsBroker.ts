@@ -1,4 +1,13 @@
-import { bases, errors, kernel, logging, sessions } from "@ludivine/runtime";
+import {
+  bases,
+  errors,
+  logging,
+  sessions,
+  endpoints,
+  messaging,
+  kernel,
+} from "@ludivine/runtime";
+
 import { Session } from "./Session";
 
 export class SessionsBroker
@@ -8,7 +17,13 @@ export class SessionsBroker
   constructor(readonly kernel: kernel.IKernel) {
     super("sessions", kernel);
     this.sessions = new Map();
+    this.endpoints = this.kernel.container.get("endpoints");
+    this.messaging = this.kernel.container.get("messaging");
   }
+
+  endpoints: endpoints.IEndpointsBroker;
+
+  messaging: messaging.IMessagingBroker;
 
   sessions: Map<string, sessions.ISession>;
 
@@ -24,10 +39,10 @@ export class SessionsBroker
 
   begin = async (): Promise<string> => {
     const id = "session-" + String(this.sessions.size + 1);
-    const session = new Session(id, this.kernel, this);
+    const session = new Session(id, this);
     this.sessions.set(id, session);
     await session.initialize();
-    await this.kernel.endpoints.openEndpoint(session, "cli");
+    await this.endpoints.openEndpoint(session, "cli");
     return id;
   };
 
@@ -43,7 +58,7 @@ export class SessionsBroker
     if (!this.sessions.has(id)) return false;
     const session = this.sessions.get(id);
     if (session == null) return false;
-    await this.kernel.endpoints.closeEndpoint(session.id);
+    await this.endpoints.closeEndpoint(session.id);
     await session.terminate();
     await session.shutdown();
     this.sessions.delete(id);

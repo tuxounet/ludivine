@@ -1,19 +1,20 @@
-import { ComputeRuntimeBash } from "../../runtimes/bash-local";
-import { ComputeRuntimeJavascript } from "../../runtimes/javascript-local";
-import { ComputeRuntimePython } from "../../runtimes/python-local";
-import { ComputeRuntimeTypescript } from "../../runtimes/typescript-local";
-import { bases, kernel, compute, errors, storage } from "@ludivine/runtime";
+import { ComputeRuntimeBash } from "./runtimes/bash-local";
+import { ComputeRuntimeJavascript } from "./runtimes/javascript-local";
+import { ComputeRuntimePython } from "./runtimes/python-local";
+import { ComputeRuntimeTypescript } from "./runtimes/typescript-local";
+import { bases, compute, errors, storage, kernel } from "@ludivine/runtime";
+
 export class ComputeBroker
   extends bases.KernelElement
   implements compute.IComputeBroker
 {
   constructor(readonly kernel: kernel.IKernel) {
-    super("compute-broker", kernel);
+    super("compute", kernel);
     this.runtimes = [
-      new ComputeRuntimeBash(kernel, this),
-      new ComputeRuntimePython(kernel, this),
-      new ComputeRuntimeJavascript(kernel, this),
-      new ComputeRuntimeTypescript(kernel, this),
+      new ComputeRuntimeBash(this),
+      new ComputeRuntimePython(this),
+      new ComputeRuntimeJavascript(this),
+      new ComputeRuntimeTypescript(this),
     ];
   }
 
@@ -44,8 +45,10 @@ export class ComputeBroker
         runtime
       );
     }
-
-    return await localRuntime.executeEval(strToEval, runVolume);
+    await localRuntime.provision();
+    const result = await localRuntime.executeEval(strToEval, runVolume);
+    await localRuntime.unprovision();
+    return result;
   }
 
   async executeSource(

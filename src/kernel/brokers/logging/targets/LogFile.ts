@@ -1,13 +1,13 @@
-import { bases, kernel, logging, messaging } from "@ludivine/runtime";
+import { bases, logging, messaging } from "@ludivine/runtime";
+import { LogsBroker } from "../LogsBroker";
 
 export class LogTargetFile
   extends bases.KernelElement
   implements logging.ILogTarget
 {
-  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
-    super("log-target-file", kernel, parent);
-
-    this.queue = new messaging.Queue("logging", kernel, this);
+  constructor(readonly parent: LogsBroker) {
+    super("log-target-file", parent.kernel, parent);
+    this.queue = new messaging.Queue("logging", parent.kernel, this);
   }
 
   private outputInterval?: NodeJS.Timer;
@@ -52,7 +52,7 @@ export class LogTargetFile
   }
 
   private async appendLines(lines: logging.ILogLine[]): Promise<boolean> {
-    const logVolume = await this.kernel.storage.getVolume(this.LOG_VOLUME_NAME);
+    const logVolume = await this.parent.storage.getVolume(this.LOG_VOLUME_NAME);
     let dump = lines
       .map((item) => {
         return `${item.date} ${item.level} ${item.sender} ${item.line}`;
@@ -71,7 +71,7 @@ export class LogTargetFile
   }
 
   private async purgeLogFiles(): Promise<void> {
-    const logVolume = await this.kernel.storage.getVolume(this.LOG_VOLUME_NAME);
+    const logVolume = await this.parent.storage.getVolume(this.LOG_VOLUME_NAME);
     const allFiles = await logVolume.fileSystem.list("");
     const allLogsFiles = allFiles
       .filter((item) => item.path.endsWith(this.LOG_FILENAME_SUFFIX))

@@ -4,7 +4,7 @@ export class QueuesStore extends bases.KernelElement {
     readonly kernel: kernel.IKernel,
     readonly parent: kernel.IKernelElement
   ) {
-    super("queues-store", kernel, parent);
+    super("queues", kernel, parent);
     this.queues = new Map();
   }
 

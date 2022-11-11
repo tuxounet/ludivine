@@ -1,11 +1,18 @@
-import { bases, errors, kernel, modules } from "@ludivine/runtime";
+import {
+  bases,
+  errors,
+  modules,
+  kernel,
+  storage,
+  compute,
+} from "@ludivine/runtime";
 
 export class ModulesBroker
   extends bases.KernelElement
   implements modules.IModulesBroker
 {
-  constructor(kernel: kernel.IKernel) {
-    super("modules-broker", kernel);
+  constructor(readonly kernel: kernel.IKernel) {
+    super("modules", kernel);
     this.modules = new Map();
     this.requiredModules = [
       // {
@@ -13,18 +20,24 @@ export class ModulesBroker
       //   upstream: "@ludivine-apps/shell-natural",
       // },
     ];
+    this.storage = this.kernel.container.get("storage");
+    this.compute = this.kernel.container.get("compute");
   }
+
+  storage: storage.IStorageBroker;
+
+  compute: compute.IComputeBroker;
 
   modules: Map<string, modules.IRuntimeModule>;
 
   requiredModules: modules.IRuntimeModuleSource[];
 
   async initialize(): Promise<void> {
-    const modulesVolume = await this.kernel.storage.getVolume("modules");
+    const modulesVolume = await this.storage.getVolume("modules");
 
     const setuped = await modulesVolume.fileSystem.existsFile("package.json");
     if (!setuped) {
-      await this.kernel.compute.executeEval(
+      await this.compute.executeEval(
         "bash-local",
         "npm init -y",
         modulesVolume
@@ -49,7 +62,7 @@ export class ModulesBroker
   findModule = async (
     name: string
   ): Promise<modules.IRuntimeModule | undefined> => {
-    const modulesVolume = await this.kernel.storage.getVolume("modules");
+    const modulesVolume = await this.storage.getVolume("modules");
 
     const pkgExists = await modulesVolume.fileSystem.existsFile("package.json");
     if (!pkgExists) {
@@ -81,9 +94,9 @@ export class ModulesBroker
   registerModule = async (
     source: modules.IRuntimeModuleSource
   ): Promise<modules.IRuntimeModule> => {
-    const modulesVolume = await this.kernel.storage.getVolume("modules");
+    const modulesVolume = await this.storage.getVolume("modules");
     const cmd = `npm install --save ${source.upstream}`;
-    const result = await this.kernel.compute.executeEval(
+    const result = await this.compute.executeEval(
       "bash-local",
       cmd,
       modulesVolume

@@ -1,49 +1,61 @@
-import { kernel } from "@ludivine/runtime";
-import { MessagingBroker } from "./messaging/MessagingBroker";
-import { EndpointsBroker } from "./endpoints/EndpointsBroker";
-import { ComputeBroker } from "./compute/ComputeBroker";
-import { ApplicationsBroker } from "./applications/ApplicationsBroker";
-import { LogBroker } from "./logging/LogBroker";
-import { StoragesBroker } from "./storage/StoragesBroker";
-import { ModulesBroker } from "./modules/ModulesBroker";
-import { SessionsBroker } from "./sessions/SessionsBroker";
+import { kernel, sys, ioc, logging, applications } from "@ludivine/runtime";
+import { MessagingBroker } from "./brokers/messaging/MessagingBroker";
+
+import { ComputeBroker } from "./brokers/compute/ComputeBroker";
+import { ApplicationsBroker } from "./brokers/applications/ApplicationsBroker";
+import { StoragesBroker } from "./brokers/storage/StoragesBroker";
+import { InitialLogBroker } from "./brokers/logging/InitialLogBroker";
+import { LogsBroker } from "./brokers/logging/LogsBroker";
+import { ModulesBroker } from "./brokers/modules/ModulesBroker";
+import { EndpointsBroker } from "./brokers/endpoints/EndpointsBroker";
+import { SessionsBroker } from "./brokers/sessions/SessionsBroker";
 
 export class Kernel implements kernel.IKernel {
   production: boolean;
   started: boolean;
-  applications: ApplicationsBroker;
-  messaging: MessagingBroker;
-  endpoints: EndpointsBroker;
-  compute: ComputeBroker;
-  logging: LogBroker;
-  storage: StoragesBroker;
-  modules: ModulesBroker;
-  sessions: SessionsBroker;
-  constructor(readonly entryPoint: string) {
-    this.fullName = "kernel";
-    this.version = "0.0";
+  readonly version: string;
+  readonly nickname: string;
+  container: ioc.Container;
+
+  brokers: Map<string, kernel.IKernelBroker>;
+
+  constructor(readonly options: kernel.IKernelOptions) {
+    this.nickname = options.nickname != null ? options.nickname : "ludivine";
+    const pkg = sys.files.readJSONFileSync(
+      options.entryPoint,
+      "..",
+      "package.json"
+    );
+    this.version = pkg.version;
     this.production = process.env.NODE_ENV === "production";
-    this.logging = new LogBroker(this);
-    this.messaging = new MessagingBroker(this);
-    this.sessions = new SessionsBroker(this);
-    this.compute = new ComputeBroker(this);
-    // this.channels = new ChannelsBroker(this);
-    this.applications = new ApplicationsBroker(this);
-    this.storage = new StoragesBroker(this);
-    this.endpoints = new EndpointsBroker(this);
-    this.modules = new ModulesBroker(this);
+    this.brokers = new Map();
+    this.logs = new InitialLogBroker(this);
+    this.container = new ioc.Container(this);
+
     this.started = false;
   }
 
-  version: string;
-  fullName: string;
+  logs: logging.ILogsBroker;
 
-  async run(): Promise<number> {
+  run = async (commandLine?: string[]): Promise<number> => {
+    // Greetings
+    console.info(
+      this.nickname,
+      this.version,
+      ">",
+      commandLine?.join(" "),
+      "(",
+      this.options.cwdFolder,
+      ")"
+    );
+
+    // boot
+
     await this.initialize();
     const rc = await this.listen();
     await this.shutdown();
     return rc;
-  }
+  };
 
   askShutdown = async (): Promise<void> => {
     await new Promise<void>((resolve) => {
@@ -55,32 +67,45 @@ export class Kernel implements kernel.IKernel {
   };
 
   async initialize(): Promise<void> {
-    await this.storage.initialize();
-    await this.logging.initialize();
-    await this.modules.initialize();
-    await this.compute.initialize();
-    await this.sessions.initialize();
-    // await this.channels.initialize();
-    await this.endpoints.initialize();
-    await this.applications.initialize();
+    this.container.registerType("storage", StoragesBroker, [this]);
+    this.container.registerType("logs", LogsBroker, [this]);
+    this.container.registerType("compute", ComputeBroker, [this]);
+    this.container.registerType("messaging", MessagingBroker, [this]);
+    this.container.registerType("modules", ModulesBroker, [this]);
+    this.container.registerType("endpoints", EndpointsBroker, [this]);
+    this.container.registerType("sessions", SessionsBroker, [this]);
+    this.container.registerType("applications", ApplicationsBroker, [this]);
+
+    const bootOrder = [
+      "storage",
+      "logs",
+      "compute",
+      "messaging",
+      "modules",
+      "endpoints",
+      "sessions",
+      "applications",
+    ];
+    await this.container.initialize(bootOrder);
+
     this.started = true;
+  }
+
+  public async service(): Promise<number> {
+    return 0;
   }
 
   private async listen(): Promise<number> {
     // await this.channels.openAllInputs();
     // await this.channels.openAllOutputs();
-    return await this.applications.executeRootProcess();
+    const applications =
+      this.container.get<applications.IApplicationsBroker>("applications");
+    return await applications.executeRootProcess();
   }
 
   async shutdown(): Promise<void> {
     this.started = false;
-    await this.applications.shutdown();
-    await this.endpoints.shutdown();
-    await this.sessions.shutdown();
-    // await this.channels.shutdown();
-    await this.compute.shutdown();
-    await this.modules.shutdown();
-    await this.logging.shutdown();
-    await this.storage.shutdown();
+
+    await this.container.shutdown();
   }
 }

@@ -1,4 +1,5 @@
-import { bases, kernel, messaging, errors, logging } from "@ludivine/runtime";
+import { bases, messaging, errors, logging, kernel } from "@ludivine/runtime";
+
 import { QueuesStore } from "./QueuesStore";
 import { TopicsStore } from "./TopicsStore";
 
@@ -6,8 +7,8 @@ export class MessagingBroker
   extends bases.KernelElement
   implements messaging.IMessagingBroker
 {
-  constructor(kernel: kernel.IKernel) {
-    super("topic-broker", kernel);
+  constructor(readonly kernel: kernel.IKernel) {
+    super("messaging", kernel);
     this.topicsStore = new TopicsStore(this.kernel, this);
     this.queuesStore = new QueuesStore(this.kernel, this);
   }

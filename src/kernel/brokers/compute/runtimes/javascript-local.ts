@@ -1,8 +1,9 @@
-import { bases, kernel, storage } from "@ludivine/runtime";
+import { bases, storage } from "@ludivine/runtime";
+import { ComputeBroker } from "../ComputeBroker";
 
 export class ComputeRuntimeJavascript extends bases.ComputeRuntimeElement {
-  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
-    super("javascript-local", "node ", "--eval", kernel, parent);
+  constructor(readonly parent: ComputeBroker) {
+    super("javascript-local", "node ", "--eval", parent.kernel, parent);
     this.commandsDependencies = [
       {
         name: "node",
@@ -14,7 +15,7 @@ export class ComputeRuntimeJavascript extends bases.ComputeRuntimeElement {
     name: string,
     runVolume: storage.IStorageVolume
   ): Promise<number> {
-    const result = await this.kernel.compute.executeEval(
+    const result = await this.parent.executeEval(
       "bash-local",
       `npm install --prefer-offline ${name}`,
       runVolume
