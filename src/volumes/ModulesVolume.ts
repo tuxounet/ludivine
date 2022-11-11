@@ -6,10 +6,14 @@ export class ModulesVolume extends storage.StorageVolume {
       "modules",
       false,
       true,
-      kernel.storage.createPathsDriver("local"),
-      kernel.storage.createFileSystemDriver("local", {
-        folder: "run/modules",
-      }),
+      kernel.container
+        .get<storage.IStorageBroker>("storage")
+        .createPathsDriver("local"),
+      kernel.container
+        .get<storage.IStorageBroker>("storage")
+        .createFileSystemDriver("local", {
+          folder: "run/modules",
+        }),
       kernel,
       parent
     );

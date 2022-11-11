@@ -29,7 +29,7 @@ export class ShellApp extends bases.AppElement {
       if (inputLine.startsWith(this.imperativePrefix)) {
         await this.processCommand(inputLine);
       } else {
-        await this.kernel.messaging.publish("/channels/input/natural", {
+        await this.messaging.publish("/channels/input/natural", {
           command: inputLine,
         });
       }

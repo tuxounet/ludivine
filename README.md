@@ -1,9 +1,11 @@
 # ludivine
 
-## usage
-
-> magic oneline 
+## USAGE
 
 ```bash
-npx -y -p ludivine
+npx ludivine
+```
+
+```bash
+npx ludivine@latest
 ```

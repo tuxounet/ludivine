@@ -6,10 +6,14 @@ export class LogsVolume extends storage.StorageVolume {
       "logs",
       false,
       true,
-      kernel.storage.createPathsDriver("local"),
-      kernel.storage.createFileSystemDriver("local", {
-        folder: "run/logs",
-      }),
+      kernel.container
+        .get<storage.IStorageBroker>("storage")
+        .createPathsDriver("local"),
+      kernel.container
+        .get<storage.IStorageBroker>("storage")
+        .createFileSystemDriver("local", {
+          folder: "run/logs",
+        }),
       kernel,
       parent
     );
