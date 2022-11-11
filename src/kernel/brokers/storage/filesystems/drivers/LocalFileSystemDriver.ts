@@ -42,7 +42,7 @@ export class LocalFileSystemDriver
     }
     const folderPath = path.resolve(folderValue);
     if (!fs.existsSync(folderPath)) {
-      fs.mkdirSync(folderPath);
+      fs.mkdirSync(folderPath, { recursive: true });
     }
     return folderPath;
   }
@@ -165,7 +165,7 @@ export class LocalFileSystemDriver
         fullPath
       );
     }
-    fs.mkdirSync(realPath);
+    fs.mkdirSync(realPath, { recursive: true });
     return true;
   }
 
