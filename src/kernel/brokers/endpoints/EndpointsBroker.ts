@@ -30,7 +30,7 @@ export class EndpointsBroker
       await this.closeEndpoint(name);
     }
 
-    const descriptor = await this.findEndpointsDescriptor(name);
+    const descriptor = await this.modules.findEndpointsDescriptor(name);
     if (!descriptor) {
       throw errors.BasicError.notFound(
         this.fullName,
@@ -56,15 +56,4 @@ export class EndpointsBroker
     }
     return endpoint;
   }
-
-  private readonly findEndpointsDescriptor = async (
-    name: string
-  ): Promise<modules.IModuleEndpointDescriptor | undefined> => {
-    const result = Array.from(this.modules.modules.values())
-      .map((item) => item.definition.endpoints)
-      .flat()
-      .find((item) => item?.name === name);
-
-    return result;
-  };
 }

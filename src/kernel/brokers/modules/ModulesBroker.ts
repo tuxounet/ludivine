@@ -5,6 +5,7 @@ import {
   kernel,
   storage,
   compute,
+  logging,
 } from "@ludivine/runtime";
 
 export class ModulesBroker
@@ -32,6 +33,7 @@ export class ModulesBroker
 
   requiredModules: modules.IRuntimeModuleSource[];
 
+  @logging.logMethod()
   async initialize(): Promise<void> {
     const modulesVolume = await this.storage.getVolume("modules");
 
@@ -54,14 +56,14 @@ export class ModulesBroker
     await super.initialize();
   }
 
+  @logging.logMethod()
   async shutdown(): Promise<void> {
     // cleanup npm context
     await super.shutdown();
   }
 
-  findModule = async (
-    name: string
-  ): Promise<modules.IRuntimeModule | undefined> => {
+  @logging.logMethod()
+  async findModule(name: string): Promise<modules.IRuntimeModule | undefined> {
     const modulesVolume = await this.storage.getVolume("modules");
 
     const pkgExists = await modulesVolume.fileSystem.existsFile("package.json");
@@ -89,11 +91,12 @@ export class ModulesBroker
     }
     const instance = this.modules.get(name);
     return instance;
-  };
+  }
 
-  registerModule = async (
+  @logging.logMethod()
+  async registerModule(
     source: modules.IRuntimeModuleSource
-  ): Promise<modules.IRuntimeModule> => {
+  ): Promise<modules.IRuntimeModule> {
     const modulesVolume = await this.storage.getVolume("modules");
     const cmd = `npm install --save ${source.upstream}`;
     const result = await this.compute.executeEval(
@@ -159,9 +162,34 @@ export class ModulesBroker
 
     this.modules.set(module.id, module);
     return module;
-  };
+  }
 
-  unregisterModule = async (id: string): Promise<boolean> => {
+  @logging.logMethod()
+  async unregisterModule(id: string): Promise<boolean> {
     return false;
-  };
+  }
+
+  @logging.logMethod()
+  async findApplicationDescriptor(
+    name: string
+  ): Promise<modules.IModuleApplicationDescriptor | undefined> {
+    const result = Array.from(this.modules.values())
+      .map((item) => item.definition.applications)
+      .flat()
+      .find((item) => item?.name === name);
+
+    return result;
+  }
+
+  @logging.logMethod()
+  async findEndpointsDescriptor(
+    name: string
+  ): Promise<modules.IModuleEndpointDescriptor | undefined> {
+    const result = Array.from(this.modules.values())
+      .map((item) => item.definition.endpoints)
+      .flat()
+      .find((item) => item?.name === name);
+
+    return result;
+  }
 }

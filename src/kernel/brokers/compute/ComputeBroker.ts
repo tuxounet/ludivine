@@ -2,7 +2,14 @@ import { ComputeRuntimeBash } from "./runtimes/bash-local";
 import { ComputeRuntimeJavascript } from "./runtimes/javascript-local";
 import { ComputeRuntimePython } from "./runtimes/python-local";
 import { ComputeRuntimeTypescript } from "./runtimes/typescript-local";
-import { bases, compute, errors, storage, kernel } from "@ludivine/runtime";
+import {
+  bases,
+  compute,
+  errors,
+  storage,
+  kernel,
+  logging,
+} from "@ludivine/runtime";
 
 export class ComputeBroker
   extends bases.KernelElement
@@ -20,18 +27,20 @@ export class ComputeBroker
 
   runtimes: compute.IComputeRuntime[];
 
+  @logging.logMethod()
   async initialize(): Promise<void> {
     await Promise.all(
       this.runtimes.map(async (item) => await item.provision())
     );
   }
-
+  @logging.logMethod()
   async shutdown(): Promise<void> {
     await Promise.all(
       this.runtimes.reverse().map(async (item) => await item.unprovision())
     );
   }
 
+  @logging.logMethod()
   async executeEval(
     runtime: string,
     strToEval: string,
@@ -51,6 +60,7 @@ export class ComputeBroker
     return result;
   }
 
+  @logging.logMethod()
   async executeSource(
     runtime: string,
     sourceVolume: storage.IStorageVolume,

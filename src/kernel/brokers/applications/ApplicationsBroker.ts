@@ -6,6 +6,7 @@ import {
   errors,
   sessions,
   messaging,
+  logging,
 } from "@ludivine/runtime";
 import type { kernel } from "@ludivine/runtime";
 
@@ -27,10 +28,12 @@ export class ApplicationsBroker
 
   readonly applications: Map<string, applications.IAppElement>;
 
+  @logging.logMethod()
   async initialize(): Promise<void> {
     await super.initialize();
   }
 
+  @logging.logMethod()
   async shutdown(): Promise<void> {
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -40,18 +43,8 @@ export class ApplicationsBroker
     await super.shutdown();
   }
 
-  private readonly findApplicationDescriptor = async (
-    name: string
-  ): Promise<modules.IModuleApplicationDescriptor | undefined> => {
-    const result = Array.from(this.modules.modules.values())
-      .map((item) => item.definition.applications)
-      .flat()
-      .find((item) => item?.name === name);
-
-    return result;
-  };
-
-  eval = async (sessionId: string, request: string): Promise<number> => {
+  @logging.logMethod()
+  async eval(sessionId: string, request: string): Promise<number> {
     const session = await this.sessions.get(sessionId);
 
     const shellApp = new ShellApp(session, request);
@@ -60,15 +53,13 @@ export class ApplicationsBroker
     const result = await shellApp.execute();
     this.applications.delete(shellApp.fullName);
     return result;
-  };
+  }
 
-  launchApplication = async (
-    sessionId: string,
-    name: string
-  ): Promise<number> => {
+  @logging.logMethod()
+  async launchApplication(sessionId: string, name: string): Promise<number> {
     const session = await this.sessions.get(sessionId);
 
-    const descriptor = await this.findApplicationDescriptor(name);
+    const descriptor = await this.modules.findApplicationDescriptor(name);
     if (descriptor == null) {
       throw errors.BasicError.notFound(
         this.fullName,
@@ -96,5 +87,5 @@ export class ApplicationsBroker
           descriptor.name
         );
       });
-  };
+  }
 }

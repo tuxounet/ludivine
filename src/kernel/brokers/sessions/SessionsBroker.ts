@@ -33,24 +33,27 @@ export class SessionsBroker
     await super.shutdown();
   }
 
-  begin = async (): Promise<string> => {
+  @logging.logMethod()
+  async begin(): Promise<string> {
     const id = "session-" + String(this.sessions.size + 1);
     const session = new Session(id, this);
     this.sessions.set(id, session);
     await session.initialize();
 
     return id;
-  };
+  }
 
-  get = async (id: string): Promise<sessions.ISession> => {
+  @logging.logMethod()
+  async get(id: string): Promise<sessions.ISession> {
     const instance = this.sessions.get(id);
     if (instance == null) {
       throw errors.BasicError.notFound(this.fullName, "get", id);
     }
     return instance;
-  };
+  }
 
-  terminate = async (id: string): Promise<boolean> => {
+  @logging.logMethod()
+  async terminate(id: string): Promise<boolean> {
     if (!this.sessions.has(id)) return false;
     const session = this.sessions.get(id);
     if (session == null) return false;
@@ -59,5 +62,5 @@ export class SessionsBroker
     await session.shutdown();
     this.sessions.delete(id);
     return true;
-  };
+  }
 }

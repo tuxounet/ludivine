@@ -28,9 +28,9 @@ export class LogsBroker
     await Promise.all(this.targets.map(async (item) => await item.shutdown()));
   }
 
-  output = (line: logging.ILogLine): void => {
+  output(line: logging.ILogLine): void {
     if (line.level.valueOf() < this.level.valueOf()) return;
     if (this.targets.length > 0)
       this.targets.forEach((target) => target.appendLog(line));
-  };
+  }
 }

@@ -10,30 +10,30 @@ export class ShellApp extends bases.AppElement {
   @logging.logMethod()
   protected async main(): Promise<number> {
     await this.session.output({ type: "message", body: "bonjour" });
-    while (this.kernel.started) {
-      const input = await this.session.input({ prompt: ">" });
-      if (input === undefined || input.value === undefined) {
-        await this.session.output({ type: "message", body: "aucune entrée" });
-        continue;
-      }
-      const inputLine = String(input.value).trim();
-      if (inputLine === "") {
-        await this.session.output({ type: "message", body: "commande vide" });
-        continue;
-      }
-      await this.session.output({
-        type: "message",
-        body: "commande reçue : " + inputLine,
-      });
 
-      if (inputLine.startsWith(this.imperativePrefix)) {
-        await this.processCommand(inputLine);
-      } else {
-        await this.messaging.publish("/channels/input/natural", {
-          command: inputLine,
-        });
-      }
+    if (
+      this.request === undefined ||
+      typeof this.request !== "string" ||
+      this.request.trim() === ""
+    ) {
+      await this.session.output({ type: "message", body: "aucune entrée" });
+      return 1;
     }
+    const inputLine = this.request.trim();
+
+    await this.session.output({
+      type: "message",
+      body: "commande reçue : " + inputLine,
+    });
+
+    if (inputLine.startsWith(this.imperativePrefix)) {
+      await this.processCommand(inputLine);
+    } else {
+      await this.messaging.publish("/channels/input/natural", {
+        command: inputLine,
+      });
+    }
+
     return 0;
   }
 

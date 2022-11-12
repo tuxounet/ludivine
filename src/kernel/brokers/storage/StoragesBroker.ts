@@ -14,6 +14,7 @@ export class StoragesBroker
   fileSystemsFactory: StorageFileSystemsFactory;
   pathsFactory: StoragePathsFactory;
   volumes: Map<string, storage.IStorageVolume>;
+
   constructor(readonly kernel: kernel.IKernel) {
     super("storage", kernel);
     this.fileSystemsFactory = new StorageFileSystemsFactory(this.kernel, this);
@@ -43,6 +44,7 @@ export class StoragesBroker
     await this.pathsFactory.shutdown();
   }
 
+  @logging.logMethod()
   createPathsDriver(
     name: string,
     params?: Record<string, unknown>
@@ -50,6 +52,7 @@ export class StoragesBroker
     return this.pathsFactory.getOneDriver(name, params != null ? params : {});
   }
 
+  @logging.logMethod()
   createFileSystemDriver(
     name: string,
     params?: Record<string, unknown>
@@ -60,35 +63,39 @@ export class StoragesBroker
     );
   }
 
-  mountAll = async (): Promise<void> => {
+  @logging.logMethod()
+  async mountAll(): Promise<void> {
     await Promise.all(
       Array.from(this.volumes.values()).map(
         async (item) => await item.initialize()
       )
     );
-  };
+  }
 
-  unmountAll = async (): Promise<void> => {
+  @logging.logMethod()
+  async unmountAll(): Promise<void> {
     await Promise.all(
       Array.from(this.volumes.values()).map(
         async (item) => await item.shutdown()
       )
     );
-  };
+  }
 
-  getVolume = async (id: string): Promise<storage.IStorageVolume> => {
+  @logging.logMethod()
+  async getVolume(id: string): Promise<storage.IStorageVolume> {
     const volume = this.volumes.get(id);
     if (volume == null)
       throw errors.BasicError.notFound(this.fullName, "getVolume", id);
     return volume;
-  };
+  }
 
-  createEphemeralVolume = async (
+  @logging.logMethod()
+  async createEphemeralVolume(
     paths: string,
     filesystem: string,
     config: Record<string, unknown>,
     parent: kernel.IKernelElement
-  ): Promise<storage.IStorageVolume> => {
+  ): Promise<storage.IStorageVolume> {
     const pathsDriver = this.createPathsDriver(paths, config);
     const filesystemDriver = this.createFileSystemDriver(filesystem, config);
 
@@ -105,5 +112,5 @@ export class StoragesBroker
     this.volumes.set(ephVolume.id, ephVolume);
 
     return ephVolume;
-  };
+  }
 }
