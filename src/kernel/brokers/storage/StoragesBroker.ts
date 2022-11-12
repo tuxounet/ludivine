@@ -1,4 +1,11 @@
-import { bases, storage, errors, logging, kernel } from "@ludivine/runtime";
+import {
+  bases,
+  storage,
+  errors,
+  logging,
+  kernel,
+  config,
+} from "@ludivine/runtime";
 import { LogsVolume } from "../../../volumes/LogsVolume";
 import { ModulesVolume } from "../../../volumes/ModulesVolume";
 import { RunspaceVolume } from "../../../volumes/RunspaceVolume";
@@ -11,28 +18,34 @@ export class StoragesBroker
   extends bases.KernelElement
   implements storage.IStorageBroker
 {
-  fileSystemsFactory: StorageFileSystemsFactory;
-  pathsFactory: StoragePathsFactory;
-  volumes: Map<string, storage.IStorageVolume>;
-
   constructor(readonly kernel: kernel.IKernel) {
     super("storage", kernel);
     this.fileSystemsFactory = new StorageFileSystemsFactory(this.kernel, this);
     this.pathsFactory = new StoragePathsFactory(this.kernel, this);
     this.volumes = new Map();
+    this.config = this.kernel.container.get("config");
   }
+
+  fileSystemsFactory: StorageFileSystemsFactory;
+  pathsFactory: StoragePathsFactory;
+  volumes: Map<string, storage.IStorageVolume>;
+
+  config: config.IConfigBroker;
 
   @logging.logMethod()
   async initialize(): Promise<void> {
     await this.pathsFactory.initialize();
     await this.fileSystemsFactory.initialize();
-    const logsVolume = new LogsVolume(this.kernel, this);
+
+    const prefix = "run/";
+
+    const logsVolume = new LogsVolume(prefix, this.kernel, this);
     this.volumes.set(logsVolume.id, logsVolume);
-    const modulesVolume = new ModulesVolume(this.kernel, this);
+    const modulesVolume = new ModulesVolume(prefix, this.kernel, this);
     this.volumes.set(modulesVolume.id, modulesVolume);
-    const runspaceVolume = new RunspaceVolume(this.kernel, this);
+    const runspaceVolume = new RunspaceVolume(prefix, this.kernel, this);
     this.volumes.set(runspaceVolume.id, runspaceVolume);
-    const workspaceVolume = new WorkspaceVolume(this.kernel, this);
+    const workspaceVolume = new WorkspaceVolume(prefix, this.kernel, this);
     this.volumes.set(workspaceVolume.id, workspaceVolume);
     await this.mountAll();
   }

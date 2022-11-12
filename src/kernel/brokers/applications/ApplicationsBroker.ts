@@ -1,4 +1,4 @@
-import { ShellApp } from "../../../apps/shell";
+import { InterpreterApp } from "../../../apps/InterpreterApp";
 import {
   bases,
   applications,
@@ -47,11 +47,11 @@ export class ApplicationsBroker
   async eval(sessionId: string, request: string): Promise<number> {
     const session = await this.sessions.get(sessionId);
 
-    const shellApp = new ShellApp(session, request);
-    this.applications.set(shellApp.fullName, shellApp);
+    const interpreterApp = new InterpreterApp(session, request);
+    this.applications.set(interpreterApp.fullName, interpreterApp);
 
-    const result = await shellApp.execute();
-    this.applications.delete(shellApp.fullName);
+    const result = await interpreterApp.execute();
+    this.applications.delete(interpreterApp.fullName);
     return result;
   }
 

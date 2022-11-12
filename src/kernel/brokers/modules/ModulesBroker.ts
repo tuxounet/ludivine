@@ -6,6 +6,7 @@ import {
   storage,
   compute,
   logging,
+  config,
 } from "@ludivine/runtime";
 
 export class ModulesBroker
@@ -15,23 +16,17 @@ export class ModulesBroker
   constructor(readonly kernel: kernel.IKernel) {
     super("modules", kernel);
     this.modules = new Map();
-    this.requiredModules = [
-      {
-        name: "@ludivine/endpoints-tui",
-        upstream: "../../../ludivine-endpoints-tui",
-      },
-    ];
+
+    this.config = this.kernel.container.get("config");
     this.storage = this.kernel.container.get("storage");
     this.compute = this.kernel.container.get("compute");
   }
 
   storage: storage.IStorageBroker;
-
+  config: config.IConfigBroker;
   compute: compute.IComputeBroker;
 
   modules: Map<string, modules.IRuntimeModule>;
-
-  requiredModules: modules.IRuntimeModuleSource[];
 
   @logging.logMethod()
   async initialize(): Promise<void> {
@@ -46,7 +41,18 @@ export class ModulesBroker
       );
     }
 
-    for (const requiredModule of this.requiredModules) {
+    const defaultRequiredModules: modules.IRuntimeModuleSource[] = [
+      {
+        name: "@ludivine/endpoints-tui",
+        upstream: "../../../ludivine-endpoints-tui",
+      },
+    ];
+    const requiredModules = await this.config.get(
+      "modules.requiredModules",
+      defaultRequiredModules
+    );
+
+    for (const requiredModule of requiredModules) {
       const modulePresent = await this.findModule(requiredModule.name);
       if (modulePresent != null) continue;
       const module = await this.registerModule(requiredModule);

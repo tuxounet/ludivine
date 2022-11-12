@@ -16,6 +16,7 @@ import { LogsBroker } from "./brokers/logging/LogsBroker";
 import { ModulesBroker } from "./brokers/modules/ModulesBroker";
 import { EndpointsBroker } from "./brokers/endpoints/EndpointsBroker";
 import { SessionsBroker } from "./brokers/sessions/SessionsBroker";
+import { ConfigBroker } from "./brokers/config/ConfigBroker";
 
 export class Kernel implements kernel.IKernel {
   production: boolean;
@@ -97,6 +98,7 @@ export class Kernel implements kernel.IKernel {
   }
 
   private async initialize(): Promise<void> {
+    this.container.registerType("config", ConfigBroker, [this]);
     this.container.registerType("storage", StoragesBroker, [this]);
     this.container.registerType("logs", LogsBroker, [this]);
     this.container.registerType("compute", ComputeBroker, [this]);
@@ -107,6 +109,7 @@ export class Kernel implements kernel.IKernel {
     this.container.registerType("applications", ApplicationsBroker, [this]);
 
     const bootOrder = [
+      "config",
       "storage",
       "logs",
       "compute",

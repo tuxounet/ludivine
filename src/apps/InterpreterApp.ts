@@ -1,6 +1,6 @@
 import { bases, kernel, logging, sessions } from "@ludivine/runtime";
 
-export class ShellApp extends bases.AppElement {
+export class InterpreterApp extends bases.AppElement {
   constructor(readonly session: sessions.ISession, readonly request: string) {
     super("shell", session);
   }
