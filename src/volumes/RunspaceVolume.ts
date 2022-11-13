@@ -1,6 +1,10 @@
 import { kernel, storage } from "@ludivine/runtime";
 export class RunspaceVolume extends storage.StorageVolume {
-  constructor(readonly kernel: kernel.IKernel, parent: kernel.IKernelElement) {
+  constructor(
+    prefix: string,
+    readonly kernel: kernel.IKernel,
+    parent: kernel.IKernelElement
+  ) {
     super(
       "runspace-volume",
       "runspace",
@@ -12,7 +16,7 @@ export class RunspaceVolume extends storage.StorageVolume {
       kernel.container
         .get<storage.IStorageBroker>("storage")
         .createFileSystemDriver("local", {
-          folder: "run/task",
+          folder: prefix + "task",
         }),
       kernel,
       parent

@@ -1,4 +1,4 @@
-import { ShellApp } from "../../../apps/shell";
+import { InterpreterApp } from "../../../apps/InterpreterApp";
 import {
   bases,
   applications,
@@ -6,6 +6,7 @@ import {
   errors,
   sessions,
   messaging,
+  logging,
 } from "@ludivine/runtime";
 import type { kernel } from "@ludivine/runtime";
 
@@ -27,10 +28,12 @@ export class ApplicationsBroker
 
   readonly applications: Map<string, applications.IAppElement>;
 
+  @logging.logMethod()
   async initialize(): Promise<void> {
     await super.initialize();
   }
 
+  @logging.logMethod()
   async shutdown(): Promise<void> {
     await new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -40,37 +43,23 @@ export class ApplicationsBroker
     await super.shutdown();
   }
 
-  async executeRootProcess(): Promise<number> {
-    const sessionId = await this.sessions.begin();
+  @logging.logMethod()
+  async eval(sessionId: number, request: string): Promise<number> {
     const session = await this.sessions.get(sessionId);
 
-    const shellApp = new ShellApp(session);
-    this.applications.set(shellApp.fullName, shellApp);
+    const interpreterApp = new InterpreterApp(session, request);
+    this.applications.set(interpreterApp.fullName, interpreterApp);
 
-    const apps = [shellApp.execute()];
-
-    const rcs = await Promise.all(apps);
-    return rcs.filter((item) => item > 0).length;
+    const result = await interpreterApp.execute();
+    this.applications.delete(interpreterApp.fullName);
+    return result;
   }
 
-  private readonly findApplicationDescriptor = async (
-    name: string
-  ): Promise<modules.IModuleApplicationDescriptor | undefined> => {
-    const result = Array.from(this.modules.modules.values())
-      .map((item) => item.definition.applications)
-      .flat()
-      .find((item) => item?.name === name);
-
-    return result;
-  };
-
-  launchApplication = async (
-    sessionId: string,
-    name: string
-  ): Promise<number> => {
+  @logging.logMethod()
+  async launchApplication(sessionId: number, name: string): Promise<number> {
     const session = await this.sessions.get(sessionId);
 
-    const descriptor = await this.findApplicationDescriptor(name);
+    const descriptor = await this.modules.findApplicationDescriptor(name);
     if (descriptor == null) {
       throw errors.BasicError.notFound(
         this.fullName,
@@ -98,5 +87,5 @@ export class ApplicationsBroker
           descriptor.name
         );
       });
-  };
+  }
 }

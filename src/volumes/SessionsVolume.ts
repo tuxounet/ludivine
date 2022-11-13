@@ -1,13 +1,13 @@
 import { kernel, storage } from "@ludivine/runtime";
-export class WorkspaceVolume extends storage.StorageVolume {
+export class SessionsVolume extends storage.StorageVolume {
   constructor(
     prefix: string,
     readonly kernel: kernel.IKernel,
     parent: kernel.IKernelElement
   ) {
     super(
-      "workspace-volume",
-      "workspace",
+      "sessions-volume",
+      "sessions",
       false,
       true,
       kernel.container
@@ -16,7 +16,7 @@ export class WorkspaceVolume extends storage.StorageVolume {
       kernel.container
         .get<storage.IStorageBroker>("storage")
         .createFileSystemDriver("local", {
-          folder: prefix + "home",
+          folder: prefix + "sessions",
         }),
       kernel,
       parent

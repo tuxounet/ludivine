@@ -3,9 +3,9 @@ import {
   errors,
   logging,
   sessions,
-  endpoints,
   messaging,
   kernel,
+  storage,
 } from "@ludivine/runtime";
 
 import { Session } from "./Session";
@@ -17,51 +17,113 @@ export class SessionsBroker
   constructor(readonly kernel: kernel.IKernel) {
     super("sessions", kernel);
     this.sessions = new Map();
-    this.endpoints = this.kernel.container.get("endpoints");
     this.messaging = this.kernel.container.get("messaging");
+    this.storage = this.kernel.container.get("storage");
+    this.sequence = 0;
   }
 
-  endpoints: endpoints.IEndpointsBroker;
-
   messaging: messaging.IMessagingBroker;
-
-  sessions: Map<string, sessions.ISession>;
+  storage: storage.IStorageBroker;
+  sequence: number;
+  sessions: Map<number, sessions.ISession>;
 
   @logging.logMethod()
   async initialize(): Promise<void> {
+    await this.load();
     await super.initialize();
   }
 
   @logging.logMethod()
   async shutdown(): Promise<void> {
+    await Promise.all(
+      Array.from(this.sessions.values()).map(
+        async (item) => await item.shutdown()
+      )
+    );
+
+    await this.persist();
     await super.shutdown();
   }
 
-  begin = async (): Promise<string> => {
-    const id = "session-" + String(this.sessions.size + 1);
+  @logging.logMethod()
+  async load(): Promise<void> {
+    const sessionVolume = await this.storage.getVolume("sessions");
+    const sessionsFilePath = sessionVolume.paths.combinePaths("sessions.json");
+    const sessionsFileExists = await sessionVolume.fileSystem.existsFile(
+      sessionsFilePath
+    );
+    if (!sessionsFileExists) {
+      await this.persist();
+    }
+    const sessionsState =
+      await sessionVolume.fileSystem.readObjectFile<sessions.files.ISessionsStateFile>(
+        sessionsFilePath
+      );
+    const body = sessionsState.body;
+    if (body == null)
+      throw errors.BasicError.notFound(this.fullName, "sessions.json", "body");
+
+    this.sequence = body.body.sequence;
+  }
+
+  @logging.logMethod()
+  async persist(): Promise<void> {
+    const sessionVolume = await this.storage.getVolume("sessions");
+    const sessionsFilePath = sessionVolume.paths.combinePaths("sessions.json");
+
+    const sessionsStateContent: sessions.files.ISessionsStateFile = {
+      metadata: {
+        id: this.fullName,
+        kind: "sessions",
+      },
+      body: {
+        sequence: this.sequence,
+        sessions: Array.from(this.sessions.values()).map((session) => {
+          return {
+            id: session.id,
+            folder: String(session.id) + "/session.json",
+            state: session.state,
+            sequence: session.sequence,
+          };
+        }),
+      },
+    };
+
+    await sessionVolume.fileSystem.writeObjectFile(
+      sessionsFilePath,
+      sessionsStateContent
+    );
+  }
+
+  @logging.logMethod()
+  async begin(): Promise<number> {
+    this.sequence++;
+
+    const id = this.sequence;
     const session = new Session(id, this);
     this.sessions.set(id, session);
     await session.initialize();
-    await this.endpoints.openEndpoint(session, "cli");
     return id;
-  };
+  }
 
-  get = async (id: string): Promise<sessions.ISession> => {
+  @logging.logMethod()
+  async get(id: number): Promise<sessions.ISession> {
     const instance = this.sessions.get(id);
     if (instance == null) {
-      throw errors.BasicError.notFound(this.fullName, "get", id);
+      throw errors.BasicError.notFound(this.fullName, "get", String(id));
     }
     return instance;
-  };
+  }
 
-  terminate = async (id: string): Promise<boolean> => {
+  @logging.logMethod()
+  async terminate(id: number): Promise<boolean> {
     if (!this.sessions.has(id)) return false;
     const session = this.sessions.get(id);
     if (session == null) return false;
-    await this.endpoints.closeEndpoint(session.id);
+
     await session.terminate();
     await session.shutdown();
     this.sessions.delete(id);
     return true;
-  };
+  }
 }

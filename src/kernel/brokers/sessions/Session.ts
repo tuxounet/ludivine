@@ -1,109 +1,183 @@
-import {
-  bases,
-  channels,
-  logging,
-  messaging,
-  sessions,
-} from "@ludivine/runtime";
+import { bases, errors, logging, messaging, sessions } from "@ludivine/runtime";
 import events from "events";
 import { SessionsBroker } from "./SessionsBroker";
 
 export class Session extends bases.KernelElement implements sessions.ISession {
   constructor(
-    readonly id: string,
+    readonly id: number,
 
     readonly parent: SessionsBroker
   ) {
-    super(id, parent.kernel, parent);
-    this.sequence = 0;
+    super(`session<${id}>`, parent.kernel, parent);
 
     this.emitter = new events.EventEmitter();
+    this.state = "NONE";
+    this.facts = [];
+    this.sequence = 0;
   }
 
-  emitter: events.EventEmitter;
   sequence: number;
+
+  state: string;
+  facts: sessions.facts.ISessionFact[];
+
+  emitter: events.EventEmitter;
 
   @logging.logMethod()
   async initialize(): Promise<void> {
-    await this.parent.endpoints.openEndpoint(this, "cli");
-    await this.parent.messaging.subscribeTopic("/sessions/" + this.id, this);
+    await this.load();
+    await this.parent.messaging.subscribeTopic(
+      "/sessions/" + String(this.id),
+      this
+    );
   }
 
   @logging.logMethod()
   async shutdown(): Promise<void> {
     await this.parent.messaging.unsubscribeTopic(
-      "/sessions/" + this.id,
+      "/sessions/" + String(this.id),
       this.fullName
     );
-
-    await this.parent.endpoints.closeEndpoint(this.id);
+    await this.persist();
   }
 
   @logging.logMethod()
-  protected async waitForReply(
-    sequence: string,
-    timeout: number = 30000
-  ): Promise<messaging.IMessageEvent> {
-    return await new Promise<messaging.IMessageEvent>((resolve, reject) => {
-      const solver = (message: messaging.IMessageEvent): void => {
-        clearTimeout(timoutTmr);
-        resolve(message);
-      };
-      const timoutTmr = setTimeout(() => {
-        clearTimeout(timoutTmr);
-        this.emitter.off(sequence, solver);
+  async load(): Promise<void> {
+    const sessionsVolume = await this.parent.storage.getVolume("sessions");
 
-        reject(new Error("reply timeout for sequence " + sequence));
-      }, timeout);
-      this.emitter.once(sequence, solver);
-    });
+    const sessionFolder = sessionsVolume.paths.combinePaths(String(this.id));
+    const sessionFolderExists = await sessionsVolume.fileSystem.existsDirectory(
+      sessionFolder
+    );
+    if (!sessionFolderExists) {
+      await this.persist();
+    }
+
+    const sessionFile = sessionsVolume.paths.combinePaths(
+      sessionFolder,
+      "session.json"
+    );
+    const sessionFileExits = await sessionsVolume.fileSystem.existsFile(
+      sessionFile
+    );
+    if (!sessionFileExits) {
+      await this.persist();
+    }
+    const sessionFileEntry =
+      await sessionsVolume.fileSystem.readObjectFile<sessions.files.ISessionFile>(
+        sessionFile
+      );
+    if (sessionFileEntry.body == null) {
+      throw errors.BasicError.notFound(this.fullName, "session.json", "body");
+    }
+
+    const sessionFileContent = sessionFileEntry.body;
+    this.sequence = sessionFileContent.body.sequence;
+    this.state = sessionFileContent.body.state;
+    this.facts = sessionFileContent.body.facts;
+  }
+
+  @logging.logMethod()
+  async persist(): Promise<void> {
+    const sessionsVolume = await this.parent.storage.getVolume("sessions");
+    const sessionFolder = sessionsVolume.paths.combinePaths(String(this.id));
+    const sessionFolderExists = await sessionsVolume.fileSystem.existsDirectory(
+      sessionFolder
+    );
+    if (!sessionFolderExists) {
+      await sessionsVolume.fileSystem.createDirectory(sessionFolder);
+    }
+
+    const sessionFile = sessionsVolume.paths.combinePaths(
+      sessionFolder,
+      "session.json"
+    );
+
+    const sessionContent: sessions.files.ISessionFile = {
+      metadata: {
+        id: this.fullName,
+        kind: "session",
+      },
+      body: {
+        id: this.id,
+        state: this.state,
+        sequence: this.sequence,
+        facts: this.facts,
+      },
+    };
+    await sessionsVolume.fileSystem.writeObjectFile(
+      sessionFile,
+      sessionContent
+    );
   }
 
   @logging.logMethod()
   async onMessage(messageEvent: messaging.IMessageEvent): Promise<void> {
     const sequence = messageEvent.body.sequence;
 
-    if (sequence != null && typeof sequence === "string") {
-      this.emitter.emit(sequence, messageEvent);
+    if (sequence != null) {
+      this.emitter.emit("SEQ-" + String(sequence), messageEvent);
     }
   }
 
   @logging.logMethod()
-  async output(out: channels.IOutputMessage): Promise<void> {
-    const endpoint = await this.parent.endpoints.get(this.id);
-    await endpoint.emitOutput(out);
+  async output(
+    body: string,
+    kind: sessions.facts.ISessionFactOutputKind = "message"
+  ): Promise<void> {
+    const fact: sessions.facts.ISessionFactOutput = {
+      type: "output",
+      kind,
+      body,
+      date: new Date().toISOString(),
+      sender: this.fullName,
+      sequence: this.sequence,
+      session: this.id,
+    };
+
+    await this.pushFact(fact);
   }
 
   @logging.logMethod()
-  async input(
-    query: channels.IInputQuery
-  ): Promise<channels.IInputMessage<string>> {
-    this.sequence++;
+  async ask(prompt: string): Promise<void> {
+    const fact: sessions.facts.ISessionFactAsk = {
+      type: "ask",
+      prompt,
+      date: new Date().toISOString(),
+      sender: this.fullName,
+      sequence: this.sequence,
+      session: this.id,
+    };
 
-    const sequence = "I" + String(this.sequence);
-    const endpoint = await this.parent.endpoints.get(this.id);
+    await this.pushFact(fact);
+  }
 
-    await endpoint.emitEvent({
-      type: "input",
-      body: JSON.stringify({
-        session: this.id,
-        sequence,
-        query,
-      }),
+  @logging.logMethod()
+  async waitForReply(
+    sequence: number
+  ): Promise<sessions.facts.ISessionFactReply> {
+    const message = await new Promise<messaging.IMessageEvent>((resolve) => {
+      const solver = (message: messaging.IMessageEvent): void => {
+        resolve(message);
+      };
+
+      this.emitter.once("SEQ-" + String(sequence), solver);
     });
 
-    const message = await this.waitForReply(sequence);
-
     if (message === undefined) {
-      throw new Error("no messsage in reply for sequence " + sequence);
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "reply",
+        String(sequence)
+      );
     }
 
-    const line = String(message.body.value);
-
-    const result: channels.IInputMessage<string> = {
-      sender: message.sender,
-      type: "line",
-      value: line,
+    const result: sessions.facts.ISessionFactReply = {
+      type: "reply",
+      date: new Date().toISOString(),
+      sender: this.fullName,
+      sequence: this.sequence,
+      session: this.id,
     };
 
     return result;
@@ -111,7 +185,21 @@ export class Session extends bases.KernelElement implements sessions.ISession {
 
   @logging.logMethod()
   async terminate(): Promise<boolean> {
-    this.log.warn("terminate query ");
+    const fact: sessions.facts.ISessionFactEnd = {
+      type: "end",
+
+      date: new Date().toISOString(),
+      sender: this.fullName,
+      sequence: this.sequence,
+      session: this.id,
+    };
+    await this.pushFact(fact);
     return true;
+  }
+
+  @logging.logMethod()
+  private async pushFact(fact: sessions.facts.ISessionFact): Promise<void> {
+    this.facts.push(fact);
+    this.sequence++;
   }
 }

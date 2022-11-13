@@ -2,13 +2,14 @@
 
 import { Kernel } from "./kernel/kernel";
 
+const args = process.argv.splice(2);
 const kernel = new Kernel({
   nickname: "ludivine",
   cwdFolder: process.cwd(),
   entryPoint: __dirname,
 });
 kernel
-  .run(process.argv)
+  .run(args)
   .then((rc) => {
     console.info("INFO", "end with result", rc);
     process.exit(rc);

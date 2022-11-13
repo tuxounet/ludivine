@@ -1,39 +1,36 @@
 import { bases, kernel, logging, sessions } from "@ludivine/runtime";
 
-export class ShellApp extends bases.AppElement {
-  constructor(readonly session: sessions.ISession) {
+export class InterpreterApp extends bases.AppElement {
+  constructor(readonly session: sessions.ISession, readonly request: string) {
     super("shell", session);
   }
 
-  readonly imperativePrefix = "!";
+  readonly imperativePrefix = "?";
 
   @logging.logMethod()
   protected async main(): Promise<number> {
-    await this.session.output({ type: "message", body: "bonjour" });
-    while (this.kernel.started) {
-      const input = await this.session.input({ prompt: ">" });
-      if (input === undefined || input.value === undefined) {
-        await this.session.output({ type: "message", body: "aucune entrée" });
-        continue;
-      }
-      const inputLine = String(input.value).trim();
-      if (inputLine === "") {
-        await this.session.output({ type: "message", body: "commande vide" });
-        continue;
-      }
-      await this.session.output({
-        type: "message",
-        body: "commande reçue : " + inputLine,
-      });
+    await this.session.output("bonjour", "message");
 
-      if (inputLine.startsWith(this.imperativePrefix)) {
-        await this.processCommand(inputLine);
-      } else {
-        await this.messaging.publish("/channels/input/natural", {
-          command: inputLine,
-        });
-      }
+    if (
+      this.request === undefined ||
+      typeof this.request !== "string" ||
+      this.request.trim() === ""
+    ) {
+      await this.session.output("aucune entrée", "message");
+      return 1;
     }
+    const inputLine = this.request.trim();
+
+    await this.session.output("commande reçue : " + inputLine, "message");
+
+    if (inputLine.startsWith(this.imperativePrefix)) {
+      await this.processCommand(inputLine);
+    } else {
+      await this.messaging.publish("/channels/input/natural", {
+        command: inputLine,
+      });
+    }
+
     return 0;
   }
 
@@ -86,10 +83,10 @@ export class ShellApp extends bases.AppElement {
         }
 
         const output = await result.apply(broker, args);
-        await this.session.output({
-          type: "message",
-          body: "command ok:" + String(cleanCommand) + " : " + String(output),
-        });
+        await this.session.output(
+          "command ok:" + String(cleanCommand) + " : " + String(output),
+          "message"
+        );
 
         return;
       }
@@ -101,12 +98,11 @@ export class ShellApp extends bases.AppElement {
         Object.keys(anyBroker[item]).includes("fullName")
       );
     });
-    await this.session.output({
-      type: "message",
-      body:
-        "command ok:" +
+    await this.session.output(
+      "command ok:" +
         "bad command : possible tokens " +
         possibleMethods.join(","),
-    });
+      "message"
+    );
   }
 }

@@ -1,14 +1,12 @@
 import {
   bases,
   endpoints,
-  sessions,
   errors,
   kernel,
   messaging,
   logging,
+  modules,
 } from "@ludivine/runtime";
-
-import { CliEndpoint } from "./cli/CliEndpoint";
 
 export class EndpointsBroker
   extends bases.KernelElement
@@ -16,42 +14,45 @@ export class EndpointsBroker
 {
   constructor(readonly kernel: kernel.IKernel) {
     super("endpoints", kernel);
-    this.providers = new Map();
-    this.providers.set("cli", (session) => new CliEndpoint(session, this));
-    this.sessions = new Map();
+
+    this.endpoints = new Map();
     this.messaging = this.kernel.container.get("messaging");
+    this.modules = this.kernel.container.get("modules");
   }
 
   messaging: messaging.IMessagingBroker;
-
-  providers: Map<string, (session: sessions.ISession) => endpoints.IEndpoint>;
-
-  sessions: Map<string, endpoints.IEndpoint>;
+  modules: modules.IModulesBroker;
+  endpoints: Map<string, endpoints.IEndpoint>;
 
   @logging.logMethod()
-  async openEndpoint(session: sessions.ISession, type: string): Promise<void> {
-    const provider = this.providers.get(type);
-    if (provider == null) {
-      throw errors.BasicError.notFound(
-        this.fullName,
-        "openEndpoint/provider",
-        type
-      );
+  async openEndpoint(name: string): Promise<void> {
+    if (this.endpoints.has(name)) {
+      await this.closeEndpoint(name);
     }
 
-    const endpointSession = provider(session);
-
-    this.sessions.set(session.id, endpointSession);
+    const descriptor = await this.modules.findEndpointsDescriptor(name);
+    if (descriptor == null) {
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "openEndpoint/descriptor",
+        name
+      );
+    }
+    const endpoint = descriptor.ctor(this);
+    await endpoint.initialize();
+    this.endpoints.set(name, endpoint);
+    await endpoint.listenAPI();
+    await endpoint.renderUI();
   }
 
   @logging.logMethod()
-  async closeEndpoint(session: string): Promise<void> {}
+  async closeEndpoint(name: string): Promise<void> {}
 
   @logging.logMethod()
-  async get(session: string): Promise<endpoints.IEndpoint> {
-    const endpoint = this.sessions.get(session);
+  async get(name: string): Promise<endpoints.IEndpoint> {
+    const endpoint = this.endpoints.get(name);
     if (endpoint == null) {
-      throw errors.BasicError.notFound(this.fullName, "get/session", session);
+      throw errors.BasicError.notFound(this.fullName, "get", name);
     }
     return endpoint;
   }

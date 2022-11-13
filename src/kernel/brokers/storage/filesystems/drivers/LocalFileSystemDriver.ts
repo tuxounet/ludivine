@@ -152,20 +152,20 @@ export class LocalFileSystemDriver
     const realPath = await this.getRealPath(fullPath);
 
     if (fs.existsSync(realPath)) {
+      if (fs.statSync(realPath).isFile()) {
+        throw errors.BasicError.badQuery(
+          this.fullName,
+          "createDirectory/not-a-directory",
+          fullPath
+        );
+      }
       throw errors.BasicError.badQuery(
         this.fullName,
         "createDirectory/already-exists",
         fullPath
       );
     }
-    if (fs.statSync(realPath).isDirectory()) {
-      throw errors.BasicError.badQuery(
-        this.fullName,
-        "existsFile/not-a-file",
-        fullPath
-      );
-    }
-    fs.mkdirSync(realPath, { recursive: true });
+    await fs.promises.mkdir(realPath, { recursive: true });
     return true;
   }
 
