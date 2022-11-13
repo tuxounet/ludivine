@@ -84,7 +84,7 @@ export class Kernel implements kernel.IKernel {
       level: logging.LogLevel.DEBUG,
       date: new Date().toISOString(),
       line: "waiting until end by " + sender,
-      sender: sender,
+      sender,
     });
     let loopinterval: NodeJS.Timer;
     await new Promise<void>((resolve) => {
@@ -123,6 +123,7 @@ export class Kernel implements kernel.IKernel {
 
     this.started = true;
   }
+
   private async shutdown(): Promise<void> {
     this.started = false;
     await new Promise<void>((resolve) => {

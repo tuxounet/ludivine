@@ -36,7 +36,9 @@ export class SessionsBroker
   @logging.logMethod()
   async shutdown(): Promise<void> {
     await Promise.all(
-      Array.from(this.sessions.values()).map((item) => item.shutdown())
+      Array.from(this.sessions.values()).map(
+        async (item) => await item.shutdown()
+      )
     );
 
     await this.persist();
@@ -44,7 +46,7 @@ export class SessionsBroker
   }
 
   @logging.logMethod()
-  async load() {
+  async load(): Promise<void> {
     const sessionVolume = await this.storage.getVolume("sessions");
     const sessionsFilePath = sessionVolume.paths.combinePaths("sessions.json");
     const sessionsFileExists = await sessionVolume.fileSystem.existsFile(
@@ -58,14 +60,14 @@ export class SessionsBroker
         sessionsFilePath
       );
     const body = sessionsState.body;
-    if (!body)
+    if (body == null)
       throw errors.BasicError.notFound(this.fullName, "sessions.json", "body");
 
     this.sequence = body.body.sequence;
   }
 
   @logging.logMethod()
-  async persist() {
+  async persist(): Promise<void> {
     const sessionVolume = await this.storage.getVolume("sessions");
     const sessionsFilePath = sessionVolume.paths.combinePaths("sessions.json");
 

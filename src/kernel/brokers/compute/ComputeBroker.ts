@@ -33,6 +33,7 @@ export class ComputeBroker
       this.runtimes.map(async (item) => await item.provision())
     );
   }
+
   @logging.logMethod()
   async shutdown(): Promise<void> {
     await Promise.all(

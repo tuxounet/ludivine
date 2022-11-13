@@ -31,7 +31,7 @@ export class EndpointsBroker
     }
 
     const descriptor = await this.modules.findEndpointsDescriptor(name);
-    if (!descriptor) {
+    if (descriptor == null) {
       throw errors.BasicError.notFound(
         this.fullName,
         "openEndpoint/descriptor",

@@ -15,6 +15,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
     this.facts = [];
     this.sequence = 0;
   }
+
   sequence: number;
 
   state: string;
@@ -25,20 +26,23 @@ export class Session extends bases.KernelElement implements sessions.ISession {
   @logging.logMethod()
   async initialize(): Promise<void> {
     await this.load();
-    await this.parent.messaging.subscribeTopic("/sessions/" + this.id, this);
+    await this.parent.messaging.subscribeTopic(
+      "/sessions/" + String(this.id),
+      this
+    );
   }
 
   @logging.logMethod()
   async shutdown(): Promise<void> {
     await this.parent.messaging.unsubscribeTopic(
-      "/sessions/" + this.id,
+      "/sessions/" + String(this.id),
       this.fullName
     );
     await this.persist();
   }
 
   @logging.logMethod()
-  async load() {
+  async load(): Promise<void> {
     const sessionsVolume = await this.parent.storage.getVolume("sessions");
 
     const sessionFolder = sessionsVolume.paths.combinePaths(String(this.id));
@@ -63,7 +67,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
       await sessionsVolume.fileSystem.readObjectFile<sessions.files.ISessionFile>(
         sessionFile
       );
-    if (!sessionFileEntry.body) {
+    if (sessionFileEntry.body == null) {
       throw errors.BasicError.notFound(this.fullName, "session.json", "body");
     }
 
@@ -72,8 +76,9 @@ export class Session extends bases.KernelElement implements sessions.ISession {
     this.state = sessionFileContent.body.state;
     this.facts = sessionFileContent.body.facts;
   }
+
   @logging.logMethod()
-  async persist() {
+  async persist(): Promise<void> {
     const sessionsVolume = await this.parent.storage.getVolume("sessions");
     const sessionFolder = sessionsVolume.paths.combinePaths(String(this.id));
     const sessionFolderExists = await sessionsVolume.fileSystem.existsDirectory(
@@ -110,8 +115,8 @@ export class Session extends bases.KernelElement implements sessions.ISession {
   async onMessage(messageEvent: messaging.IMessageEvent): Promise<void> {
     const sequence = messageEvent.body.sequence;
 
-    if (sequence != null && typeof sequence === "string") {
-      this.emitter.emit("SEQ-" + sequence, messageEvent);
+    if (sequence != null) {
+      this.emitter.emit("SEQ-" + String(sequence), messageEvent);
     }
   }
 
@@ -123,7 +128,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
     const fact: sessions.facts.ISessionFactOutput = {
       type: "output",
       kind,
-      body: body,
+      body,
       date: new Date().toISOString(),
       sender: this.fullName,
       sequence: this.sequence,
@@ -137,7 +142,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
   async ask(prompt: string): Promise<void> {
     const fact: sessions.facts.ISessionFactAsk = {
       type: "ask",
-      prompt: prompt,
+      prompt,
       date: new Date().toISOString(),
       sender: this.fullName,
       sequence: this.sequence,
@@ -156,7 +161,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
         resolve(message);
       };
 
-      this.emitter.once("SEQ-" + sequence, solver);
+      this.emitter.once("SEQ-" + String(sequence), solver);
     });
 
     if (message === undefined) {
@@ -193,7 +198,7 @@ export class Session extends bases.KernelElement implements sessions.ISession {
   }
 
   @logging.logMethod()
-  private async pushFact(fact: sessions.facts.ISessionFact) {
+  private async pushFact(fact: sessions.facts.ISessionFact): Promise<void> {
     this.facts.push(fact);
     this.sequence++;
   }
