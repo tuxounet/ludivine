@@ -1,11 +1,4 @@
-import {
-  bases,
-  channels,
-  errors,
-  logging,
-  messaging,
-  sessions,
-} from "@ludivine/runtime";
+import { bases, errors, logging, messaging, sessions } from "@ludivine/runtime";
 import events from "events";
 import { SessionsBroker } from "./SessionsBroker";
 
@@ -155,7 +148,9 @@ export class Session extends bases.KernelElement implements sessions.ISession {
   }
 
   @logging.logMethod()
-  async waitForReply(sequence: number) {
+  async waitForReply(
+    sequence: number
+  ): Promise<sessions.facts.ISessionFactReply> {
     const message = await new Promise<messaging.IMessageEvent>((resolve) => {
       const solver = (message: messaging.IMessageEvent): void => {
         resolve(message);
@@ -172,12 +167,12 @@ export class Session extends bases.KernelElement implements sessions.ISession {
       );
     }
 
-    const line = String(message.body.value);
-
-    const result: channels.IInputMessage<string> = {
-      sender: message.sender,
-      type: "line",
-      value: line,
+    const result: sessions.facts.ISessionFactReply = {
+      type: "reply",
+      date: new Date().toISOString(),
+      sender: this.fullName,
+      sequence: this.sequence,
+      session: this.id,
     };
 
     return result;
@@ -185,7 +180,6 @@ export class Session extends bases.KernelElement implements sessions.ISession {
 
   @logging.logMethod()
   async terminate(): Promise<boolean> {
-    this.log.warn("terminate query ");
     const fact: sessions.facts.ISessionFactEnd = {
       type: "end",
 

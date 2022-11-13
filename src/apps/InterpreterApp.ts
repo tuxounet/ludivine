@@ -9,22 +9,19 @@ export class InterpreterApp extends bases.AppElement {
 
   @logging.logMethod()
   protected async main(): Promise<number> {
-    await this.session.output({ type: "message", body: "bonjour" });
+    await this.session.output("bonjour", "message");
 
     if (
       this.request === undefined ||
       typeof this.request !== "string" ||
       this.request.trim() === ""
     ) {
-      await this.session.output({ type: "message", body: "aucune entrée" });
+      await this.session.output("aucune entrée", "message");
       return 1;
     }
     const inputLine = this.request.trim();
 
-    await this.session.output({
-      type: "message",
-      body: "commande reçue : " + inputLine,
-    });
+    await this.session.output("commande reçue : " + inputLine, "message");
 
     if (inputLine.startsWith(this.imperativePrefix)) {
       await this.processCommand(inputLine);
@@ -86,10 +83,10 @@ export class InterpreterApp extends bases.AppElement {
         }
 
         const output = await result.apply(broker, args);
-        await this.session.output({
-          type: "message",
-          body: "command ok:" + String(cleanCommand) + " : " + String(output),
-        });
+        await this.session.output(
+          "command ok:" + String(cleanCommand) + " : " + String(output),
+          "message"
+        );
 
         return;
       }
@@ -101,12 +98,11 @@ export class InterpreterApp extends bases.AppElement {
         Object.keys(anyBroker[item]).includes("fullName")
       );
     });
-    await this.session.output({
-      type: "message",
-      body:
-        "command ok:" +
+    await this.session.output(
+      "command ok:" +
         "bad command : possible tokens " +
         possibleMethods.join(","),
-    });
+      "message"
+    );
   }
 }
