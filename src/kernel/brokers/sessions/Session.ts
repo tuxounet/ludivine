@@ -114,60 +114,62 @@ export class Session extends bases.KernelElement implements sessions.ISession {
   }
 
   @logging.logMethod()
-  protected async waitForReply(
-    sequence: string,
-    timeout: number = 30000
-  ): Promise<messaging.IMessageEvent> {
-    return await new Promise<messaging.IMessageEvent>((resolve, reject) => {
-      const solver = (message: messaging.IMessageEvent): void => {
-        clearTimeout(timoutTmr);
-        resolve(message);
-      };
-      const timoutTmr = setTimeout(() => {
-        clearTimeout(timoutTmr);
-        this.emitter.off(sequence, solver);
-
-        reject(new Error("reply timeout for sequence " + sequence));
-      }, timeout);
-      this.emitter.once(sequence, solver);
-    });
-  }
-
-  @logging.logMethod()
   async onMessage(messageEvent: messaging.IMessageEvent): Promise<void> {
     const sequence = messageEvent.body.sequence;
 
     if (sequence != null && typeof sequence === "string") {
-      this.emitter.emit(sequence, messageEvent);
+      this.emitter.emit("SEQ-" + sequence, messageEvent);
     }
   }
 
   @logging.logMethod()
-  async output(out: channels.IOutputMessage): Promise<void> {
-    this.sequence++;
-    const sequence = "O" + String(this.sequence);
+  async output(
+    body: string,
+    kind: sessions.facts.ISessionFactOutputKind = "message"
+  ): Promise<void> {
+    const fact: sessions.facts.ISessionFactOutput = {
+      type: "output",
+      kind,
+      body: body,
+      date: new Date().toISOString(),
+      sender: this.fullName,
+      sequence: this.sequence,
+      session: this.id,
+    };
 
-    await this.pushFact(sequence, "output", { ...out });
+    await this.pushFact(fact);
   }
 
   @logging.logMethod()
-  async input(
-    query: channels.IInputQuery
-  ): Promise<channels.IInputMessage<string>> {
-    this.sequence++;
-
-    const sequence = "I" + String(this.sequence);
-
-    await this.pushFact(sequence, "input", {
+  async ask(prompt: string): Promise<void> {
+    const fact: sessions.facts.ISessionFactAsk = {
+      type: "ask",
+      prompt: prompt,
+      date: new Date().toISOString(),
+      sender: this.fullName,
+      sequence: this.sequence,
       session: this.id,
-      sequence,
-      query,
+    };
+
+    await this.pushFact(fact);
+  }
+
+  @logging.logMethod()
+  async waitForReply(sequence: number) {
+    const message = await new Promise<messaging.IMessageEvent>((resolve) => {
+      const solver = (message: messaging.IMessageEvent): void => {
+        resolve(message);
+      };
+
+      this.emitter.once("SEQ-" + sequence, solver);
     });
 
-    const message = await this.waitForReply(sequence);
-
     if (message === undefined) {
-      throw new Error("no messsage in reply for sequence " + sequence);
+      throw errors.BasicError.notFound(
+        this.fullName,
+        "reply",
+        String(sequence)
+      );
     }
 
     const line = String(message.body.value);
@@ -184,13 +186,21 @@ export class Session extends bases.KernelElement implements sessions.ISession {
   @logging.logMethod()
   async terminate(): Promise<boolean> {
     this.log.warn("terminate query ");
+    const fact: sessions.facts.ISessionFactEnd = {
+      type: "end",
+
+      date: new Date().toISOString(),
+      sender: this.fullName,
+      sequence: this.sequence,
+      session: this.id,
+    };
+    await this.pushFact(fact);
     return true;
   }
 
   @logging.logMethod()
-  private async pushFact(
-    sequence: string,
-    type: string,
-    datas: Record<string, unknown>
-  ) {}
+  private async pushFact(fact: sessions.facts.ISessionFact) {
+    this.facts.push(fact);
+    this.sequence++;
+  }
 }

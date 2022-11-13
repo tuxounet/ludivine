@@ -35,6 +35,10 @@ export class SessionsBroker
 
   @logging.logMethod()
   async shutdown(): Promise<void> {
+    await Promise.all(
+      Array.from(this.sessions.values()).map((item) => item.shutdown())
+    );
+
     await this.persist();
     await super.shutdown();
   }
@@ -76,6 +80,8 @@ export class SessionsBroker
           return {
             id: session.id,
             folder: String(session.id) + "/session.json",
+            state: session.state,
+            sequence: session.sequence,
           };
         }),
       },
