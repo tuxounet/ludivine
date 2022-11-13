@@ -9,6 +9,7 @@ import {
 import { LogsVolume } from "../../../volumes/LogsVolume";
 import { ModulesVolume } from "../../../volumes/ModulesVolume";
 import { RunspaceVolume } from "../../../volumes/RunspaceVolume";
+import { SessionsVolume } from "../../../volumes/SessionsVolume";
 import { WorkspaceVolume } from "../../../volumes/WorkspaceVolume";
 
 import { StorageFileSystemsFactory } from "./filesystems/StorageFileSystemsFactory";
@@ -47,6 +48,8 @@ export class StoragesBroker
     this.volumes.set(runspaceVolume.id, runspaceVolume);
     const workspaceVolume = new WorkspaceVolume(prefix, this.kernel, this);
     this.volumes.set(workspaceVolume.id, workspaceVolume);
+    const sessionsVolume = new SessionsVolume(prefix, this.kernel, this);
+    this.volumes.set(sessionsVolume.id, sessionsVolume);
     await this.mountAll();
   }
 

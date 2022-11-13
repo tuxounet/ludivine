@@ -44,7 +44,7 @@ export class ApplicationsBroker
   }
 
   @logging.logMethod()
-  async eval(sessionId: string, request: string): Promise<number> {
+  async eval(sessionId: number, request: string): Promise<number> {
     const session = await this.sessions.get(sessionId);
 
     const interpreterApp = new InterpreterApp(session, request);
@@ -56,7 +56,7 @@ export class ApplicationsBroker
   }
 
   @logging.logMethod()
-  async launchApplication(sessionId: string, name: string): Promise<number> {
+  async launchApplication(sessionId: number, name: string): Promise<number> {
     const session = await this.sessions.get(sessionId);
 
     const descriptor = await this.modules.findApplicationDescriptor(name);

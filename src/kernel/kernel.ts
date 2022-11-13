@@ -144,12 +144,13 @@ export class Kernel implements kernel.IKernel {
   private async eval(request: string): Promise<number> {
     const sessions = this.container.get<sessions.ISessionsBroker>("sessions");
     const sessionId = await sessions.begin();
+    const session = await sessions.get(sessionId);
     const applications =
       this.container.get<applications.IApplicationsBroker>("applications");
 
     const result = await applications.eval(sessionId, request);
+    await session.terminate();
 
-    await sessions.terminate(sessionId);
     return result;
   }
 }
