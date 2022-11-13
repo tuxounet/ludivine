@@ -5,7 +5,7 @@ export class InterpreterApp extends bases.AppElement {
     super("shell", session);
   }
 
-  readonly imperativePrefix = "!";
+  readonly imperativePrefix = "?";
 
   @logging.logMethod()
   protected async main(): Promise<number> {
