@@ -152,8 +152,8 @@ export class ModulesBroker
     );
 
     // TODO: put it in "storage paths" provider => convertToUri
-    realModuleEntryPoint = realModuleEntryPoint.replace("\\", "/");
     realModuleEntryPoint = realModuleEntryPoint.replace(":", "");
+    realModuleEntryPoint = realModuleEntryPoint.replace(/\\/gi, "/");
     realModuleEntryPoint = "file://" + realModuleEntryPoint;
     this.log.trace(
       "loading external module",
