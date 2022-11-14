@@ -147,10 +147,19 @@ export class ModulesBroker
       modulePackageJsonObj.body.main
     );
 
-    const realModuleEntryPoint = await modulesVolume.fileSystem.getRealPath(
+    let realModuleEntryPoint = await modulesVolume.fileSystem.getRealPath(
       moduleEntryPoint
     );
 
+    realModuleEntryPoint = realModuleEntryPoint.replace("\\", "/");
+    realModuleEntryPoint = realModuleEntryPoint.replace(":", "");
+    realModuleEntryPoint = "file://" + realModuleEntryPoint;
+    this.log.trace(
+      "loading external module",
+      modulePackageJsonObj.body.name,
+      "from",
+      realModuleEntryPoint
+    );
     const moduleDefinition = await import(realModuleEntryPoint);
     if (
       moduleDefinition.default === undefined ||

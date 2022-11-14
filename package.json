@@ -1,6 +1,6 @@
 {
   "name": "ludivine",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "",
   "main": "dist/index.js",
   "bin": "dist/index.js",
@@ -35,6 +35,7 @@
   },
   "homepage": "https://github.com/tuxounet/ludivine#readme",
   "dependencies": {
+    "@ludivine/endpoints-tui": "^0.0.1",
     "@ludivine/runtime": "^0.0.10",
     "body-parser": "^1.20.1",
     "command-exists": "1.2.9",
