@@ -151,7 +151,7 @@ export class ModulesBroker
       moduleEntryPoint
     );
 
-    //TODO: put it in "storage path provider => convertToUri"
+    // TODO: put it in "storage paths" provider => convertToUri
     realModuleEntryPoint = realModuleEntryPoint.replace("\\", "/");
     realModuleEntryPoint = realModuleEntryPoint.replace(":", "");
     realModuleEntryPoint = "file://" + realModuleEntryPoint;
