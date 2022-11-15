@@ -157,6 +157,9 @@ export class ModulesBroker
       "from",
       realModuleEntryPoint
     );
+
+    // TODO: require => Transform as "sys" call
+    /* eslint @typescript-eslint/no-var-requires: off */
     const moduleDefinition = require(realModuleEntryPoint);
     if (moduleDefinition.default === undefined) {
       throw errors.BasicError.notFound(
