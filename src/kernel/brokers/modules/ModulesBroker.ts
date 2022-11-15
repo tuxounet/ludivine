@@ -147,32 +147,25 @@ export class ModulesBroker
       modulePackageJsonObj.body.main
     );
 
-    let realModuleEntryPoint = await modulesVolume.fileSystem.getRealPath(
+    const realModuleEntryPoint = await modulesVolume.fileSystem.getRealPath(
       moduleEntryPoint
     );
 
-    // TODO: put it in "storage paths" provider => convertToUri
-    realModuleEntryPoint = realModuleEntryPoint.replace(":", "");
-    realModuleEntryPoint = realModuleEntryPoint.replace(/\\/gi, "/");
-    realModuleEntryPoint = "file://" + realModuleEntryPoint;
     this.log.trace(
       "loading external module",
       modulePackageJsonObj.body.name,
       "from",
       realModuleEntryPoint
     );
-    const moduleDefinition = await import(realModuleEntryPoint);
-    if (
-      moduleDefinition.default === undefined ||
-      moduleDefinition.default.default === undefined
-    ) {
+    const moduleDefinition = require(realModuleEntryPoint);
+    if (moduleDefinition.default === undefined) {
       throw errors.BasicError.notFound(
         this.fullName,
         "registerModule/default",
         moduleEntryPoint
       );
     }
-    const definition = moduleDefinition.default.default;
+    const definition = moduleDefinition.default;
 
     const module: modules.IRuntimeModule = {
       id: modulePackageJsonObj.body.name,

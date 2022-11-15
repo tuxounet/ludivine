@@ -1,12 +1,13 @@
 {
   "name": "ludivine",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "",
   "main": "dist/index.js",
   "bin": "dist/index.js",
   "scripts": {
     "prebuild": "npm run clean",
     "build": "rollup -c",
+    "build:watch": "rollup -c -w",
     "start": "node .",
     "predev": "npm install --prefer-offline",
     "dev": "nodemon -I",
