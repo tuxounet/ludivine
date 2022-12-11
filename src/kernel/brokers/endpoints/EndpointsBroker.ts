@@ -41,12 +41,17 @@ export class EndpointsBroker
     const endpoint = descriptor.ctor(this);
     await endpoint.initialize();
     this.endpoints.set(name, endpoint);
-    await endpoint.listenAPI();
-    await endpoint.renderUI();
+    await endpoint.open();
   }
 
   @logging.logMethod()
-  async closeEndpoint(name: string): Promise<void> {}
+  async closeEndpoint(name: string): Promise<void> {
+    const endpoint = this.endpoints.get(name);
+    if (endpoint) {
+      await endpoint.close();
+      this.endpoints.delete(name);
+    }
+  }
 
   @logging.logMethod()
   async get(name: string): Promise<endpoints.IEndpoint> {

@@ -137,8 +137,16 @@ export class Kernel implements kernel.IKernel {
   private async endpoint(): Promise<number> {
     const endpoints =
       this.container.get<endpoints.IEndpointsBroker>("endpoints");
-    await endpoints.openEndpoint("tui");
-    await endpoints.closeEndpoint("tui");
+    const config = this.container.get<ConfigBroker>("config");
+    const registeredEndpoint = await config.get("endpoints", []);
+
+    await Promise.race(
+      registeredEndpoint.map((endpoint) => endpoints.openEndpoint(endpoint))
+    );
+    await Promise.all(
+      registeredEndpoint.map((endpoint) => endpoints.closeEndpoint(endpoint))
+    );
+
     return 0;
   }
 

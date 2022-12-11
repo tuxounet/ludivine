@@ -1,5 +1,5 @@
 import { bases, logging, kernel, config, sys } from "@ludivine/runtime";
-
+import initialConfig from "../../../config.json";
 export class ConfigBroker
   extends bases.KernelElement
   implements config.IConfigBroker
@@ -7,6 +7,8 @@ export class ConfigBroker
   constructor(readonly kernel: kernel.IKernel) {
     super("config", kernel);
     this.entries = new Map();
+    const config = initialConfig as Record<string, unknown>;
+    Object.keys(config).forEach((key) => this.entries.set(key, config[key]));
   }
 
   private entries: Map<string, unknown>;
