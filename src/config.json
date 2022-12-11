@@ -1,0 +1,21 @@
+{
+    "modules.requiredModules": [
+        {
+            "name": "@ludivine/endpoints-tui",
+            "upstream": "@ludivine/endpoints-tui"
+        },
+        {
+            "name": "@ludivine/endpoints-web",
+            "upstream": "@ludivine/endpoints-web"
+        },
+        {
+            "name": "@ludivine-apps/shell-natural",
+            "upstream": "@ludivine-apps/shell-natural"
+        }
+    ],
+    "endpoints": [
+        "tui",
+        "web"
+    ],
+    "endpoints.web.port": 7727
+}

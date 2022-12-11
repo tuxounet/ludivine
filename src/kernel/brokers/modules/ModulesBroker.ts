@@ -41,20 +41,9 @@ export class ModulesBroker
       );
     }
 
-    const defaultRequiredModules: modules.IRuntimeModuleSource[] = [
-      {
-        name: "@ludivine/endpoints-tui",
-        upstream: "@ludivine/endpoints-tui",
-      },
-      {
-        name: "@ludivine-apps/shell-natural",
-        upstream: "@ludivine-apps/shell-natural",
-      },
-    ];
-    const requiredModules = await this.config.get(
-      "modules.requiredModules",
-      defaultRequiredModules
-    );
+    const requiredModules = await this.config.get<
+      { name: string; upstream: string }[]
+    >("modules.requiredModules", []);
 
     for (const requiredModule of requiredModules) {
       const modulePresent = await this.findModule(requiredModule.name);
