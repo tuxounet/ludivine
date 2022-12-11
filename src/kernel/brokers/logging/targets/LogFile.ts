@@ -132,7 +132,7 @@ export class LogTargetFile
 
     const format: logging.ILogTimeFormat = {
       YYYY: String(timestamp.getFullYear()),
-      MM: formatData(timestamp.getMonth()),
+      MM: formatData(timestamp.getMonth() + 1),
       DD: formatData(timestamp.getDate()),
       HH: formatData(timestamp.getHours()),
     };
