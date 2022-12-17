@@ -1,4 +1,4 @@
-import { bases, logging, kernel, storage } from "@ludivine/runtime";
+import { bases, logging, kernel } from "@ludivine/runtime";
 import { LogTargetConsole } from "./targets/LogConsole";
 import { LogTargetFile } from "./targets/LogFile";
 
@@ -13,6 +13,7 @@ export class LogsBroker
 
     this.targets = [new LogTargetConsole(this), new LogTargetFile(this)];
   }
+
   @logging.logMethod()
   async initialize(): Promise<void> {
     await Promise.all(

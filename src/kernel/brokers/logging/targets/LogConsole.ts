@@ -7,6 +7,7 @@ export class LogTargetConsole
     super("log-target-console", parent.kernel, parent);
     this.level = logging.LogLevel.DEBUG;
   }
+
   level: logging.LogLevel;
 
   appendLog(line: logging.ILogLine): void {

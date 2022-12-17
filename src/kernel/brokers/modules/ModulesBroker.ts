@@ -97,7 +97,7 @@ export class ModulesBroker
     source: modules.IRuntimeModuleSource
   ): Promise<modules.IRuntimeModule> {
     const modulesVolume = await this.storage.getVolume("modules");
-    const cmd = `npm install --save ${source.upstream}`;
+    const cmd = `npm install --save ${source.upstream ?? source.name}`;
     const result = await this.compute.executeEval(
       "bash-local",
       cmd,

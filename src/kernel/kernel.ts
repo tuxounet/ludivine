@@ -54,6 +54,7 @@ export class Kernel implements kernel.IKernel {
     "sessions",
     "applications",
   ];
+
   run = async (args: string[]): Promise<number> => {
     console.info(
       this.nickname,
@@ -138,10 +139,14 @@ export class Kernel implements kernel.IKernel {
     const registeredEndpoint = await config.get("endpoints", []);
 
     await Promise.race(
-      registeredEndpoint.map((endpoint) => endpoints.openEndpoint(endpoint))
+      registeredEndpoint.map(
+        async (endpoint) => await endpoints.openEndpoint(endpoint)
+      )
     );
     await Promise.all(
-      registeredEndpoint.map((endpoint) => endpoints.closeEndpoint(endpoint))
+      registeredEndpoint.map(
+        async (endpoint) => await endpoints.closeEndpoint(endpoint)
+      )
     );
 
     return 0;

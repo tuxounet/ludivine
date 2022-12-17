@@ -10,6 +10,7 @@ export class LogTargetFile
 
     this.level = logging.LogLevel.TRACE;
   }
+
   level: logging.LogLevel;
   storage?: storage.IStorageBroker;
   private outputInterval?: NodeJS.Timer;
@@ -26,15 +27,17 @@ export class LogTargetFile
     }
   }
 
+  @logging.logMethod()
   async initialize(): Promise<void> {}
 
+  @logging.logMethod()
   async shutdown(): Promise<void> {
     await this.flushLogs();
     this.disablePersistance();
   }
 
   @logging.logMethod()
-  enablePersistence() {
+  enablePersistence(): void {
     this.storage = this.kernel.container.get("storage");
     this.outputInterval = setInterval(() => {
       this.dequeueLogs().catch((e) =>
@@ -47,7 +50,7 @@ export class LogTargetFile
   }
 
   @logging.logMethod()
-  disablePersistance() {
+  disablePersistance(): void {
     this.storage = undefined;
     clearInterval(this.outputInterval);
     this.outputInterval = undefined;
@@ -81,7 +84,7 @@ export class LogTargetFile
   }
 
   private async appendLines(lines: logging.ILogLine[]): Promise<boolean> {
-    if (!this.storage) return false;
+    if (this.storage == null) return false;
 
     const logVolume = await this.storage.getVolume(this.LOG_VOLUME_NAME);
     let dump = lines
@@ -103,7 +106,7 @@ export class LogTargetFile
   }
 
   private async purgeLogFiles(): Promise<boolean> {
-    if (!this.storage) return false;
+    if (this.storage == null) return false;
 
     const logVolume = await this.storage.getVolume(this.LOG_VOLUME_NAME);
     const allFiles = await logVolume.fileSystem.list("");
