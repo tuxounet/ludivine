@@ -42,7 +42,7 @@ export class ModulesBroker
     }
 
     const requiredModules = await this.config.get<
-      { name: string; upstream: string }[]
+      modules.IRuntimeModuleSource[]
     >("modules.requiredModules", []);
 
     for (const requiredModule of requiredModules) {

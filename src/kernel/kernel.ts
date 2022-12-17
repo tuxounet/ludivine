@@ -11,7 +11,6 @@ import { MessagingBroker } from "./brokers/messaging/MessagingBroker";
 import { ComputeBroker } from "./brokers/compute/ComputeBroker";
 import { ApplicationsBroker } from "./brokers/applications/ApplicationsBroker";
 import { StoragesBroker } from "./brokers/storage/StoragesBroker";
-import { InitialLogBroker } from "./brokers/logging/InitialLogBroker";
 import { LogsBroker } from "./brokers/logging/LogsBroker";
 import { ModulesBroker } from "./brokers/modules/ModulesBroker";
 import { EndpointsBroker } from "./brokers/endpoints/EndpointsBroker";
@@ -38,13 +37,23 @@ export class Kernel implements kernel.IKernel {
 
     this.production = process.env.NODE_ENV === "production";
     this.brokers = new Map();
-    this.logs = new InitialLogBroker(this);
+    this.logs = new LogsBroker(this);
     this.container = new ioc.Container(this);
     this.started = false;
   }
 
-  logs: logging.ILogsBroker;
-
+  logs: LogsBroker;
+  bootOrder = [
+    "config",
+    "storage",
+    "logs",
+    "compute",
+    "messaging",
+    "modules",
+    "endpoints",
+    "sessions",
+    "applications",
+  ];
   run = async (args: string[]): Promise<number> => {
     console.info(
       this.nickname,
@@ -98,28 +107,16 @@ export class Kernel implements kernel.IKernel {
   }
 
   private async initialize(): Promise<void> {
+    this.container.registerInstance("logs", this.logs);
     this.container.registerType("config", ConfigBroker, [this]);
     this.container.registerType("storage", StoragesBroker, [this]);
-    this.container.registerType("logs", LogsBroker, [this]);
     this.container.registerType("compute", ComputeBroker, [this]);
     this.container.registerType("messaging", MessagingBroker, [this]);
     this.container.registerType("modules", ModulesBroker, [this]);
     this.container.registerType("endpoints", EndpointsBroker, [this]);
     this.container.registerType("sessions", SessionsBroker, [this]);
     this.container.registerType("applications", ApplicationsBroker, [this]);
-
-    const bootOrder = [
-      "config",
-      "storage",
-      "logs",
-      "compute",
-      "messaging",
-      "modules",
-      "endpoints",
-      "sessions",
-      "applications",
-    ];
-    await this.container.initialize(bootOrder);
+    await this.container.initialize(this.bootOrder);
 
     this.started = true;
   }
@@ -131,7 +128,7 @@ export class Kernel implements kernel.IKernel {
         resolve();
       }, 100);
     });
-    await this.container.shutdown();
+    await this.container.shutdown(this.bootOrder);
   }
 
   private async endpoint(): Promise<number> {

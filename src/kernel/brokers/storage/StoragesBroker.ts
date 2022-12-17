@@ -60,6 +60,13 @@ export class StoragesBroker
     await this.pathsFactory.shutdown();
   }
 
+  async getVolume(id: string): Promise<storage.IStorageVolume> {
+    const volume = this.volumes.get(id);
+    if (volume == null)
+      throw errors.BasicError.notFound(this.fullName, "getVolume", id);
+    return volume;
+  }
+
   @logging.logMethod()
   createPathsDriver(
     name: string,
@@ -95,14 +102,6 @@ export class StoragesBroker
         async (item) => await item.shutdown()
       )
     );
-  }
-
-  @logging.logMethod()
-  async getVolume(id: string): Promise<storage.IStorageVolume> {
-    const volume = this.volumes.get(id);
-    if (volume == null)
-      throw errors.BasicError.notFound(this.fullName, "getVolume", id);
-    return volume;
   }
 
   @logging.logMethod()

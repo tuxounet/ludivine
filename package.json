@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/tuxounet/ludivine#readme",
   "dependencies": {
-    "@ludivine/runtime": "^0.0.11"
+    "@ludivine/runtime": "^0.0.12"
   },
   "devDependencies": {
     "command-exists": "1.2.9",

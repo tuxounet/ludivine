@@ -1,27 +1,42 @@
-import { bases, logging, messaging } from "@ludivine/runtime";
-import { LogsBroker } from "../LogsBroker";
+import { bases, logging, messaging, storage } from "@ludivine/runtime";
 
 export class LogTargetFile
   extends bases.KernelElement
   implements logging.ILogTarget
 {
-  constructor(readonly parent: LogsBroker) {
+  constructor(readonly parent: logging.ILogsBroker) {
     super("log-target-file", parent.kernel, parent);
     this.queue = new messaging.Queue("logging", parent.kernel, this);
-  }
 
+    this.level = logging.LogLevel.TRACE;
+  }
+  level: logging.LogLevel;
+  storage?: storage.IStorageBroker;
   private outputInterval?: NodeJS.Timer;
   queue: messaging.Queue<logging.ILogLine>;
   private readonly LOG_VOLUME_NAME = "logs";
-  private readonly WRITE_DEQUEUE_INTERNAL = 200;
+  private readonly WRITE_DEQUEUE_INTERNAL = 1000;
+  private readonly WRITE_DEQUEUE_BUFFER_MAX = 100;
   private readonly LOG_RETENTION_HOURS = 24;
   private readonly LOG_FILENAME_SUFFIX = "-ludivine.log";
+
   appendLog(line: logging.ILogLine): void {
-    this.queue.enqueue(line);
+    if (line.level >= this.level) {
+      this.queue.enqueue(line);
+    }
   }
 
-  async initialize(): Promise<void> {
-    this.outputInterval = setTimeout(() => {
+  async initialize(): Promise<void> {}
+
+  async shutdown(): Promise<void> {
+    await this.flushLogs();
+    this.disablePersistance();
+  }
+
+  @logging.logMethod()
+  enablePersistence() {
+    this.storage = this.kernel.container.get("storage");
+    this.outputInterval = setInterval(() => {
       this.dequeueLogs().catch((e) =>
         this.log.error("file output loop failed", e)
       );
@@ -31,28 +46,44 @@ export class LogTargetFile
     }, this.WRITE_DEQUEUE_INTERNAL);
   }
 
-  async shutdown(): Promise<void> {
-    clearTimeout(this.outputInterval);
+  @logging.logMethod()
+  disablePersistance() {
+    this.storage = undefined;
+    clearInterval(this.outputInterval);
+    this.outputInterval = undefined;
   }
 
   private async dequeueLogs(): Promise<void> {
     const buffer: logging.ILogLine[] = [];
 
-    while (this.queue.canDequeue() && buffer.length < 20) {
-      const line = await this.queue.dequeue();
+    while (
+      this.queue.canDequeue() &&
+      buffer.length <= this.WRITE_DEQUEUE_BUFFER_MAX
+    ) {
+      const line = this.queue.dequeue();
       buffer.push(line);
     }
-    await this.appendLines(buffer);
-    if (this.kernel.started)
-      this.outputInterval = setTimeout(() => {
-        this.dequeueLogs().catch((e) =>
-          this.log.error("file output loop failed", e)
-        );
-      }, this.WRITE_DEQUEUE_INTERNAL);
+    if (buffer.length > 0) {
+      await this.appendLines(buffer);
+    }
+  }
+
+  private async flushLogs(): Promise<void> {
+    const buffer: logging.ILogLine[] = [];
+
+    while (this.queue.canDequeue()) {
+      const line = this.queue.dequeue();
+      buffer.push(line);
+    }
+    if (buffer.length > 0) {
+      await this.appendLines(buffer);
+    }
   }
 
   private async appendLines(lines: logging.ILogLine[]): Promise<boolean> {
-    const logVolume = await this.parent.storage.getVolume(this.LOG_VOLUME_NAME);
+    if (!this.storage) return false;
+
+    const logVolume = await this.storage.getVolume(this.LOG_VOLUME_NAME);
     let dump = lines
       .map((item) => {
         return `${item.date} ${item.level} ${item.sender} ${item.line}`;
@@ -62,6 +93,7 @@ export class LogTargetFile
     if (lines.length > 0) {
       dump += "\n";
     }
+
     const timeSegments = this.toTimeLogsString();
 
     return await logVolume.fileSystem.appendFile(
@@ -70,8 +102,10 @@ export class LogTargetFile
     );
   }
 
-  private async purgeLogFiles(): Promise<void> {
-    const logVolume = await this.parent.storage.getVolume(this.LOG_VOLUME_NAME);
+  private async purgeLogFiles(): Promise<boolean> {
+    if (!this.storage) return false;
+
+    const logVolume = await this.storage.getVolume(this.LOG_VOLUME_NAME);
     const allFiles = await logVolume.fileSystem.list("");
     const allLogsFiles = allFiles
       .filter((item) => item.path.endsWith(this.LOG_FILENAME_SUFFIX))
@@ -115,6 +149,7 @@ export class LogTargetFile
         async (item) => await logVolume.fileSystem.deleteFile(item.item.path)
       )
     );
+    return true;
   }
 
   private toTimeLogsString(timestamp?: Date): string {
