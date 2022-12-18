@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Kernel } from "./kernel/kernel";
-
+process.env.TZ = "Europe/Paris";
 const args = process.argv.splice(2);
 const kernel = new Kernel({
   nickname: "ludivine",

@@ -16,6 +16,8 @@ import { ModulesBroker } from "./brokers/modules/ModulesBroker";
 import { EndpointsBroker } from "./brokers/endpoints/EndpointsBroker";
 import { SessionsBroker } from "./brokers/sessions/SessionsBroker";
 import { ConfigBroker } from "./brokers/config/ConfigBroker";
+import { SchedulerBroker } from "./brokers/scheduler/SchedulerBroker";
+import { KnowledgeBroker } from "./brokers/knowledge/KnowledgeBroker";
 
 export class Kernel implements kernel.IKernel {
   production: boolean;
@@ -53,6 +55,8 @@ export class Kernel implements kernel.IKernel {
     "endpoints",
     "sessions",
     "applications",
+    "knowledge",
+    "scheduler",
   ];
 
   run = async (args: string[]): Promise<number> => {
@@ -117,6 +121,8 @@ export class Kernel implements kernel.IKernel {
     this.container.registerType("endpoints", EndpointsBroker, [this]);
     this.container.registerType("sessions", SessionsBroker, [this]);
     this.container.registerType("applications", ApplicationsBroker, [this]);
+    this.container.registerType("scheduler", SchedulerBroker, [this]);
+    this.container.registerType("knowledge", KnowledgeBroker, [this]);
     await this.container.initialize(this.bootOrder);
 
     this.started = true;
