@@ -47,7 +47,7 @@ export class EndpointsBroker
   @logging.logMethod()
   async closeEndpoint(name: string): Promise<void> {
     const endpoint = this.endpoints.get(name);
-    if (endpoint) {
+    if (endpoint != null) {
       await endpoint.close();
       this.endpoints.delete(name);
     }
